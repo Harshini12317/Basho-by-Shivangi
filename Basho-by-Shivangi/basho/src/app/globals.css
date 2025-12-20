@@ -1,13 +1,8 @@
+@import "tailwindcss";
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,8 +12,108 @@
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Organic, earthy styling with imperfect shapes */
+@layer utilities {
+  .organic-shadow {
+    box-shadow:
+      0 15px 35px rgba(68, 45, 28, 0.15),
+      0 8px 20px rgba(142, 80, 34, 0.1),
+      0 4px 10px rgba(200, 132, 40, 0.08);
+  }
+
+  .clay-texture {
+    background-image:
+      radial-gradient(circle at 25% 25%, rgba(237, 216, 180, 0.4) 0%, transparent 40%),
+      radial-gradient(circle at 75% 75%, rgba(200, 132, 40, 0.3) 0%, transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(68, 45, 28, 0.2) 0%, transparent 50%),
+      radial-gradient(circle at 10% 90%, rgba(142, 80, 34, 0.25) 0%, transparent 35%),
+      radial-gradient(circle at 90% 10%, rgba(101, 40, 16, 0.15) 0%, transparent 40%),
+      linear-gradient(135deg, rgba(237, 216, 180, 0.1) 0%, transparent 25%, transparent 75%, rgba(237, 216, 180, 0.1) 100%),
+      linear-gradient(45deg, rgba(200, 132, 40, 0.05) 0%, transparent 50%, rgba(142, 80, 34, 0.05) 100%);
+  }
+
+  .imperfect-shape-1 {
+    clip-path: polygon(0% 0%, 95% 0%, 100% 8%, 100% 92%, 92% 100%, 0% 100%);
+  }
+
+  .imperfect-shape-2 {
+    clip-path: polygon(0% 0%, 98% 0%, 100% 5%, 100% 95%, 95% 100%, 0% 100%);
+  }
+
+  .imperfect-shape-3 {
+    clip-path: polygon(0% 0%, 96% 0%, 100% 6%, 100% 94%, 94% 100%, 0% 100%);
+  }
+
+  .imperfect-shape-4 {
+    clip-path: polygon(0% 0%, 97% 0%, 100% 4%, 100% 96%, 96% 100%, 0% 100%);
+  }
+
+  .handcrafted-border {
+    border-image: linear-gradient(45deg, #EDD8B4, #8E5022, #652810) 1;
+  }
+
+  .organic-float {
+    animation: organic-float 6s ease-in-out infinite;
+  }
+
+  @keyframes organic-float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-5px) rotate(1deg); }
+    50% { transform: translateY(-10px) rotate(0deg); }
+    75% { transform: translateY(-5px) rotate(-1deg); }
+  }
+}
+
+/* Custom scrollbar for earthy feel */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #EDD8B4;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #8E5022, #C85428);
+  border-radius: 5px;
+  border: 2px solid #EDD8B4;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #652810, #8E5022);
+}
+
+/* Imperfect button hover effects */
+.organic-button:hover {
+  transform: scale(1.05) rotate(1deg);
+  box-shadow:
+    0 20px 40px rgba(68, 45, 28, 0.2),
+    0 12px 25px rgba(142, 80, 34, 0.15);
+}
+
+/* Enhanced background with earthy gradient using many color variations */
+.japanese-bg {
+  background: linear-gradient(135deg, 
+    #EDD8B4 0%, 
+    #F0E4C3 5%, 
+    #E8D5B7 10%, 
+    #E0C9A3 15%, 
+    #D4B08A 20%, 
+    #C8A77A 25%, 
+    #C85428 30%, 
+    #B84A22 35%, 
+    #A84A20 40%, 
+    #8E5022 45%, 
+    #7A4520 50%, 
+    #6A3D1C 55%, 
+    #652810 60%, 
+    #5A2410 65%, 
+    #4A1F0F 70%, 
+    #442D1C 75%, 
+    #3D2518 80%, 
+    #362015 85%, 
+    #2F1B12 90%, 
+    #28160F 95%, 
+    #1F120C 100%);
 }

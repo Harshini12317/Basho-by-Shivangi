@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Product from "@/models/Product";
 
+interface Props {
+  params: Promise<{ slug: string }>;
+}
+
 const dummyProducts = [
   {
     _id: "1",
@@ -66,10 +70,16 @@ const dummyProducts = [
   },
 ];
 
-export async function GET() {
+export async function GET(req: Request, { params }: Props) {
   try {
-    // For now, return dummy data
-    return NextResponse.json(dummyProducts);
+    const { slug } = await params;
+    const product = dummyProducts.find(p => p.slug === slug);
+
+    if (!product) {
+      return NextResponse.json({ message: "Product not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(product);
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
