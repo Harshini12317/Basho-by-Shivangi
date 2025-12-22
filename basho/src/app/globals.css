@@ -1,48 +1,64 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
-/* Elegant, earthy styling with refined aesthetics */
+/* ------------------------------
+   Brand Color System (Modern)
+-------------------------------- */
+:root {
+  --bg-primary: #fbf7f2;       /* warm porcelain */
+  --bg-secondary: #f4ede4;     /* clay wash */
+  --bg-glass: rgba(255, 255, 255, 0.6);
+
+  --text-primary: #2a1f17;     /* deep brown */
+  --text-muted: #6b5a4c;
+
+  --accent-clay: #c26a3a;
+  --accent-sand: #e8d5b7;
+
+  --border-soft: rgba(42, 31, 23, 0.08);
+
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ------------------------------
+   Base Reset & Feel
+-------------------------------- */
+html,
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+* {
+  transition:
+    background-color 0.6s var(--ease-soft),
+    color 0.6s var(--ease-soft),
+    border-color 0.6s var(--ease-soft),
+    transform 0.6s var(--ease-soft);
+}
+
+/* ------------------------------
+   Glass / Modern UI
+-------------------------------- */
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid var(--border-soft);
+}
+
+/* ------------------------------
+   Soft Organic Shadow (Luxury)
+-------------------------------- */
 @layer utilities {
   .organic-shadow {
     box-shadow:
-      0 20px 40px rgba(68, 45, 28, 0.12),
-      0 12px 24px rgba(142, 80, 34, 0.08),
-      0 6px 12px rgba(200, 132, 40, 0.06);
-  }
-
-  .clay-texture {
-    background-image:
-      radial-gradient(circle at 25% 25%, rgba(237, 216, 180, 0.4) 0%, transparent 40%),
-      radial-gradient(circle at 75% 75%, rgba(200, 132, 40, 0.3) 0%, transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(68, 45, 28, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 10% 90%, rgba(142, 80, 34, 0.25) 0%, transparent 35%),
-      radial-gradient(circle at 90% 10%, rgba(101, 40, 16, 0.15) 0%, transparent 40%),
-      linear-gradient(135deg, rgba(237, 216, 180, 0.1) 0%, transparent 25%, transparent 75%, rgba(237, 216, 180, 0.1) 100%),
-      linear-gradient(45deg, rgba(200, 132, 40, 0.05) 0%, transparent 50%, rgba(142, 80, 34, 0.05) 100%);
-  }
-
-  .elegant-rounded {
-    border-radius: 16px;
-  }
-
-  .elegant-rounded-lg {
-    border-radius: 24px;
-  }
-
-  .elegant-rounded-xl {
-    border-radius: 32px;
-  }
-
-  .refined-border {
-    border: 2px solid rgba(237, 216, 180, 0.3);
-  }
-
-  .handcrafted-border {
-    border-image: linear-gradient(45deg, #EDD8B4, #8E5022, #652810) 1;
+      0 20px 40px rgba(42, 31, 23, 0.08),
+      0 10px 20px rgba(42, 31, 23, 0.04);
   }
 
   .organic-float {
-    animation: organic-float 6s ease-in-out infinite;
+    animation: organic-float 8s ease-in-out infinite;
   }
 
   .clay-morphism {
@@ -73,10 +89,12 @@
   }
 
   @keyframes organic-float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    25% { transform: translateY(-3px) rotate(0.5deg); }
-    50% { transform: translateY(-6px) rotate(0deg); }
-    75% { transform: translateY(-3px) rotate(-0.5deg); }
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
   }
 
   @keyframes gentle-sway {
@@ -135,44 +153,54 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
 }
 
-/* Custom scrollbar for earthy feel */
+/* ------------------------------
+   Minimal Scrollbar
+-------------------------------- */
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: linear-gradient(180deg, #EDD8B4, #F0E4C3);
-  border-radius: 8px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #8E5022, #C85428);
-  border-radius: 8px;
-  border: 3px solid #EDD8B4;
+  background: rgba(42, 31, 23, 0.25);
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #652810, #8E5022);
+  background: rgba(42, 31, 23, 0.4);
 }
 
-/* Elegant button hover effects */
+/* ------------------------------
+   Soft Buttons
+-------------------------------- */
+.organic-button {
+  transition: transform 0.4s var(--ease-soft),
+              box-shadow 0.4s var(--ease-soft);
+}
+
 .organic-button:hover {
-  transform: translateY(-2px) scale(1.02);
+  transform: translateY(-2px);
   box-shadow:
-    0 15px 35px rgba(68, 45, 28, 0.15),
-    0 8px 20px rgba(142, 80, 34, 0.1);
+    0 12px 30px rgba(42, 31, 23, 0.15);
 }
 
-/* Enhanced background with sophisticated earthy gradient */
+/* ------------------------------
+   Subtle Background Texture
+-------------------------------- */
 .japanese-bg {
-  background: linear-gradient(135deg,
-    #F8F5F0 0%,
-    #F0E8DD 15%,
-    #E8DCC7 30%,
-    #E0D4B1 45%,
-    #D8CC9B 60%,
-    #D0C485 75%,
-    #C8BC6F 90%,
-    #C0B459 100%);
-  background-attachment: fixed;
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(232, 213, 183, 0.35),
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 80% 30%,
+      rgba(194, 106, 58, 0.12),
+      transparent 55%
+    ),
+    var(--bg-primary);
 }

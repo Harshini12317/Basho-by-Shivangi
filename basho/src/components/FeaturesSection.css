@@ -1,0 +1,124 @@
+/* ===============================
+   FEATURES SECTION (TIGHTER)
+================================ */
+.features-section {
+  background: var(--bg-primary);
+  padding: 110px 0; /* ⬅ reduced from 180 */
+}
+
+/* ===============================
+   CONTAINER
+================================ */
+.features-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 64px; /* ⬅ slightly tighter */
+}
+
+/* ===============================
+   HEADER
+================================ */
+.features-header {
+  max-width: 720px;
+  margin-bottom: 64px; /* ⬅ reduced */
+}
+
+.features-header h2 {
+  font-family: serif;
+  font-size: 4.2rem;     /* ⬅ BIGGER */
+  line-height: 1.1;     /* ⬅ tighter */
+  color: var(--text-primary);
+  margin-bottom: 18px;
+}
+
+.features-header p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+/* ===============================
+   GRID (TIGHTER)
+================================ */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 72px 80px; /* ⬅ reduced from 120px */
+}
+
+/* ===============================
+   FEATURE CARD
+================================ */
+.feature-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; /* ⬅ tighter */
+}
+
+/* smaller stagger */
+.feature-card.offset {
+  margin-top: 36px; /* ⬅ reduced from 80 */
+}
+
+/* ===============================
+   IMAGE
+================================ */
+.feature-image {
+  position: relative;
+  height: 240px; /* ⬅ slightly smaller */
+  border-radius: 20px;
+  overflow: hidden;
+
+  box-shadow:
+    0 14px 32px rgba(42, 31, 23, 0.12);
+}
+
+.feature-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s var(--ease-soft);
+}
+
+.feature-card:hover .feature-image img {
+  transform: scale(1.04);
+}
+
+/* ===============================
+   CONTENT
+================================ */
+.feature-content h3 {
+  font-size: 1.4rem; /* ⬅ slightly bolder */
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.feature-content p {
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  max-width: 420px;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 900px) {
+  .features-container {
+    padding: 0 28px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .feature-card.offset {
+    margin-top: 0;
+  }
+
+  .features-header h2 {
+    font-size: 3.2rem;
+  }
+}
