@@ -9,6 +9,9 @@
   --bg-secondary: #f4ede4;     /* clay wash */
   --bg-glass: rgba(255, 255, 255, 0.6);
 
+  /* Unified radius for elegant UI */
+  --global-radius: 12px;
+
   --text-primary: #2a1f17;     /* deep brown */
   --text-muted: #6b5a4c;
 
@@ -114,6 +117,34 @@ body {
     transform: translateY(-6px) scale(1.01);
     box-shadow: 0 25px 50px rgba(68, 45, 28, 0.15);
   }
+
+  /* Elegant rounded utilities used across the app */
+  .elegant-rounded-sm { border-radius: calc(var(--global-radius) - 6px); }
+  .elegant-rounded-lg { border-radius: calc(var(--global-radius) - 2px); }
+  .elegant-rounded-xl { border-radius: calc(var(--global-radius)); }
+  .elegant-rounded-2xl { border-radius: calc(var(--global-radius) + 6px); }
+  .elegant-rounded-3xl { border-radius: calc(var(--global-radius) + 12px); }
+
+  /* File input styling fallback for non-tailwind file: selectors */
+  input[type="file"] { border-radius: calc(var(--global-radius) - 4px); }
+
+  /* Form controls refinement */
+  input[type="text"], input[type="email"], input[type="tel"], textarea, select {
+    border-radius: calc(var(--global-radius) - 4px);
+    border: 1px solid rgba(42,31,23,0.08);
+    padding: 0.6rem 0.9rem;
+    background: rgba(255,255,255,0.85);
+  }
+
+  /* form background utility to match primary name input (warm porcelain tint) */
+  .form-bg, input.form-bg, textarea.form-bg {
+    background: linear-gradient(180deg, rgba(237,216,180,0.45), rgba(255,255,255,0.6));
+    color: var(--text-primary);
+    border: 1px solid rgba(68,45,28,0.06);
+  }
+
+  /* Card and gallery refinements used in custom-order */
+  .card-soft { background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(237,216,180,0.02)); border: 1px solid rgba(68,45,28,0.04); border-radius: var(--global-radius); padding: 1rem; }
 
   /* Typewriter effect */
   .typewriter-cursor {

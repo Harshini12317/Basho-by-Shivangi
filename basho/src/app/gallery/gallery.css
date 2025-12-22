@@ -1,0 +1,6 @@
+@import '../../components/MediaShowcase.css';
+
+/* gallery-specific overrides (kept minimal) */
+.ms-hero { padding: 2.25rem 1.5rem; }
+.ms-hero-title { font-size: 2.25rem; }
+.ms-root { padding: 1.5rem; }

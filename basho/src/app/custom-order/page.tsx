@@ -144,13 +144,13 @@ export default function CustomOrderPage() {
                 ]
               }
             ].map((order) => (
-              <div key={order.id} className="bg-[#F5E6C3]/50 elegant-rounded-xl p-6 border border-[#8E5022]/20 hover:shadow-lg transition-shadow">
-                <div className="grid grid-cols-2 gap-2 mb-4">
+              <div key={order.id} className="card-soft elegant-rounded-2xl p-6 border border-[#8E5022]/20 hover:shadow-lg transition-shadow">
+                <div className="grid grid-cols-2 gap-3 mb-6">
                   {order.images.map((image, index) => (
                     <img
                       key={index}
                       src={image}
-                      className="w-full h-24 object-cover elegant-rounded-lg border-2 border-white"
+                      className="w-full h-32 md:h-40 object-cover elegant-rounded-lg border-2 border-white"
                       alt={`${order.name} - ${index + 1}`}
                     />
                   ))}
@@ -174,7 +174,7 @@ export default function CustomOrderPage() {
                   placeholder="Enter your full name"
                   value={customOrderForm.name}
                   onChange={(e) => setCustomOrderForm({ ...customOrderForm, name: e.target.value })}
-                  className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors bg-white/50"
+                  className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors form-bg"
                   required
                 />
               </div>
@@ -185,7 +185,7 @@ export default function CustomOrderPage() {
                   placeholder="your.email@example.com"
                   value={customOrderForm.email}
                   onChange={(e) => setCustomOrderForm({ ...customOrderForm, email: e.target.value })}
-                  className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors bg-white/50"
+                    className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors form-bg"
                   required
                 />
               </div>
@@ -198,29 +198,29 @@ export default function CustomOrderPage() {
                 placeholder="+91 98765 43210"
                 value={customOrderForm.phone}
                 onChange={(e) => setCustomOrderForm({ ...customOrderForm, phone: e.target.value })}
-                className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors bg-white/50"
+                className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors form-bg"
                 required
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 mb-6">
               <label className="text-[#442D1C] font-semibold text-lg serif">Describe Your Vision</label>
               <textarea
                 placeholder="Tell us about your dream pottery piece. Include details like size, shape, color preferences, intended use, and any special features..."
                 value={customOrderForm.description}
                 onChange={(e) => setCustomOrderForm({ ...customOrderForm, description: e.target.value })}
-                className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors h-40 resize-none bg-white/50"
+                className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors h-40 resize-none form-bg"
                 required
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 mb-6">
               <label className="text-[#442D1C] font-semibold text-lg serif">Additional Notes (Optional)</label>
               <textarea
                 placeholder="Any specific requirements, timeline preferences, or other details..."
                 value={customOrderForm.notes}
                 onChange={(e) => setCustomOrderForm({ ...customOrderForm, notes: e.target.value })}
-                className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors h-32 resize-none bg-white/50"
+                className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors h-32 resize-none form-bg"
               />
             </div>
 
@@ -238,7 +238,7 @@ export default function CustomOrderPage() {
                     setCustomOrderForm({ ...customOrderForm, referenceImages: urls });
                   }
                 }}
-                className="w-full p-4 border-2 border-dashed border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors file:mr-4 file:py-3 file:px-6 file:elegant-rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#8E5022] file:text-white hover:file:bg-[#652810] bg-white/50"
+                className="w-full p-4 border-2 border-dashed border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors file:mr-4 file:py-3 file:px-6 file:elegant-rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#8E5022] file:text-white hover:file:bg-[#652810] form-bg"
               />
               {customOrderForm.referenceImages.length > 0 && (
                 <div className="flex flex-wrap gap-4 mt-4">

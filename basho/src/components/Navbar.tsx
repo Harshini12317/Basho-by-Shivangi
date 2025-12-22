@@ -34,6 +34,7 @@ export default function Navbar() {
   <div className="nav-links left-links">
   <Link href="/">Home</Link>
   <Link href="/about">About</Link>
+  <Link href="/gallery">Gallery</Link>
 </div>
 
     <div className="nav-logo">
@@ -43,6 +44,7 @@ export default function Navbar() {
 
     <div className="nav-links right-links">
       <Link href="/products">Products</Link>
+      <Link href="/media?tab=Media">Media</Link>
       <Link href="/workshop/register">Workshop</Link>
     </div>
 
