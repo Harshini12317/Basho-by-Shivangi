@@ -7,15 +7,17 @@ import Navbar from "@/components/Navbar";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Basho Pottery",
+  title: "Basho by Shivangi",
   description: "Handcrafted pottery and custom tableware",
 };
 
@@ -25,15 +27,35 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      className="scroll-smooth"
+      suppressHydrationWarning
+    >
       <head>
-        <Script src="https://checkout.razorpay.com/v1/checkout.js" />
+        {/* Razorpay */}
+        <Script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="beforeInteractive"
+        />
       </head>
+
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased japanese-bg min-h-screen`}
+        className={`
+          ${geistSans.variable}
+          ${geistMono.variable}
+          antialiased
+          min-h-screen
+          bg-[var(--bg-primary)]
+          text-[var(--text-primary)]
+          overflow-x-hidden
+        `}
       >
+        {/* Glass Navbar */}
         <Navbar />
-        <main className="pt-20">
+
+        {/* Main Content */}
+        <main className="relative">
           {children}
         </main>
       </body>

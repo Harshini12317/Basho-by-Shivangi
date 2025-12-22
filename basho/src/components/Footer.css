@@ -1,0 +1,113 @@
+/* ===============================
+   FOOTER
+================================ */
+.footer {
+  background: var(--bg-secondary);
+  padding: 100px 0 40px;
+  border-top: 1px solid var(--border-soft);
+}
+
+/* ===============================
+   CONTAINER
+================================ */
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 64px;
+
+  display: grid;
+  grid-template-columns: 1.2fr 1.5fr 1fr;
+  gap: 80px;
+}
+
+/* ===============================
+   BRAND
+================================ */
+.footer-brand h3 {
+  font-family: serif;
+  font-size: 2rem;
+  margin-bottom: 14px;
+  color: var(--text-primary);
+}
+
+.footer-brand p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  max-width: 260px;
+}
+
+/* ===============================
+   LINKS
+================================ */
+.footer-links {
+  display: flex;
+  gap: 80px;
+}
+
+.footer-links div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-links span {
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.footer-links a {
+  text-decoration: none;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  transition: opacity 0.3s ease;
+}
+
+.footer-links a:hover {
+  opacity: 0.6;
+}
+
+/* ===============================
+   NOTE
+================================ */
+.footer-note {
+  font-family: serif;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+/* ===============================
+   BOTTOM
+================================ */
+.footer-bottom {
+  margin-top: 80px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-soft);
+
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 900px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 48px;
+    padding: 0 32px;
+  }
+
+  .footer-links {
+    gap: 48px;
+  }
+
+  .footer-note {
+    font-size: 1rem;
+  }
+}
