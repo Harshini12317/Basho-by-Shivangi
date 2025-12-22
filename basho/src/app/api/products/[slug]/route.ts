@@ -66,10 +66,18 @@ const dummyProducts = [
   },
 ];
 
-export async function GET() {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ slug: string }> }
+) {
   try {
-    // For now, return dummy data
-    return NextResponse.json(dummyProducts);
+    const { slug } = await params;
+    // For now, return dummy data - find the product by slug
+    const product = dummyProducts.find(p => p.slug === slug);
+    if (!product) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+    return NextResponse.json(product);
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
