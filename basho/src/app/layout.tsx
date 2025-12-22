@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import NavbarWrapper from "@/components/NavbarWrapper";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -23,17 +23,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html
-      lang="en"
-      className="scroll-smooth"
-      suppressHydrationWarning
-    >
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <head>
-        {/* Razorpay */}
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
           strategy="beforeInteractive"
@@ -51,10 +46,9 @@ export default function RootLayout({
           overflow-x-hidden
         `}
       >
-        {/* Glass Navbar */}
-        <Navbar />
+        {/* 👇 Navbar logic moved out */}
+        <NavbarWrapper />
 
-        {/* Main Content */}
         <main className="relative">
           {children}
         </main>
