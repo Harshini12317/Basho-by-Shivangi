@@ -231,7 +231,10 @@ export default function CheckoutPage() {
                 type="text"
                 placeholder="Name"
                 value={customer.name}
-                onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
+               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+  setCustomer({ ...customer, name: e.target.value })
+}
+
                 className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors"
                 required
               />
@@ -239,7 +242,9 @@ export default function CheckoutPage() {
                 type="email"
                 placeholder="Email"
                 value={customer.email}
-                onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+  setCustomer({ ...customer, email: e.target.value })
+}
                 className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors"
                 required
               />
@@ -247,7 +252,10 @@ export default function CheckoutPage() {
                 type="tel"
                 placeholder="Phone"
                 value={customer.phone}
-                onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
+               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+  setCustomer({ ...customer, phone: e.target.value })
+}
+  
                 className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors"
                 required
               />
@@ -255,7 +263,7 @@ export default function CheckoutPage() {
                 type="text"
                 placeholder="GST Number (Optional)"
                 value={customer.gstNumber}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setCustomer({ ...customer, gstNumber: e.target.value });
                   setGstIncluded(!!e.target.value);
                 }}

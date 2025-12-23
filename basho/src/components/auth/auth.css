@@ -1,0 +1,149 @@
+.auth-page {
+  min-height: 100vh;
+  background: #faf7f2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* BACKGROUND */
+.auth-background-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.auth-bg {
+  width: 100%;
+  height: 100%;
+}
+
+/* CLOSE BUTTON */
+.close-btn {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid #d6c8b8;
+  background: #ffffff;
+  cursor: pointer;
+  z-index: 3;
+
+  display: flex;              /* 👇 THIS */
+  align-items: center;        /* 👇 */
+  justify-content: center;    /* 👇 */
+
+  padding: 0;                 /* 👇 important */
+}
+
+.close-btn:hover {
+  background: #f4efe9;
+  transform: scale(1.05);
+}
+
+
+
+/* CONTAINER */
+.auth-container {
+  width: 900px;
+  height: 480px;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 30px 60px rgba(0,0,0,.1);
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+}
+
+/* FORM */
+.form-panel {
+  width: 50%;
+  height: 100%;
+  padding: 50px;
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.login { left: 0; }
+.signup { left: 50%; transform: translateX(100%); }
+
+.auth-container.active .login { transform: translateX(-100%); }
+.auth-container.active .signup { transform: translateX(0); }
+
+.form-panel h2 {
+  font-family: serif;
+  font-size: 2.3rem;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #7a6652;
+}
+
+.form-panel input {
+  padding: 12px 12px 12px 42px;
+  width: 260px;
+  border-radius: 10px;
+  border: 1px solid #e6ddd2;
+  background: #faf7f2;
+}
+
+/* BUTTONS */
+.form-panel button {
+  padding: 12px 24px;
+  border-radius: 999px;
+  border: none;
+  background: #3b2f2f;
+  color: white;
+  cursor: pointer;
+}
+
+/* GOOGLE BUTTON */
+.social-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #e6ddd2;
+  box-shadow: 0 10px 25px rgba(0,0,0,.12);
+  transition: all .3s ease;
+}
+
+.social-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* OVERLAY */
+.overlay-panel {
+  position: absolute;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background: #f4efe9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.auth-container.active .overlay-panel {
+  transform: translateX(-100%);
+}
+
+.auth-bg canvas {
+  filter: blur(60px);
+  opacity: 0.6;
+}
