@@ -53,7 +53,7 @@ export default function Home() {
       {/* ================= GSAP PRODUCT SLIDER ================= */}
       <GsapSlider />
       <FeaturesSection />
-      <Footer />
+      
       
     </>
   );

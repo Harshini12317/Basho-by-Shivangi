@@ -1,0 +1,49 @@
+.about-hero {
+  position: relative;
+  height: 100vh;
+  background: #faf6ef;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-bg {
+  object-fit: cover;
+  opacity: 0.18;
+  filter: grayscale(100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 1rem;
+   transform: translateY(-7.5rem);
+}
+
+.hero-h1 {
+  font-size: clamp(3.5rem, 8vw, 6rem);
+  font-weight: 500;
+  line-height: 0.95;
+  color: #4a2f1b;
+}
+
+.hero-h2 {
+  margin-top: 1rem;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  font-weight: 400;
+  max-width: 38rem;
+  margin-inline: auto;
+  color: #6b4a2f;
+  line-height: 1.4;
+}
+
+/* Required for SplitText */
+[data-drop-text] {
+  display: block;
+}
+
+[data-drop-text] div {
+  display: inline-block;
+}

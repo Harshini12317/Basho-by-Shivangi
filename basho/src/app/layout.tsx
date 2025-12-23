@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
+import Footer from "@/components/Footer";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -52,6 +53,7 @@ export default function RootLayout({
         <main className="relative">
           {children}
         </main>
+        <Footer/>
       </body>
     </html>
   );

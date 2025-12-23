@@ -1,0 +1,137 @@
+/* ================= STAGE ================= */
+
+.book-stage {
+  height: 100vh;
+  background: #faf6ef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ================= BOOK ================= */
+
+.book {
+  position: relative;
+  width: 85vw;
+  height: 72vh;
+  overflow: hidden;
+}
+
+/* ================= SPREAD ================= */
+
+.spread {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  background: #faf6ef;
+   will-change: transform;
+}
+
+.spread-1 {
+  z-index: 1;
+}
+
+.spread-2 {
+  z-index: 2;
+
+}
+
+/* ================= PAGE ================= */
+
+.page {
+  position: relative;
+  width: 42vw;
+  height: 72vh;
+  overflow: hidden;
+  background: #fffaf2;
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.05);
+  transform-style: preserve-3d;
+}
+
+.page img {
+  object-fit: cover;
+  filter: grayscale(100%) contrast(1.05);
+  backface-visibility: hidden;
+}
+
+/* front-facing content (text) should not show through during flip */
+.page-content,
+.page > img {
+  backface-visibility: hidden;
+  transform: translateZ(0.1px);
+  opacity: 0.95;
+}
+
+/* ================= SPINE ================= */
+
+.spine {
+  width: 16px;
+  background: linear-gradient(
+    to bottom,
+    #6a4328,
+    #3f2616,
+    #6a4328
+  );
+}
+
+/* transform origins for inward opening */
+.page-left {
+  transform-origin: right center;
+}
+
+.page-right {
+  transform-origin: left center;
+}
+
+/* ================= CONTENT ================= */
+
+.page-content {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 3rem;
+  background: linear-gradient(
+    to top,
+    rgba(255,250,242,0.95),
+    rgba(255,250,242,0.75),
+    transparent
+  );
+}
+
+.page-content.left {
+  text-align: left;
+}
+
+.page-content.right {
+  text-align: right;
+}
+
+/* ================= TEXT ================= */
+
+.page-content h2 {
+  margin: 0;
+  font-size: 2.4rem;
+  color: #3f2616;
+}
+
+.page-content span {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7a563b;
+}
+
+.page-content p {
+  margin-top: 1.4rem;
+  max-width: 70%;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #5a3a22;
+}
+
+.page-content.right p {
+  margin-left: auto;
+}

@@ -1,0 +1,50 @@
+.philosophy-section {
+  position: relative;
+  background-color: #faf6ef;
+  padding: 6rem 1.5rem;
+  overflow: hidden;
+}
+
+/* Wave texture layer */
+.philosophy-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(200, 84, 40, 0.3),
+      rgba(200, 84, 40, 0.3) 1px,
+      transparent 1px,
+      transparent 24px
+    );
+
+  opacity: 1;
+  pointer-events: none;
+}
+
+
+
+
+.philosophy-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+   position: relative;
+  z-index: 1;
+}
+
+.philosophy-inner h3 {
+  font-size: 2.1rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  color: #4a2f1b;
+}
+
+.philosophy-inner p {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: #6b4a2f;
+  margin-bottom: 1.2rem;
+}

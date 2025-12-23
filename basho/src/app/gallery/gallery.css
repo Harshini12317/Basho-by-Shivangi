@@ -1,6 +1,236 @@
-@import '../../components/MediaShowcase.css';
+/* BASE */
+.ms-root {
+  max-width: 1400px;
+  margin: auto;
+  padding: 2rem;
+  background: #faf8f5;
+}
 
-/* gallery-specific overrides (kept minimal) */
-.ms-hero { padding: 2.25rem 1.5rem; }
-.ms-hero-title { font-size: 2.25rem; }
-.ms-root { padding: 1.5rem; }
+.ms-hero-title {
+  font-size: 3rem;
+  font-weight: 500;
+  color: #2d2118;
+  margin-bottom: 2.5rem;
+}
+
+/* HORIZONTAL SCROLL */
+.ms-horizontal {
+  overflow: hidden;
+  margin-bottom: 3rem;
+  background: linear-gradient(135deg, #f5efe8, #faf7f3);
+  padding: 2rem 0;
+}
+
+.ms-horizontal-track {
+  display: flex;
+  gap: 1.5rem;
+  animation: scroll 35s linear infinite;
+}
+
+.ms-horizontal-item {
+  width: 320px;
+  height: 220px;
+  flex: none;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.ms-horizontal-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@keyframes scroll {
+  to { transform: translateX(-50%); }
+}
+
+/* FILTERS */
+.ms-filters {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.filter-box {
+  padding: 1.1rem;
+  background: #f4efe9;
+  border: 1px solid #d7cfc6;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+}
+
+.filter-box.active {
+  background: #2d2118;
+  color: #fff;
+}
+
+/* FEATURED VIEW */
+.ms-featured {
+  margin-bottom: 4rem;
+  padding: 2rem;
+  background: #f4efe9;
+  border-radius: 20px;
+  box-shadow: 0 25px 70px rgba(0,0,0,0.18);
+}
+
+.featured-content {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2rem;
+}
+
+.ms-featured img {
+  width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+  border-radius: 16px;
+}
+
+.featured-text h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.featured-text p {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.close-btn {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  border: none;
+  background: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.featured-like {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+/* GRID */
+.ms-image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.6rem;
+}
+
+.ms-image-card {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #eae6e1;
+}
+
+.ms-image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* LIKE ACTIONS */
+.ms-image-actions {
+  position: absolute;
+  bottom: 0.8rem;
+  left: 0.8rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  background: rgba(255,255,255,0.9);
+  padding: 0.4rem 0.6rem;
+  border-radius: 999px;
+}
+
+.like-btn {
+  border: none;
+  background: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.like-btn.liked {
+  color: #e85b6a;
+}
+
+
+/* ===============================
+   FLOATING OVERLAY SHOWCASE
+================================ */
+
+.ms-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: auto;
+}
+
+.ms-overlay-panel {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1100px, 92%);
+  background: #f4efe9;
+  border-radius: 22px;
+  padding: 2rem;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.25);
+}
+
+.overlay-content {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2rem;
+}
+
+.ms-overlay-panel img {
+  width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 16px;
+}
+
+.overlay-text h2 {
+  font-size: 1.9rem;
+  margin-bottom: 0.8rem;
+}
+
+.overlay-text p {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+/* Close button */
+.close-btn {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+/* Mobile fallback */
+@media (max-width: 768px) {
+  .overlay-content {
+    grid-template-columns: 1fr;
+  }
+
+  .ms-overlay-panel {
+    top: 5%;
+    padding: 1.5rem;
+  }
+}
