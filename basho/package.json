@@ -15,6 +15,7 @@
     "mongoose": "^9.0.2",
     "next": "16.1.0",
     "next-cloudinary": "^6.17.5",
+    "nodemailer": "^7.0.12",
     "razorpay": "^2.9.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
