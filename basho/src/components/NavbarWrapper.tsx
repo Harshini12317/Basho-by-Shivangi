@@ -10,6 +10,9 @@ export default function NavbarWrapper() {
   if (pathname.startsWith("/auth")) {
     return null;
   }
+  if (pathname.startsWith("/wishlist")) {
+    return null;
+  }
 
   return <Navbar />;
 }

@@ -77,7 +77,7 @@ export default function Navbar() {
         <Link href="/orders" className="menu-item">
           <MdHistory /> Order History
         </Link>
-        <Link href="/favorites" className="menu-item">
+        <Link href="/wishlist" className="menu-item">
           <MdFavoriteBorder /> Wishlist
         </Link>
         <Link href="/settings" className="menu-item">
