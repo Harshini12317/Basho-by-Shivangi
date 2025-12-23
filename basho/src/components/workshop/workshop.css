@@ -1,0 +1,40 @@
+.workshop-list{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:18px;
+  align-items:start;
+}
+
+.workshop-card{
+  display:block;
+  background: #fff;
+  border-radius:12px;
+  padding:12px;
+  border:1px solid rgba(20,20,20,0.04);
+  box-shadow: 0 8px 20px rgba(18,18,18,0.06);
+  color:inherit;
+  text-decoration:none;
+  overflow:hidden;
+}
+
+.card-image{ border-radius:10px; overflow:hidden; }
+.card-image img{ display:block; width:100%; height:auto; }
+
+.card-body{ padding:8px 4px; }
+.card-body h3{ margin:6px 0 4px; font-size:1.05rem; }
+.muted{ color:#6b6b6b; font-size:0.9rem; }
+
+.student-creations{ margin-top:28px; }
+.creations-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.creation-card img{ width:100%; height:auto; border-radius:8px; display:block; }
+
+.modal-backdrop{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.36); z-index:1000; }
+.modal{ position:relative; background:#fff; padding:20px; border-radius:12px; width:100%; max-width:460px; box-shadow:0 20px 50px rgba(12,12,12,0.25); }
+.modal-close{ position:absolute; right:12px; top:8px; background:transparent; border:none; font-size:22px; cursor:pointer; }
+.registration-form label{ display:block; margin-bottom:10px; }
+.registration-form input{ width:100%; padding:8px 10px; border-radius:8px; border:1px solid #e6e6e6; }
+.form-actions{ display:flex; gap:8px; margin-top:12px; }
+.btn-primary{ background:#7c4dff; color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
+.btn-ghost{ background:transparent; border:1px solid #ddd; padding:8px 12px; border-radius:8px; cursor:pointer; }
+.success{ color:green; }
+.error{ color:#b00020; }
