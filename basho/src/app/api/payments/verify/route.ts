@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { sendPaymentSuccessEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,12 +20,27 @@ export async function POST(request: NextRequest) {
 
     if (razorpay_signature === expectedSign) {
       // Payment verified successfully
-      // Here you can save the order details to your database
       console.log('Payment verified:', {
         orderId: razorpay_order_id,
         paymentId: razorpay_payment_id,
         orderDetails
       });
+
+      // Send confirmation emails to customer and owner
+      try {
+        await sendPaymentSuccessEmail(
+          orderDetails.customer.email,
+          {
+            ...orderDetails,
+            orderId: razorpay_order_id,
+            amount: orderDetails.totalAmount
+          },
+          razorpay_payment_id
+        );
+      } catch (emailError) {
+        console.error('Error sending confirmation emails:', emailError);
+        // Don't fail the payment verification if email fails
+      }
 
       // You can save this to your database here
       // Example: await saveOrderToDatabase(orderDetails);
