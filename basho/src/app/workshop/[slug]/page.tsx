@@ -279,7 +279,7 @@ export default function WorkshopDetailPage() {
                 <ul className="space-y-3 text-slate-700">
                   <li>• <span className="font-medium">Duration:</span> {details.duration}</li>
                   <li>⏱ <span className="font-medium">Timings:</span> {details.timings}</li>
-                  <li>📍 <span className="font-medium">Venue:</span> {details.venue} <span className="text-slate-400 text-xs">(Exact location shared post‑registration)</span></li>
+                  <li>📍 <span className="font-medium">Venue:</span> <a href="https://maps.google.com/?q=Basho+Pottery+Studio,+New+Delhi" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline">{details.venue}</a> <span className="text-slate-400 text-xs">(Exact location shared post‑registration)</span></li>
                   <li>📝 <span className="font-medium">Mode of Conduct:</span> {details.mode}</li>
                 </ul>
               </div>
@@ -343,6 +343,7 @@ export default function WorkshopDetailPage() {
             <RegistrationModal 
               workshopTitle={details.title} 
               workshopDate={details.date}
+              workshopPrice={details.price}
               onClose={() => setIsModalOpen(false)} 
             />
           )}
