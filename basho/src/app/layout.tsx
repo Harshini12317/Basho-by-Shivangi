@@ -4,6 +4,8 @@ import Script from "next/script";
 import "./globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
 import Footer from "@/components/Footer";
+import SessionProviderWrapper from "@/components/auth/SessionProviderWrapper";
+
 
 const inter = Inter({
   variable: "--font-inter",
@@ -47,13 +49,15 @@ export default function RootLayout({
           overflow-x-hidden
         `}
       >
-        {/* 👇 Navbar logic moved out */}
-        <NavbarWrapper />
+      <SessionProviderWrapper>
+    <NavbarWrapper />
 
-        <main className="relative">
-          {children}
-        </main>
-        <Footer/>
+    <main className="relative">
+      {children}
+    </main>
+
+    <Footer />
+  </SessionProviderWrapper>
       </body>
     </html>
   );
