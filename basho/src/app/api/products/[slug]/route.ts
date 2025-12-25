@@ -71,14 +71,15 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    await connectDB();
     const { slug } = await params;
-    // For now, return dummy data - find the product by slug
-    const product = dummyProducts.find(p => p.slug === slug);
+    const product = await Product.findOne({ slug, isPublished: true });
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
     return NextResponse.json(product);
   } catch (err: any) {
+    console.error('GET /api/products/[slug] error:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

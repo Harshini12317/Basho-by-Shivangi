@@ -4,7 +4,17 @@ import { connectDB } from '@/lib/mongodb';
 import Product from '@/models/product';
 
 export async function GET() {
-  return NextResponse.json([{ title: 'Test Product', slug: 'test', price: 100 }]);
+  try {
+    await connectDB();
+    const products = await Product.find({}).sort({ createdAt: -1 });
+    return NextResponse.json(products);
+  } catch (error) {
+    console.error('GET /api/admin/products error:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch products' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: NextRequest) {
