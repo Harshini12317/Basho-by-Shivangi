@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev ",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -15,7 +15,7 @@
     "framer-motion": "^12.23.26",
     "gsap": "^3.14.2",
     "mongoose": "^9.0.2",
-    "next": "16.1.0",
+    "next": "15.1.6",
     "next-cloudinary": "^6.17.5",
     "nodemailer": "^7.0.12",
     "razorpay": "^2.9.6",
