@@ -6,9 +6,13 @@ import { FiMail, FiLock, FiUser, FiX } from "react-icons/fi";
 import AuthBackground from "./AuthBackground";
 import "./auth.css";
 import { signIn } from "next-auth/react";
+import { FiCheckCircle, FiXCircle } from "react-icons/fi";
 
 
 export default function AuthContainer() {
+
+
+  //
   const router = useRouter();
   const [isSignup, setIsSignup] = useState(false);
 
@@ -22,6 +26,113 @@ export default function AuthContainer() {
     email: "",
     password: "",
   });
+  //
+  const handleSignup = async () => {
+  if (!signupData.username || !signupData.email || !signupData.password) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: signupData.username,
+        email: signupData.email,
+        password: signupData.password,
+      }),
+    });
+
+
+    const data = await res.json();
+
+   if (!res.ok) {
+  if (res.status === 409) {
+    // User exists but may not be verified
+    setShowVerification(true);
+    return;
+  }
+
+  alert(data.message || "Signup failed");
+  return;
+}
+
+
+   setShowVerification(true);
+ // move to login view
+  } catch (error) {
+    alert("Something went wrong");
+  }
+};
+
+//
+
+const [showVerification, setShowVerification] = useState(false);
+const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""]);
+
+const [verificationStatus, setVerificationStatus] = useState<
+  "idle" | "success" | "error"
+>("idle");
+
+const handleVerify = async () => {
+  const code = verificationCode.join("");
+
+  if (code.length !== 6) return;
+
+  try {
+    const res = await fetch("/api/auth/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: signupData.email,
+        code,
+      }),
+    });
+
+    if (!res.ok) {
+      setVerificationStatus("error");
+      return;
+    }
+
+    setVerificationStatus("success");
+    setTimeout(() => {
+  setShowVerification(false); // hide modal
+  setIsSignup(false);         // show login panel
+  setVerificationCode(["", "", "", "", "", ""]);
+  setVerificationStatus("idle");
+}, 1200);
+  } catch {
+    setVerificationStatus("error");
+  }
+};
+
+//
+// 🔐 LOGIN WITH NEXTAUTH (EMAIL)
+const handleLogin = async () => {
+  if (!loginData.username || !loginData.password) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  const res = await signIn("credentials", {
+    email: loginData.username, // email
+    password: loginData.password,
+    redirect: false,
+  });
+
+  if (res?.error) {
+    alert(res.error);
+    return;
+  }
+
+  // ✅ session created
+  router.push("/");
+};
+
+
 
   return (
     <div className="auth-page">
@@ -43,7 +154,7 @@ export default function AuthContainer() {
           <div className="relative">
             <FiUser className="input-icon" />
             <input
-              placeholder="Username"
+              placeholder="Email"
               value={loginData.username}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setLoginData({ ...loginData, username: e.target.value })
@@ -63,7 +174,7 @@ export default function AuthContainer() {
             />
           </div>
 
-          <button>Sign In</button>
+         <button onClick={handleLogin}>Sign In</button>
 
           <div className="or-separator">
             <span>or</span>
@@ -142,8 +253,9 @@ export default function AuthContainer() {
               }
             />
           </div>
+          <button onClick={handleSignup}>Sign Up</button>
 
-          <button>Sign Up</button>
+         
 
           <p>
             Already have an account?{" "}
@@ -166,6 +278,79 @@ export default function AuthContainer() {
           </button>
         </div>
       </div>
+      {showVerification && (
+  <div className="verification-overlay">
+    <div className="verification-box">
+    <button
+  className="verification-close"
+  onClick={() => setShowVerification(false)}
+>
+  <FiX size={18} />
+</button>
+
+
+      <h3>Verify your email</h3>
+      <p>Enter the 6-digit code sent to your email</p>
+
+      <div className="otp-inputs">
+        {verificationCode.map((digit, index) => (
+          <input
+  key={index}
+  maxLength={1}
+  value={digit}
+  id={`otp-${index}`}
+  onChange={(e) => {
+    const val = e.target.value.replace(/\D/g, "");
+
+    const updated = [...verificationCode];
+    updated[index] = val;
+    setVerificationCode(updated);
+
+    setVerificationStatus("idle");
+
+    if (val && index < 5) {
+      const next = document.getElementById(`otp-${index + 1}`);
+      next?.focus();
+    }
+  }}
+  onKeyDown={(e) => {
+    if (e.key === "Backspace" && !verificationCode[index] && index > 0) {
+      const prev = document.getElementById(`otp-${index - 1}`);
+      prev?.focus();
+    }
+  }}
+/>
+
+        ))}
+      </div>
+
+      {verificationStatus !== "idle" && (
+  <div className="verification-status">
+    {verificationStatus === "success" && (
+      <FiCheckCircle size={42} />
+    )}
+    {verificationStatus === "error" && (
+      <FiXCircle size={42} />
+    )}
+  </div>
+)}
+
+<button className="verify-btn" onClick={handleVerify}>
+  Continue
+</button>
+
+
+
+
+
+
+      <p className="resend">
+        Didn’t receive the code? <span>Resend</span>
+      </p>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

@@ -23,12 +23,38 @@ export async function POST(req: Request) {
     await connectDB();
 
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return NextResponse.json(
-        { message: "User already exists" },
-        { status: 409 }
-      );
-    }
+
+if (existingUser) {
+  if (!existingUser.isVerified) {
+    // regenerate OTP
+    const verificationCode = generateCode();
+    existingUser.verificationCode = verificationCode;
+    existingUser.verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+    await existingUser.save();
+
+    await sendVerificationEmail(email, verificationCode);
+
+   return NextResponse.json(
+  {
+    message: "Verification code resent",
+    verified: false,
+  },
+  { status: 200 }
+);
+
+  }
+
+ return NextResponse.json(
+  {
+    message: "User already exists and is verified",
+    verified: true,
+  },
+  { status: 409 }
+);
+
+}
+
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const verificationCode = generateCode();
@@ -44,12 +70,14 @@ export async function POST(req: Request) {
 
     await sendVerificationEmail(email, verificationCode);
 
-    return NextResponse.json(
-      {
-        message: "Signup successful. Verification code sent to email.",
-      },
-      { status: 201 }
-    );
+  return NextResponse.json(
+  {
+    message: "Signup successful. Verification code sent to email.",
+    verified: false,
+  },
+  { status: 201 }
+);
+
   } catch (error) {
     console.error("Signup error:", error);
     return NextResponse.json(
