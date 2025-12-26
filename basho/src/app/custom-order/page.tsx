@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 export default function CustomOrderPage() {
   const [customOrderForm, setCustomOrderForm] = useState({
@@ -10,6 +11,9 @@ export default function CustomOrderPage() {
     notes: "",
     referenceImages: [] as string[],
   });
+
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const handleCustomOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,81 +49,201 @@ export default function CustomOrderPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* How Custom Orders Work Flowchart */}
         <div className="mb-16">
-          <h2 className="text-4xl font-bold serif text-[#442D1C] mb-12 text-center">How Custom Orders Work</h2>
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-4">
+          <motion.h2 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-4xl font-bold serif text-[#442D1C] mb-12 text-center"
+          >
+            How Custom Orders Work
+          </motion.h2>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-4"
+          >
             {/* Step 1 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-24 h-24 bg-[#8E5022] rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              whileHover={{ scale: 1.05 }}
+              className="flex flex-col items-center text-center"
+            >
+              <motion.div 
+                className="w-24 h-24 bg-[#8E5022] rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg"
+              >
                 1
-              </div>
+              </motion.div>
               <h3 className="font-semibold serif text-[#442D1C] text-lg mb-2">Send Request</h3>
               <p className="text-[#652810] text-sm max-w-32">Fill out the form below with your requirements</p>
-            </div>
+            </motion.div>
 
             {/* Arrow */}
-            <div className="hidden md:block text-[#8E5022] text-3xl">→</div>
-            <div className="md:hidden text-[#8E5022] text-3xl rotate-90">↓</div>
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="hidden md:block text-[#8E5022] text-3xl"
+            >
+              →
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="md:hidden text-[#8E5022] text-3xl rotate-90"
+            >
+              ↓
+            </motion.div>
 
             {/* Step 2 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-24 h-24 bg-[#C85428] rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              whileHover={{ scale: 1.05 }}
+              className="flex flex-col items-center text-center"
+            >
+              <motion.div 
+                className="w-24 h-24 bg-[#C85428] rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg"
+              >
                 2
-              </div>
+              </motion.div>
               <h3 className="font-semibold serif text-[#442D1C] text-lg mb-2">We Interact</h3>
               <p className="text-[#652810] text-sm max-w-32">Our artisans discuss details and provide pricing</p>
-            </div>
+            </motion.div>
 
             {/* Arrow */}
-            <div className="hidden md:block text-[#8E5022] text-3xl">→</div>
-            <div className="md:hidden text-[#8E5022] text-3xl rotate-90">↓</div>
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+              className="hidden md:block text-[#8E5022] text-3xl"
+            >
+              →
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+              className="md:hidden text-[#8E5022] text-3xl rotate-90"
+            >
+              ↓
+            </motion.div>
 
             {/* Step 3 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-24 h-24 bg-[#EDD8B4] rounded-full flex items-center justify-center text-[#442D1C] text-2xl font-bold mb-4 shadow-lg border-2 border-[#8E5022]">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+              className="flex flex-col items-center text-center"
+            >
+              <motion.div 
+                className="w-24 h-24 bg-[#EDD8B4] rounded-full flex items-center justify-center text-[#442D1C] text-2xl font-bold mb-4 shadow-lg border-2 border-[#8E5022]"
+              >
                 3
-              </div>
+              </motion.div>
               <h3 className="font-semibold serif text-[#442D1C] text-lg mb-2">You Agree</h3>
               <p className="text-[#652810] text-sm max-w-32">Approve the quote and finalize details</p>
-            </div>
+            </motion.div>
 
             {/* Arrow */}
-            <div className="hidden md:block text-[#8E5022] text-3xl">→</div>
-            <div className="md:hidden text-[#8E5022] text-3xl rotate-90">↓</div>
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 1.1 }}
+              className="hidden md:block text-[#8E5022] text-3xl"
+            >
+              →
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 1.1 }}
+              className="md:hidden text-[#8E5022] text-3xl rotate-90"
+            >
+              ↓
+            </motion.div>
 
             {/* Step 4 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-24 h-24 bg-[#8E5022] rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 1.2 }}
+              whileHover={{ scale: 1.05 }}
+              className="flex flex-col items-center text-center"
+            >
+              <motion.div 
+                className="w-24 h-24 bg-[#8E5022] rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg"
+              >
                 4
-              </div>
+              </motion.div>
               <h3 className="font-semibold serif text-[#442D1C] text-lg mb-2">Payment</h3>
               <p className="text-[#652810] text-sm max-w-32">Secure payment through our checkout</p>
-            </div>
+            </motion.div>
 
             {/* Arrow */}
-            <div className="hidden md:block text-[#8E5022] text-3xl">→</div>
-            <div className="md:hidden text-[#8E5022] text-3xl rotate-90">↓</div>
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 1.4 }}
+              className="hidden md:block text-[#8E5022] text-3xl"
+            >
+              →
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 1.4 }}
+              className="md:hidden text-[#8E5022] text-3xl rotate-90"
+            >
+              ↓
+            </motion.div>
 
             {/* Step 5 */}
-            <div className="flex flex-col items-center text-center">
-              <div className="w-24 h-24 bg-[#C85428] rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 1.5 }}
+              whileHover={{ scale: 1.05 }}
+              className="flex flex-col items-center text-center"
+            >
+              <motion.div 
+                className="w-24 h-24 bg-[#C85428] rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4 shadow-lg"
+              >
                 5
-              </div>
+              </motion.div>
               <h3 className="font-semibold serif text-[#442D1C] text-lg mb-2">Order Placed</h3>
               <p className="text-[#652810] text-sm max-w-32">Your custom piece begins creation</p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
 
         {/* Custom Orders Gallery */}
         <div className="mb-16">
-          <h2 className="text-4xl font-bold serif text-[#442D1C] mb-8 text-center">Previous Custom Creations</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <motion.h2 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.7 }}
+            className="text-4xl font-bold serif text-[#442D1C] mb-8 text-center"
+          >
+            Previous Custom Creations
+          </motion.h2>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 1.9 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
             {/* Mock custom orders data - in real app, fetch from API */}
             {[
               {
                 id: 1,
                 name: "Wedding Vase",
-                description: "Custom floral vase for wedding ceremony",
+                description: "Custom floral vase for wedding ceremony with intricate hand-painted details and gold accents",
                 images: [
                   "/images/product1.png",
                   "/images/product2.png"
@@ -128,7 +252,7 @@ export default function CustomOrderPage() {
               {
                 id: 2,
                 name: "Coffee Mug Set",
-                description: "Personalized mugs for office team",
+                description: "Personalized mugs for office team with custom logos and ergonomic design",
                 images: [
                   "/images/product1.png",
                   "/images/product2.png"
@@ -137,133 +261,297 @@ export default function CustomOrderPage() {
               {
                 id: 3,
                 name: "Dinnerware Set",
-                description: "Complete dinner set for family of 4",
+                description: "Complete dinner set for family of 4 with modern minimalist design",
                 images: [
                   "/images/product1.png",
                   "/images/product2.png"
                 ]
               }
-            ].map((order) => (
-              <div key={order.id} className="card-soft elegant-rounded-2xl p-6 border border-[#8E5022]/20 hover:shadow-lg transition-shadow">
+            ].map((order, orderIndex) => (
+              <motion.div 
+                key={order.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 2 + orderIndex * 0.1 }}
+                whileHover={{ y: -5 }}
+                className="card-soft elegant-rounded-2xl p-6 border border-[#8E5022]/20 hover:shadow-lg transition-shadow cursor-pointer"
+              >
                 <div className="grid grid-cols-2 gap-3 mb-6">
                   {order.images.map((image, index) => (
-                    <img
+                    <motion.img
                       key={index}
                       src={image}
-                      className="w-full h-32 md:h-40 object-cover elegant-rounded-lg border-2 border-white"
+                      whileHover={{ scale: 1.05 }}
+                      onClick={() => {
+                        setSelectedOrder(order);
+                        setSelectedImageIndex(index);
+                      }}
+                      className="w-full h-32 md:h-40 object-cover elegant-rounded-lg border-2 border-white cursor-pointer"
                       alt={`${order.name} - ${index + 1}`}
                     />
                   ))}
                 </div>
                 <h3 className="font-semibold text-[#442D1C] mb-2 text-lg serif">{order.name}</h3>
                 <p className="text-[#652810] text-sm">{order.description}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
+
+        {/* Image Modal */}
+        {selectedOrder && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+            onClick={() => setSelectedOrder(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative">
+                <img
+                  src={selectedOrder.images[selectedImageIndex]}
+                  alt={selectedOrder.name}
+                  className="w-full h-auto max-h-[60vh] object-contain"
+                />
+                
+                {/* Navigation arrows */}
+                {selectedOrder.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : selectedOrder.images.length - 1))}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                    >
+                      ‹
+                    </button>
+                    <button
+                      onClick={() => setSelectedImageIndex((prev) => (prev < selectedOrder.images.length - 1 ? prev + 1 : 0))}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                    >
+                      ›
+                    </button>
+                  </>
+                )}
+                
+                {/* Close button */}
+                <button
+                  onClick={() => setSelectedOrder(null)}
+                  className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="p-6">
+                <h3 className="text-2xl font-bold serif text-[#442D1C] mb-2">{selectedOrder.name}</h3>
+                <p className="text-[#652810]">{selectedOrder.description}</p>
+                
+                {/* Image indicators */}
+                {selectedOrder.images.length > 1 && (
+                  <div className="flex justify-center mt-4 space-x-2">
+                    {selectedOrder.images.map((_: string, index: number) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedImageIndex(index)}
+                        className={`w-3 h-3 rounded-full transition-colors ${
+                          index === selectedImageIndex ? 'bg-[#8E5022]' : 'bg-gray-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
 
         {/* Custom Order Form */}
-        <div className="bg-white/90 elegant-rounded-3xl p-12 shadow-2xl border-2 border-[#EDD8B4] organic-shadow clay-texture clay-morphism">
-          <h2 className="text-4xl font-bold serif text-[#442D1C] mb-10 text-center">Request Your Custom Piece</h2>
-          <form onSubmit={handleCustomOrderSubmit} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-2">
-                <label className="text-[#442D1C] font-semibold text-lg serif">Your Name</label>
-                <input
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={customOrderForm.name}
-                  onChange={(e) => setCustomOrderForm({ ...customOrderForm, name: e.target.value })}
-                  className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors form-bg"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[#442D1C] font-semibold text-lg serif">Email Address</label>
-                <input
-                  type="email"
-                  placeholder="your.email@example.com"
-                  value={customOrderForm.email}
-                  onChange={(e) => setCustomOrderForm({ ...customOrderForm, email: e.target.value })}
-                    className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors form-bg"
-                  required
-                />
-              </div>
-            </div>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 2.5 }}
+          className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-10 shadow-xl border border-gray-100 relative overflow-hidden"
+        >
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#8E5022]/5 rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#C85428]/5 rounded-full translate-y-12 -translate-x-12"></div>
 
-            <div className="space-y-2">
-              <label className="text-[#442D1C] font-semibold text-lg serif">Phone Number</label>
-              <input
-                type="tel"
-                placeholder="+91 98765 43210"
-                value={customOrderForm.phone}
-                onChange={(e) => setCustomOrderForm({ ...customOrderForm, phone: e.target.value })}
-                className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors form-bg"
-                required
-              />
-            </div>
-
-            <div className="space-y-2 mb-6">
-              <label className="text-[#442D1C] font-semibold text-lg serif">Describe Your Vision</label>
-              <textarea
-                placeholder="Tell us about your dream pottery piece. Include details like size, shape, color preferences, intended use, and any special features..."
-                value={customOrderForm.description}
-                onChange={(e) => setCustomOrderForm({ ...customOrderForm, description: e.target.value })}
-                className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors h-40 resize-none form-bg"
-                required
-              />
-            </div>
-
-            <div className="space-y-2 mb-6">
-              <label className="text-[#442D1C] font-semibold text-lg serif">Additional Notes (Optional)</label>
-              <textarea
-                placeholder="Any specific requirements, timeline preferences, or other details..."
-                value={customOrderForm.notes}
-                onChange={(e) => setCustomOrderForm({ ...customOrderForm, notes: e.target.value })}
-                className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors h-32 resize-none form-bg"
-              />
-            </div>
-
-            <div className="space-y-4">
-              <label className="text-[#442D1C] font-semibold text-lg serif">Reference Images (Optional)</label>
-              <p className="text-[#652810] text-sm">Upload photos of pieces you like or sketches of your vision</p>
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={(e) => {
-                  const files = e.target.files;
-                  if (files) {
-                    const urls = Array.from(files).map(file => URL.createObjectURL(file));
-                    setCustomOrderForm({ ...customOrderForm, referenceImages: urls });
-                  }
-                }}
-                className="w-full p-4 border-2 border-dashed border-[#EDD8B4] elegant-rounded-2xl focus:border-[#8E5022] focus:outline-none transition-colors file:mr-4 file:py-3 file:px-6 file:elegant-rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#8E5022] file:text-white hover:file:bg-[#652810] form-bg"
-              />
-              {customOrderForm.referenceImages.length > 0 && (
-                <div className="flex flex-wrap gap-4 mt-4">
-                  {customOrderForm.referenceImages.map((image, index) => (
-                    <img
-                      key={index}
-                      src={image}
-                      className="w-24 h-24 object-cover elegant-rounded-xl border-2 border-[#EDD8B4]"
-                      alt={`Reference ${index + 1}`}
-                    />
-                  ))}
+          <motion.h2
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 2.7 }}
+            className="text-4xl font-bold serif text-[#442D1C] mb-10 text-center relative z-10"
+          >
+            Request Your Custom Piece
+          </motion.h2>
+          <form onSubmit={handleCustomOrderSubmit} className="space-y-8 relative z-10">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 2.9 }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-8"
+            >
+              <div className="space-y-3">
+                <label className="text-[#442D1C] font-semibold text-lg serif block">Your Name</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={customOrderForm.name}
+                    onChange={(e) => setCustomOrderForm({ ...customOrderForm, name: e.target.value })}
+                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400"
+                    required
+                  />
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#8E5022]/5 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                 </div>
-              )}
-            </div>
+              </div>
+              <div className="space-y-3">
+                <label className="text-[#442D1C] font-semibold text-lg serif block">Email Address</label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    placeholder="your.email@example.com"
+                    value={customOrderForm.email}
+                    onChange={(e) => setCustomOrderForm({ ...customOrderForm, email: e.target.value })}
+                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400"
+                    required
+                  />
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#8E5022]/5 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                </div>
+              </div>
+            </motion.div>
 
-            <div className="text-center pt-8">
-              <button
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 3.1 }}
+              className="space-y-3"
+            >
+              <label className="text-[#442D1C] font-semibold text-lg serif block">Phone Number</label>
+              <div className="relative">
+                <input
+                  type="tel"
+                  placeholder="+91 98765 43210"
+                  value={customOrderForm.phone}
+                  onChange={(e) => setCustomOrderForm({ ...customOrderForm, phone: e.target.value })}
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400"
+                  required
+                />
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#8E5022]/5 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 3.3 }}
+              className="space-y-3"
+            >
+              <label className="text-[#442D1C] font-semibold text-lg serif block">Describe Your Vision</label>
+              <div className="relative">
+                <textarea
+                  placeholder="Tell us about your dream pottery piece. Include details like size, shape, color preferences, intended use, and any special features..."
+                  value={customOrderForm.description}
+                  onChange={(e) => setCustomOrderForm({ ...customOrderForm, description: e.target.value })}
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 h-36 resize-none bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400"
+                  required
+                />
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#8E5022]/5 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 3.5 }}
+              className="space-y-3"
+            >
+              <label className="text-[#442D1C] font-semibold text-lg serif block">Additional Notes <span className="text-gray-500 font-normal">(Optional)</span></label>
+              <div className="relative">
+                <textarea
+                  placeholder="Any specific requirements, timeline preferences, or other details..."
+                  value={customOrderForm.notes}
+                  onChange={(e) => setCustomOrderForm({ ...customOrderForm, notes: e.target.value })}
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 h-28 resize-none bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400"
+                />
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#8E5022]/5 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 3.7 }}
+              className="space-y-4"
+            >
+              <label className="text-[#442D1C] font-semibold text-lg serif block">Reference Images <span className="text-gray-500 font-normal">(Optional)</span></label>
+              <p className="text-[#652810] text-sm mb-4">Upload photos of pieces you like or sketches of your vision</p>
+              <div className="relative">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => {
+                    const files = e.target.files;
+                    if (files) {
+                      const urls = Array.from(files).map(file => URL.createObjectURL(file));
+                      setCustomOrderForm({ ...customOrderForm, referenceImages: urls });
+                    }
+                  }}
+                  className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 bg-gray-50 hover:bg-gray-100 focus:bg-white file:mr-4 file:py-3 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#8E5022] file:text-white hover:file:bg-[#652810] file:transition-colors file:cursor-pointer"
+                />
+              </div>
+              {customOrderForm.referenceImages.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex flex-wrap gap-4 mt-6"
+                >
+                  {customOrderForm.referenceImages.map((image, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.3, delay: index * 0.1 }}
+                      className="relative group"
+                    >
+                      <img
+                        src={image}
+                        className="w-24 h-24 object-cover rounded-xl border-2 border-gray-200 shadow-sm group-hover:shadow-md transition-shadow duration-300"
+                        alt={`Reference ${index + 1}`}
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-xl transition-colors duration-300"></div>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 3.9 }}
+              className="text-center pt-10"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(142, 80, 34, 0.3)" }}
+                whileTap={{ scale: 0.98 }}
                 type="submit"
-                className="bg-gradient-to-r from-[#8E5022] to-[#C85428] hover:from-[#652810] hover:to-[#8E5022] text-white py-6 px-12 elegant-rounded-3xl font-bold text-2xl transition-all duration-500 transform hover:scale-105 hover:rotate-1 shadow-2xl hover:shadow-3xl organic-button hover-lift"
+                className="bg-gradient-to-r from-[#8E5022] to-[#C85428] hover:from-[#652810] hover:to-[#8E5022] text-white py-5 px-12 rounded-2xl font-bold text-xl transition-all duration-500 shadow-xl hover:shadow-2xl transform relative overflow-hidden group"
               >
-                Submit Custom Order Request
-              </button>
-            </div>
+                <span className="relative z-10">Submit Custom Order Request</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+              </motion.button>
+              <p className="text-gray-500 text-sm mt-4">We'll get back to you within 24-48 hours</p>
+            </motion.div>
           </form>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
