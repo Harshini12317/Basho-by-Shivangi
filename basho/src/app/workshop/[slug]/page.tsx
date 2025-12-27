@@ -444,10 +444,16 @@ export default function WorkshopDetailPage() {
             backgroundImage: 'linear-gradient(180deg, #7E2A2A 0%, #6A2424 100%)',
           }}
         >
-          
 
           <div className="max-w-6xl mx-auto text-center">
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">Pottery Workshop</h1>
+            <div className="flex items-center justify-center gap-4">
+              <img
+                src="/images/headerimage.png"
+                alt=""
+                className="w-16 md:w-24 h-auto object-contain"
+              />
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">Pottery Workshop</h1>
+            </div>
             <p className="mt-2 text-slate-200 text-sm md:text-base">
               Mastering Traditional Botanists and Pottery
             </p>
@@ -458,12 +464,12 @@ export default function WorkshopDetailPage() {
       <div className="flex items-center justify-center p-6">
         <div className="max-w-5xl w-full bg-white rounded-3xl overflow-hidden shadow-xl">
           <div className="grid md:grid-cols-2 gap-0">
-            <div className="p-10 md:p-12 bg-[#F3EDE5]">
+            <div className="p-6 md:p-12 bg-[#F3EDE5]">
               <Link href="/workshop" className="block text-2xl md:text-3xl font-bold text-slate-500 hover:text-slate-900 transition-colors mb-4">←</Link>
               <img src={details.image} className="w-full h-auto md:h-[380px] object-cover rounded-2xl" alt={details.title} />
             </div>
             <div
-              className="p-10 md:p-12 text-[#1F2A1E] flex flex-col items-center justify-center shadow-inner"
+              className="p-6 md:p-12 text-[#1F2A1E] flex flex-col items-center justify-center shadow-inner"
               style={{
                 backgroundImage:
                   'linear-gradient(180deg, #A9B88E 0%, #90A678 48%, #7E9667 100%)',
@@ -478,7 +484,7 @@ export default function WorkshopDetailPage() {
             </div>
           </div>
 
-          <div className="px-10 md:px-12 py-6">
+          <div className="px-6 md:px-12 py-6">
             <h3 className="text-xl font-semibold mb-4 text-slate-900">Logistics & Studio Details</h3>
             <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-6">
               <div className="bg-[#EEF2F7] rounded-2xl p-5 shadow-sm">
@@ -547,7 +553,7 @@ export default function WorkshopDetailPage() {
 
           
 
-          <div className="grid md:grid-cols-2 gap-8 pt-8 pb-10 px-10 md:px-12 border-t border-slate-100">
+          <div className="grid md:grid-cols-2 gap-8 pt-8 pb-10 px-6 md:px-12 border-t border-slate-100">
             <div>
               <h3 className="text-xl font-semibold mb-4 text-slate-900">What you will learn</h3>
               <ul className="space-y-2 list-disc pl-5 text-slate-700">
@@ -593,7 +599,7 @@ export default function WorkshopDetailPage() {
 
           
 
-          <div className="p-10 md:p-12 border-t border-slate-100 space-y-6">
+          <div className="p-6 md:p-12 border-t border-slate-100 space-y-6">
               <div>
                 <h3 className="text-xl font-semibold mb-4 text-slate-900">Detailed Workshop Overview</h3>
                 <p className="text-slate-700 mb-3">This masterclass focuses on the Botanical Garden series, where you will learn to bridge the gap between raw nature and refined functional art.</p>

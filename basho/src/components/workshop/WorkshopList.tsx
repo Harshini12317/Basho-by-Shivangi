@@ -102,7 +102,7 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
     <div className="bg-[#F8F7F2] min-h-screen py-16 px-4 sm:px-8">
       <div className="max-w-6xl mx-auto bg-white rounded-[40px] p-8 md:p-16 shadow-sm">
         <div className="-mx-8 md:-mx-16 -mt-8 md:-mt-16 mb-12">
-          <div className="rounded-t-[40px] bg-[#D8A7B1] text-white text-center py-8">
+          <div className="overflow-hidden rounded-t-[40px] bg-[#D8A7B1] text-white text-center py-8">
             <h2 className="text-3xl md:text-4xl font-semibold">Pottery Workshop</h2>
           </div>
         </div>
@@ -150,30 +150,30 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
                 <div className="text-[11px] tracking-wide uppercase opacity-80">The Best Things In Life</div>
                 <div className="text-2xl md:text-3xl font-semibold">Are Handmade!</div>
               </div>
-              <div className="md:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div className="flex flex-col items-center bg-[#F7EFE7] text-[#3B3428] rounded-[28px] px-6 py-5 shadow-sm ring-1 ring-[#E2C48D]">
-                  <div className="w-12 h-12 rounded-full bg-[#6A2424] text-[#F9E8E4] flex items-center justify-center">
+              <div className="md:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                <div className="flex flex-col items-center bg-[#F7EFE7] text-[#3B3428] rounded-[28px] px-2 py-5 shadow-sm ring-1 ring-[#E2C48D] h-full justify-start">
+                  <div className="w-12 h-12 rounded-full bg-[#6A2424] text-[#F9E8E4] flex items-center justify-center flex-shrink-0">
                     <FaLeaf />
                   </div>
-                  <div className="mt-3 font-medium">Eco‑Friendly</div>
+                  <div className="mt-3 font-medium text-sm md:text-base text-center break-words w-full leading-tight">Eco-Friendly</div>
                 </div>
-                <div className="flex flex-col items-center bg-[#F7EFE7] text-[#3B3428] rounded-[28px] px-6 py-5 shadow-sm ring-1 ring-[#E2C48D]">
-                  <div className="w-12 h-12 rounded-full bg-[#6A2424] text-[#F9E8E4] flex items-center justify-center">
+                <div className="flex flex-col items-center bg-[#F7EFE7] text-[#3B3428] rounded-[28px] px-2 py-5 shadow-sm ring-1 ring-[#E2C48D] h-full justify-start">
+                  <div className="w-12 h-12 rounded-full bg-[#6A2424] text-[#F9E8E4] flex items-center justify-center flex-shrink-0">
                     <FaHandSparkles />
                   </div>
-                  <div className="mt-3 font-medium">Artisanal</div>
+                  <div className="mt-3 font-medium text-sm md:text-base text-center break-words w-full leading-tight">Artisanal</div>
                 </div>
-                <div className="flex flex-col items-center bg-[#F7EFE7] text-[#3B3428] rounded-[28px] px-6 py-5 shadow-sm ring-1 ring-[#E2C48D]">
-                  <div className="w-12 h-12 rounded-full bg-[#6A2424] text-[#F9E8E4] flex items-center justify-center">
+                <div className="flex flex-col items-center bg-[#F7EFE7] text-[#3B3428] rounded-[28px] px-2 py-5 shadow-sm ring-1 ring-[#E2C48D] h-full justify-start">
+                  <div className="w-12 h-12 rounded-full bg-[#6A2424] text-[#F9E8E4] flex items-center justify-center flex-shrink-0">
                     <FaStar />
                   </div>
-                  <div className="mt-3 font-medium">High Quality</div>
+                  <div className="mt-3 font-medium text-sm md:text-base text-center break-words w-full leading-tight">High Quality</div>
                 </div>
-                <div className="flex flex-col items-center bg-[#F7EFE7] text-[#3B3428] rounded-[28px] px-6 py-5 shadow-sm ring-1 ring-[#E2C48D]">
-                  <div className="w-12 h-12 rounded-full bg-[#6A2424] text-[#F9E8E4] flex items-center justify-center">
+                <div className="flex flex-col items-center bg-[#F7EFE7] text-[#3B3428] rounded-[28px] px-2 py-5 shadow-sm ring-1 ring-[#E2C48D] h-full justify-start">
+                  <div className="w-12 h-12 rounded-full bg-[#6A2424] text-[#F9E8E4] flex items-center justify-center flex-shrink-0">
                     <FaChair />
                   </div>
-                  <div className="mt-3 font-medium">Ergonomic</div>
+                  <div className="mt-3 font-medium text-sm md:text-base text-center break-words w-full leading-tight">Ergonomic</div>
                 </div>
               </div>
             </div>
@@ -218,27 +218,78 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
             </button>
           </div>
         </div>
-        <div className="overflow-hidden mb-16 bg-[#4B5D3A] mt-12">
-          <div className="grid md:grid-cols-2">
-            <div className="relative h-[420px] md:h-[520px]">
-              <img src="/images/women1.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-[#4B5D3A]/60" />
-              <div className="relative z-10 h-full flex flex-col items-start justify-center px-6 md:px-10 text-white">
-                <div className="text-3xl md:text-5xl font-semibold">Celebrate with Clay</div>
-                <div className="text-lg md:text-2xl mt-2">Pottery for Events & Workshops</div>
-                <p className="mt-4 max-w-xl text-sm md:text-base opacity-90">
-                  Craft memories. Mold moments. Experience a unique celebration.
+        <div className="relative">
+          <div id="events" className="relative isolate overflow-hidden mb-16 bg-[#4B5D3A] mt-12 scroll-mt-24">
+            <div className="grid md:grid-cols-2">
+              <div className="relative min-h-[420px] md:h-[520px] bg-transparent">
+                <img src="/images/w4.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
+              </div>
+              <div className="min-h-[420px] md:h-[520px] flex flex-col items-center justify-center px-8 text-center text-white py-12 md:py-0">
+                <h3 className="text-2xl md:text-3xl font-semibold mb-4">Plan Your Special Day</h3>
+                <p className="mb-8 max-w-sm opacity-90">
+                  Host a memorable creative gathering for birthdays, team building, or bridal showers.
                 </p>
+                <Link href="/contact" className="inline-block bg-[#E76F51] text-white px-8 py-3 rounded-full shadow-md hover:bg-[#D35400] transition-colors">
+                  Book Your Event
+                </Link>
               </div>
             </div>
-            <div className="h-[420px] md:h-[520px] flex flex-col items-center justify-center px-8 text-center text-white">
-              <h3 className="text-2xl md:text-3xl font-semibold mb-4">Plan Your Special Day</h3>
-              <p className="mb-8 max-w-sm opacity-90">
-                Host a memorable creative gathering for birthdays, team building, or bridal showers.
+          </div>
+          
+          <div className="grid md:grid-cols-2 items-center gap-8 mb-16">
+            <div className="flex justify-center md:justify-start group cursor-pointer bg-white rounded-2xl p-2 ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">
+              <img src="/images/ev1.png" alt="" className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
+            </div>
+            <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
+              <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">Date Night: Crafting Memories</div>
+              <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
+              <p className="leading-relaxed max-w-md md:max-w-lg">
+                Spend a romantic evening in our serene studio, connecting through the tactile experience of shaping raw earth together on the pottery wheel. It’s a mindful escape for couples.
               </p>
-              <Link href="/contact" className="inline-block bg-[#E76F51] text-white px-8 py-3 rounded-full shadow-md hover:bg-[#D35400] transition-colors">
-                Book Your Event
-              </Link>
+              <div className="flex gap-2 flex-wrap mt-4">
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Couples</span>
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Guided</span>
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">All Levels</span>
+              </div>
+              <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Book Date Night</Link>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 items-center gap-8 mb-16">
+            <div className="flex justify-center md:justify-start group cursor-pointer bg-white rounded-2xl p-2 ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">
+              <img src="/images/e3.png" alt="" className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
+            </div>
+            <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
+              <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">Birthday Bash: Creative Celebrations</div>
+              <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
+              <p className="leading-relaxed max-w-md md:max-w-lg">
+                Our Birthday Blast Workshop is the ultimate creative party where guests trade traditional gifts for a hands-on adventure in clay. Under the guidance of our expert instructors, your group will dive into the mess and magic of the pottery wheel, crafting their very own "Earthen Legacy" pieces from scratch.
+              </p>
+              <div className="flex gap-2 flex-wrap mt-4">
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Group Fun</span>
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Instructor‑Led</span>
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">All Ages</span>
+              </div>
+              <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Plan A Birthday Bash</Link>
+            </div>
+          </div>
+          
+          <div className="grid md:grid-cols-2 items-center gap-8 mb-16">
+            <div className="flex justify-center md:justify-start group cursor-pointer bg-white rounded-2xl p-2 ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">
+              <img src="/images/e5.png" alt="" className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
+            </div>
+            <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
+              <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">Team Building: Hands‑On Harmony</div>
+              <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
+              <p className="leading-relaxed max-w-md md:max-w-lg">
+                Escape the conventional office setting and immerse your team in a dynamic pottery workshop designed to foster genuine connection and collaborative spirit. Our "Hands‑On Harmony" session encourages communication, problem‑solving, and creative thinking as colleagues learn to shape clay together.
+              </p>
+              <div className="flex gap-2 flex-wrap mt-4">
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Team Bonding</span>
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Communication</span>
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Creative Thinking</span>
+              </div>
+              <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Book Team Session</Link>
             </div>
           </div>
         </div>

@@ -25,20 +25,22 @@ export default function Home() {
                 and quiet elegance into your living space.
               </p>
 
-              <button
-                className="
-                  mt-10 inline-flex items-center
-                  rounded-full
-                  bg-[var(--accent-clay)]
-                  px-8 py-4
-                  text-base font-medium
-                  text-white
-                  transition-transform
-                  hover:scale-[1.03]
-                "
-              >
-                Explore Collection
-              </button>
+              <div className="mt-10 flex flex-wrap gap-4">
+                <button
+                  className="
+                    inline-flex items-center
+                    rounded-full
+                    bg-[var(--accent-clay)]
+                    px-8 py-4
+                    text-base font-medium
+                    text-white
+                    transition-transform
+                    hover:scale-[1.03]
+                  "
+                >
+                  Explore Collection
+                </button>
+              </div>
             </div>
 
             {/* RIGHT — 3D POT */}

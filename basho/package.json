@@ -13,6 +13,7 @@
     "@tsparticles/slim": "^3.9.1",
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.8.0",
     "framer-motion": "^12.23.26",
     "gsap": "^3.14.2",
     "mongoose": "^9.0.2",
