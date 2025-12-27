@@ -59,7 +59,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             <div className="relative p-8 lg:p-12">
               <div className="relative overflow-hidden bg-[#EDD8B4]/30 backdrop-blur-sm shadow-xl hover:scale-105 transition-transform duration-500 elegant-rounded-xl">
                 <img
-                  src={selectedImage === 0 ? "/images/product1.png" : "/images/product2.png"}
+                  src={product.images?.[selectedImage] || '/images/placeholder.png'}
                   className="w-full h-80 lg:h-96 object-cover transition-all duration-700 hover:scale-105"
                   alt={product.title}
                 />
@@ -69,36 +69,25 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 <div className="absolute bottom-4 right-4 w-8 h-8 bg-[#C85428]/10 elegant-rounded-full"></div>
               </div>
 
-              {/* Thumbnails for the two images */}
+              {/* Thumbnails for all product images */}
               <div className="flex space-x-4 overflow-x-auto pb-4 px-2 mt-6">
-                <button
-                  onClick={() => setSelectedImage(0)}
-                  className={`flex-shrink-0 w-20 h-20 elegant-rounded-lg overflow-hidden border-3 transition-all duration-300 transform hover:scale-110 shadow-md ${
-                    selectedImage === 0
-                      ? "border-[#8E5022] shadow-lg"
-                      : "border-[#EDD8B4] hover:border-[#C85428]"
-                  }`}
-                >
-                  <img
-                    src="/images/product1.png"
-                    className="w-full h-full object-cover"
-                    alt={`${product.title} 1`}
-                  />
-                </button>
-                <button
-                  onClick={() => setSelectedImage(1)}
-                  className={`flex-shrink-0 w-20 h-20 elegant-rounded-lg overflow-hidden border-3 transition-all duration-300 transform hover:scale-110 shadow-md ${
-                    selectedImage === 1
-                      ? "border-[#8E5022] shadow-lg"
-                      : "border-[#EDD8B4] hover:border-[#C85428]"
-                  }`}
-                >
-                  <img
-                    src="/images/product2.png"
-                    className="w-full h-full object-cover"
-                    alt={`${product.title} 2`}
-                  />
-                </button>
+                {product.images?.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`flex-shrink-0 w-20 h-20 elegant-rounded-lg overflow-hidden border-3 transition-all duration-300 transform hover:scale-110 shadow-md ${
+                      selectedImage === index
+                        ? "border-[#8E5022] shadow-lg"
+                        : "border-[#EDD8B4] hover:border-[#C85428]"
+                    }`}
+                  >
+                    <img
+                      src={image}
+                      className="w-full h-full object-cover"
+                      alt={`${product.title} ${index + 1}`}
+                    />
+                  </button>
+                ))}
               </div>
             </div>
 

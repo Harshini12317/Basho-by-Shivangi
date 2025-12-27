@@ -13,7 +13,7 @@ interface Product {
   stock: number;
   isPublished: boolean;
   images: string[];
-  createdAt: string;
+  createdAt: Date;
 }
 
 export default function AdminProducts() {
@@ -25,6 +25,18 @@ export default function AdminProducts() {
 
   useEffect(() => {
     fetchProducts();
+  }, []);
+
+  // Refetch products when the page becomes visible (e.g., after navigation)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchProducts();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
   const fetchProducts = async () => {

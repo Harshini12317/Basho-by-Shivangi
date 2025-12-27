@@ -70,12 +70,12 @@ export default function ProductListing() {
                   {/* Image container with hover effect */}
                   <div className="relative overflow-hidden">
                     <img
-                      src="/images/product1.png"
+                      src={p.images?.[0] || '/images/placeholder.png'}
                       className="w-full h-48 object-cover transition-opacity duration-500 group-hover:opacity-0"
                       alt={p.title}
                     />
                     <img
-                      src="/images/product2.png"
+                      src={p.images?.[1] || p.images?.[0] || '/images/placeholder.png'}
                       className="absolute top-0 left-0 w-full h-48 object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                       alt={p.title}
                     />

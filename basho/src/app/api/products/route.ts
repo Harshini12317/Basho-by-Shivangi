@@ -68,9 +68,11 @@ const dummyProducts = [
 
 export async function GET() {
   try {
-    // For now, return dummy data
-    return NextResponse.json(dummyProducts);
+    await connectDB();
+    const products = await Product.find({ isPublished: true }).sort({ createdAt: -1 });
+    return NextResponse.json(products);
   } catch (err: any) {
+    console.error('GET /api/products error:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
