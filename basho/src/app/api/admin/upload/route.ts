@@ -72,11 +72,19 @@ export async function POST(request: NextRequest) {
           folder: 'basho-products',
           resource_type: 'image',
           transformation: [
-            { width: 800, height: 800, crop: 'limit' }, // Resize to max 800x800
-            { quality: 'auto' } // Auto quality optimization
+            { width: 1200, height: 1200, crop: 'limit' }, // Increased max size for better quality
+            { quality: 'auto' }, // Auto quality optimization
+            { fetch_format: 'auto' } // Auto format selection (WebP, AVIF, etc.)
           ],
-          // Reduce upload time
-          timeout: 60000 // 60 second timeout
+          // Performance optimizations
+          timeout: 60000, // 60 second timeout
+          eager: [
+            { width: 400, height: 400, crop: 'fill', quality: 'auto' } // Generate thumbnail
+          ],
+          // Upload optimizations
+          use_filename: true,
+          unique_filename: true,
+          overwrite: false
         },
         (error, result) => {
           if (error) {

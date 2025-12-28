@@ -6,7 +6,12 @@ import Product from '@/models/product';
 export async function GET() {
   try {
     await connectDB();
-    const products = await Product.find({}).sort({ createdAt: -1 });
+    const products = await Product.find({})
+      .populate({
+        path: 'category',
+        model: 'Category'
+      })
+      .sort({ createdAt: -1 });
     return NextResponse.json(products);
   } catch (error) {
     console.error('GET /api/admin/products error:', error);

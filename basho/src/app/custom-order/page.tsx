@@ -14,16 +14,41 @@ export default function CustomOrderPage() {
 
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [referenceFiles, setReferenceFiles] = useState<File[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCustomOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
+      // convert selected files to data URLs for server-side Cloudinary upload
+      const fileToDataUrl = (file: File) =>
+        new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = (err) => reject(err);
+          reader.readAsDataURL(file);
+        });
+
+      const dataUrls = referenceFiles.length
+        ? await Promise.all(referenceFiles.map((f) => fileToDataUrl(f)))
+        : [];
+
+      const payload = {
+        name: customOrderForm.name,
+        email: customOrderForm.email,
+        phone: customOrderForm.phone,
+        description: customOrderForm.description,
+        notes: customOrderForm.notes,
+        referenceImages: dataUrls,
+      };
+
       const response = await fetch("/api/custom-orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(customOrderForm),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
@@ -36,11 +61,15 @@ export default function CustomOrderPage() {
           notes: "",
           referenceImages: [],
         });
+        setReferenceFiles([]);
       } else {
         alert("Failed to submit custom order. Please try again.");
       }
     } catch (error) {
+      console.error(error);
       alert("Error submitting custom order. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -376,7 +405,7 @@ export default function CustomOrderPage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 2.5 }}
-          className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-10 shadow-xl border border-gray-100 relative overflow-hidden"
+          className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-4 sm:p-6 lg:p-10 shadow-xl border border-gray-100 relative overflow-hidden mx-4 sm:mx-0"
         >
           {/* Decorative background elements */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#8E5022]/5 rounded-full -translate-y-16 translate-x-16"></div>
@@ -386,40 +415,40 @@ export default function CustomOrderPage() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 2.7 }}
-            className="text-4xl font-bold serif text-[#442D1C] mb-10 text-center relative z-10"
+            className="text-2xl sm:text-3xl lg:text-4xl font-bold serif text-[#442D1C] mb-6 sm:mb-8 lg:mb-10 text-center relative z-10"
           >
             Request Your Custom Piece
           </motion.h2>
-          <form onSubmit={handleCustomOrderSubmit} className="space-y-8 relative z-10">
+          <form onSubmit={handleCustomOrderSubmit} className="space-y-6 sm:space-y-8 relative z-10">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 2.9 }}
-              className="grid grid-cols-1 md:grid-cols-2 gap-8"
+              className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8"
             >
-              <div className="space-y-3">
-                <label className="text-[#442D1C] font-semibold text-lg serif block">Your Name</label>
+              <div className="space-y-2 sm:space-y-3">
+                <label className="text-[#442D1C] font-semibold text-base sm:text-lg serif block">Your Name</label>
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="Enter your full name"
                     value={customOrderForm.name}
                     onChange={(e) => setCustomOrderForm({ ...customOrderForm, name: e.target.value })}
-                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400"
+                    className="w-full p-3 sm:p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400 text-sm sm:text-base"
                     required
                   />
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#8E5022]/5 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                 </div>
               </div>
-              <div className="space-y-3">
-                <label className="text-[#442D1C] font-semibold text-lg serif block">Email Address</label>
+              <div className="space-y-2 sm:space-y-3">
+                <label className="text-[#442D1C] font-semibold text-base sm:text-lg serif block">Email Address</label>
                 <div className="relative">
                   <input
                     type="email"
                     placeholder="your.email@example.com"
                     value={customOrderForm.email}
                     onChange={(e) => setCustomOrderForm({ ...customOrderForm, email: e.target.value })}
-                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400"
+                    className="w-full p-3 sm:p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400 text-sm sm:text-base"
                     required
                   />
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#8E5022]/5 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -431,16 +460,16 @@ export default function CustomOrderPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 3.1 }}
-              className="space-y-3"
+              className="space-y-2 sm:space-y-3"
             >
-              <label className="text-[#442D1C] font-semibold text-lg serif block">Phone Number</label>
+              <label className="text-[#442D1C] font-semibold text-base sm:text-lg serif block">Phone Number</label>
               <div className="relative">
                 <input
                   type="tel"
                   placeholder="+91 98765 43210"
                   value={customOrderForm.phone}
                   onChange={(e) => setCustomOrderForm({ ...customOrderForm, phone: e.target.value })}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400"
+                  className="w-full p-3 sm:p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400 text-sm sm:text-base"
                   required
                 />
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#8E5022]/5 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -451,15 +480,15 @@ export default function CustomOrderPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 3.3 }}
-              className="space-y-3"
+              className="space-y-2 sm:space-y-3"
             >
-              <label className="text-[#442D1C] font-semibold text-lg serif block">Describe Your Vision</label>
+              <label className="text-[#442D1C] font-semibold text-base sm:text-lg serif block">Describe Your Vision</label>
               <div className="relative">
                 <textarea
                   placeholder="Tell us about your dream pottery piece. Include details like size, shape, color preferences, intended use, and any special features..."
                   value={customOrderForm.description}
                   onChange={(e) => setCustomOrderForm({ ...customOrderForm, description: e.target.value })}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 h-36 resize-none bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400"
+                  className="w-full p-3 sm:p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 h-32 sm:h-36 resize-none bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400 text-sm sm:text-base"
                   required
                 />
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#8E5022]/5 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -470,15 +499,15 @@ export default function CustomOrderPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 3.5 }}
-              className="space-y-3"
+              className="space-y-2 sm:space-y-3"
             >
-              <label className="text-[#442D1C] font-semibold text-lg serif block">Additional Notes <span className="text-gray-500 font-normal">(Optional)</span></label>
+              <label className="text-[#442D1C] font-semibold text-base sm:text-lg serif block">Additional Notes <span className="text-gray-500 font-normal">(Optional)</span></label>
               <div className="relative">
                 <textarea
                   placeholder="Any specific requirements, timeline preferences, or other details..."
                   value={customOrderForm.notes}
                   onChange={(e) => setCustomOrderForm({ ...customOrderForm, notes: e.target.value })}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 h-28 resize-none bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400"
+                  className="w-full p-3 sm:p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 h-24 sm:h-28 resize-none bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400 text-sm sm:text-base"
                 />
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#8E5022]/5 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               </div>
@@ -488,10 +517,10 @@ export default function CustomOrderPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 3.7 }}
-              className="space-y-4"
+              className="space-y-3 sm:space-y-4"
             >
-              <label className="text-[#442D1C] font-semibold text-lg serif block">Reference Images <span className="text-gray-500 font-normal">(Optional)</span></label>
-              <p className="text-[#652810] text-sm mb-4">Upload photos of pieces you like or sketches of your vision</p>
+              <label className="text-[#442D1C] font-semibold text-base sm:text-lg serif block">Reference Images <span className="text-gray-500 font-normal">(Optional)</span></label>
+              <p className="text-[#652810] text-sm sm:text-base mb-3 sm:mb-4">Upload photos of pieces you like or sketches of your vision</p>
               <div className="relative">
                 <input
                   type="file"
@@ -500,7 +529,9 @@ export default function CustomOrderPage() {
                   onChange={(e) => {
                     const files = e.target.files;
                     if (files) {
-                      const urls = Array.from(files).map(file => URL.createObjectURL(file));
+                      const fileArray = Array.from(files);
+                      setReferenceFiles(fileArray);
+                      const urls = fileArray.map((file) => URL.createObjectURL(file));
                       setCustomOrderForm({ ...customOrderForm, referenceImages: urls });
                     }
                   }}
@@ -511,7 +542,7 @@ export default function CustomOrderPage() {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="flex flex-wrap gap-4 mt-6"
+                  className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 sm:gap-4 mt-4 sm:mt-6"
                 >
                   {customOrderForm.referenceImages.map((image, index) => (
                     <motion.div
@@ -523,7 +554,7 @@ export default function CustomOrderPage() {
                     >
                       <img
                         src={image}
-                        className="w-24 h-24 object-cover rounded-xl border-2 border-gray-200 shadow-sm group-hover:shadow-md transition-shadow duration-300"
+                      className="w-full aspect-square object-cover rounded-lg sm:rounded-xl border-2 border-gray-200 shadow-sm group-hover:shadow-md transition-shadow duration-300"
                         alt={`Reference ${index + 1}`}
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-xl transition-colors duration-300"></div>
@@ -537,16 +568,22 @@ export default function CustomOrderPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 3.9 }}
-              className="text-center pt-10"
+              className="text-center pt-6 sm:pt-8 lg:pt-10"
             >
               <motion.button
-                whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(142, 80, 34, 0.3)" }}
+                whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
-                className="bg-gradient-to-r from-[#8E5022] to-[#C85428] hover:from-[#652810] hover:to-[#8E5022] text-white py-5 px-12 rounded-2xl font-bold text-xl transition-all duration-500 shadow-xl hover:shadow-2xl transform relative overflow-hidden group"
+                disabled={isSubmitting}
+                className="inline-flex items-center justify-center gap-2 sm:gap-3 bg-[#8E5022] hover:bg-[#652810] text-white py-3 sm:py-4 px-4 sm:px-6 rounded-lg font-semibold text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-60 w-full sm:w-auto"
               >
-                <span className="relative z-10">Submit Custom Order Request</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                {isSubmitting ? (
+                  <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                  </svg>
+                ) : null}
+                <span>{isSubmitting ? 'Submitting…' : 'Submit Custom Order Request'}</span>
               </motion.button>
               <p className="text-gray-500 text-sm mt-4">We'll get back to you within 24-48 hours</p>
             </motion.div>

@@ -1,6 +1,13 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import CustomOrder from "@/models/CustomOrder";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const dummyCustomOrders = [
   {
@@ -70,8 +77,14 @@ const dummyCustomOrders = [
 
 export async function GET() {
   try {
-    // For now, return dummy data
-    return NextResponse.json(dummyCustomOrders);
+    // Try to return real data from DB; fallback to dummy data if DB unavailable
+    try {
+      await connectDB();
+      const orders = await CustomOrder.find({}).sort({ createdAt: -1 });
+      return NextResponse.json(orders);
+    } catch (dbErr) {
+      return NextResponse.json(dummyCustomOrders);
+    }
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
@@ -90,21 +103,37 @@ export async function POST(request: Request) {
       );
     }
 
-    // For now, just return success with the data
-    const newCustomOrder = {
-      _id: `co${Date.now()}`,
+    // If there are base64/data-URI images, upload them to Cloudinary first
+    let processedImages: string[] = referenceImages && Array.isArray(referenceImages) ? referenceImages : [];
+    try {
+      processedImages = await Promise.all(
+        processedImages.map(async (img: string) => {
+          if (typeof img === "string" && img.startsWith("data:")) {
+            // upload data URI to Cloudinary
+            const res = await cloudinary.uploader.upload(img, { folder: "custom_orders" });
+            return res.secure_url;
+          }
+          return img;
+        })
+      );
+    } catch (uploadErr) {
+      // If upload fails, continue with original values (or empty array)
+      console.error("Cloudinary upload error:", uploadErr);
+    }
+
+    // Persist to DB
+    await connectDB();
+    const created = await CustomOrder.create({
       name,
       email,
       phone,
       description,
-      referenceImages: referenceImages || [],
+      referenceImages: processedImages || [],
       notes: notes || "",
       status: "requested",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    });
 
-    return NextResponse.json(newCustomOrder, { status: 201 });
+    return NextResponse.json(created, { status: 201 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

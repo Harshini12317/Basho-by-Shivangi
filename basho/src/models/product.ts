@@ -9,7 +9,7 @@ export interface IProduct extends Document {
   images: string[];
   material: string;
   care: string;
-  category: "ready-made" | "custom-gallery";
+  category: mongoose.Types.ObjectId;
   stock: number;
   isPublished: boolean;
 }
@@ -24,7 +24,7 @@ const ProductSchema = new Schema<IProduct>(
     images: [String],
     material: String,
     care: String,
-    category: { type: String, enum: ["ready-made", "custom-gallery"] },
+    category: { type: Schema.Types.ObjectId, ref: 'Category' },
     stock: { type: Number, default: 1 },
     isPublished: { type: Boolean, default: true },
   },

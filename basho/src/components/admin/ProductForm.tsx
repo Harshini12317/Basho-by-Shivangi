@@ -11,14 +11,14 @@ interface ProductFormData {
   images: string[];
   material: string;
   care: string;
-  category: 'ready-made' | 'custom-gallery';
+  category: string; // This will be the category ID
   stock: number;
   isPublished: boolean;
 }
 
-interface ProductFormProps {
-  product?: any;
-  isEditing?: boolean;
+interface Category {
+  _id: string;
+  name: string;
 }
 
 export default function ProductForm({ product, isEditing = false }: ProductFormProps) {
@@ -26,6 +26,10 @@ export default function ProductForm({ product, isEditing = false }: ProductFormP
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [uploadingImages, setUploadingImages] = useState<Set<number>>(new Set());
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<Map<number, number>>(new Map());
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [formData, setFormData] = useState<ProductFormData>({
     title: '',
     description: '',
@@ -34,7 +38,7 @@ export default function ProductForm({ product, isEditing = false }: ProductFormP
     images: [],
     material: '',
     care: '',
-    category: 'ready-made',
+    category: '',
     stock: 1,
     isPublished: true,
   });
@@ -49,12 +53,30 @@ export default function ProductForm({ product, isEditing = false }: ProductFormP
         images: Array.isArray(product.images) ? product.images : [],
         material: product.material || '',
         care: product.care || '',
-        category: product.category || 'ready-made',
+        category: product.category?._id || product.category || '',
         stock: product.stock || 1,
         isPublished: product.isPublished ?? true,
       });
     }
   }, [product]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/admin/categories');
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data); // All categories are now active by default
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -156,89 +178,7 @@ export default function ProductForm({ product, isEditing = false }: ProductFormP
     });
   };
 
-  const handleImageUpload = async (index: number, file: File) => {
-    // Add loading state for this image
-    setUploadingImages(prev => new Set(prev).add(index));
 
-    // Compress image before upload if it's large
-    let processedFile = file;
-    if (file.size > 1024 * 1024) { // If larger than 1MB
-      try {
-        processedFile = await compressImage(file);
-      } catch (error) {
-        console.warn('Image compression failed, using original:', error);
-      }
-    }
-
-    const formData = new FormData();
-    formData.append('file', processedFile);
-
-    try {
-      console.log('Starting upload for file:', file.name, 'size:', file.size);
-      const response = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      console.log('Upload response status:', response.status);
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Upload successful:', data.url);
-        setFormData(prev => {
-          const currentImages = prev.images || [];
-          if (index >= currentImages.length) {
-            console.warn(`Image upload completed but index ${index} is out of bounds`);
-            return prev;
-          }
-          return {
-            ...prev,
-            images: currentImages.map((img, i) => i === index ? data.url : img)
-          };
-        });
-      } else {
-        const error = await response.json();
-        alert(`Upload failed: ${error.error}`);
-      }
-    } catch (error) {
-      console.error('Upload error:', error);
-      alert('Failed to upload image');
-    } finally {
-      // Remove loading state for this image
-      setUploadingImages(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(index);
-        return newSet;
-      });
-    }
-  };
-
-  const handleImageFileChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-      if (!allowedTypes.includes(file.type)) {
-        alert('Only JPG, PNG, and WebP files are allowed');
-        e.target.value = ''; // Clear the input
-        return;
-      }
-
-      // Validate file size (max 5MB)
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (file.size > maxSize) {
-        alert('File size must be less than 5MB');
-        e.target.value = ''; // Clear the input
-        return;
-      }
-
-      // Show file info
-      const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-      console.log(`Uploading ${file.name} (${sizeMB}MB)`);
-
-      handleImageUpload(index, file);
-    }
-  };
 
   const handleImageRemove = (index: number) => {
     setFormData(prev => ({
@@ -250,6 +190,104 @@ export default function ProductForm({ product, isEditing = false }: ProductFormP
       const newSet = new Set(prev);
       newSet.delete(index);
       return newSet;
+    });
+  };
+
+  const handleMultipleImageUpload = async (files: File[]) => {
+    const validFiles = files.filter(file => {
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+
+      if (!allowedTypes.includes(file.type)) {
+        alert(`File ${file.name}: Only JPG, PNG, and WebP files are allowed`);
+        return false;
+      }
+
+      if (file.size > maxSize) {
+        alert(`File ${file.name}: File size must be less than 5MB`);
+        return false;
+      }
+
+      return true;
+    });
+
+    if (validFiles.length === 0) return;
+
+    // Add placeholders for all images
+    const startIndex = formData.images.length;
+    const newImages = [...formData.images, ...validFiles.map(() => '')];
+    setFormData(prev => ({ ...prev, images: newImages }));
+
+    // Upload all images in parallel
+    const uploadPromises = validFiles.map(async (file, fileIndex) => {
+      const imageIndex = startIndex + fileIndex;
+      setUploadingImages(prev => new Set(prev).add(imageIndex));
+
+      try {
+        // Compress image before upload if it's large
+        let processedFile = file;
+        if (file.size > 1024 * 1024) { // If larger than 1MB
+          try {
+            processedFile = await compressImage(file);
+          } catch (error) {
+            console.warn('Image compression failed, using original:', error);
+          }
+        }
+
+        const formDataUpload = new FormData();
+        formDataUpload.append('file', processedFile);
+
+        console.log('Starting upload for file:', file.name, 'size:', file.size);
+        const response = await fetch('/api/admin/upload', {
+          method: 'POST',
+          body: formDataUpload,
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Upload successful:', data.url);
+          setFormData(prev => {
+            const currentImages = prev.images || [];
+            return {
+              ...prev,
+              images: currentImages.map((img, i) => i === imageIndex ? data.url : img)
+            };
+          });
+        } else {
+          const error = await response.json();
+          alert(`Upload failed for ${file.name}: ${error.error}`);
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        alert(`Failed to upload ${file.name}`);
+      } finally {
+        setUploadingImages(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(imageIndex);
+          return newSet;
+        });
+      }
+    });
+
+    // Wait for all uploads to complete
+    await Promise.allSettled(uploadPromises);
+  };
+
+  const handleMultipleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      handleMultipleImageUpload(files);
+      // Clear the input
+      e.target.value = '';
+    }
+  };
+
+  const handleImageReorder = (fromIndex: number, toIndex: number) => {
+    setFormData(prev => {
+      const images = [...(prev.images || [])];
+      const [movedImage] = images.splice(fromIndex, 1);
+      images.splice(toIndex, 0, movedImage);
+      return { ...prev, images };
     });
   };
 
@@ -299,14 +337,31 @@ export default function ProductForm({ product, isEditing = false }: ProductFormP
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Category *
               </label>
-              <select
-                value={formData.category}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData(prev => ({ ...prev, category: e.target.value as any }))}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-              >
-                <option value="ready-made">Ready Made</option>
-                <option value="custom-gallery">Custom Gallery</option>
-              </select>
+              {categoriesLoading ? (
+                <div className="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-50 flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-slate-600 mr-2"></div>
+                  <span className="text-slate-600">Loading categories...</span>
+                </div>
+              ) : (
+                <select
+                  value={formData.category}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+                  required
+                >
+                  <option value="">Select a category</option>
+                  {categories.map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {!categoriesLoading && categories.length === 0 && (
+                <p className="text-sm text-amber-600 mt-1">
+                  No active categories found. Please create categories first.
+                </p>
+              )}
             </div>
 
             <div>
@@ -396,46 +451,95 @@ export default function ProductForm({ product, isEditing = false }: ProductFormP
         <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
           <h2 className="text-xl font-semibold text-slate-900 mb-6">Product Images</h2>
 
+          {/* Multiple file upload section */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Upload Multiple Images
+            </label>
+            <div className="relative">
+              <input
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                multiple
+                onChange={handleMultipleFileChange}
+                disabled={uploadingImages.size > 0}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              {uploadingImages.size > 0 && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <svg className="animate-spin w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span className="text-sm text-slate-600">Uploading {uploadingImages.size} image{uploadingImages.size > 1 ? 's' : ''}...</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            <p className="text-sm text-slate-500 mt-1">
+              Select multiple images at once. Images will be uploaded in parallel for faster processing.
+            </p>
+          </div>
+
+          {/* Individual image management */}
           <div className="space-y-4">
+            <h3 className="text-lg font-medium text-slate-900">Manage Images</h3>
             {(formData.images || []).map((image, index) => (
-              <div key={index} className="flex gap-4 items-center">
+              <div key={index} className="flex gap-4 items-center p-4 border border-slate-200 rounded-lg">
                 <div className="flex-1">
                   {image && (
                     <div className="mb-2">
-                      <p className="text-sm text-slate-600 mb-1">Current Image:</p>
                       <img
                         src={image}
-                        alt={`Current ${index + 1}`}
+                        alt={`Product image ${index + 1}`}
                         className="w-20 h-20 object-cover rounded-lg border"
                       />
                     </div>
                   )}
-                  <div className="relative">
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/jpg,image/png,image/webp"
-                      onChange={(e) => handleImageFileChange(index, e)}
-                      disabled={uploadingImages.has(index)}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                    />
-                    {uploadingImages.has(index) && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 rounded-lg">
-                        <div className="flex items-center gap-2">
-                          <svg className="animate-spin w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          <span className="text-sm text-slate-600">Uploading...</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  {!image && !uploadingImages.has(index) && (
+                    <div className="w-20 h-20 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center">
+                      <span className="text-slate-400 text-sm">No image</span>
+                    </div>
+                  )}
+                  {uploadingImages.has(index) && (
+                    <div className="w-20 h-20 border-2 border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center">
+                      <svg className="animate-spin w-6 h-6 text-slate-600 mb-1" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span className="text-xs text-slate-600">Uploading</span>
+                    </div>
+                  )}
                   {image && !uploadingImages.has(index) && (
                     <div className="mt-2">
-                      <p className="text-sm text-green-600">✓ Image ready</p>
+                      <p className="text-sm text-green-600">✓ Image uploaded</p>
                     </div>
                   )}
                 </div>
+
+                {/* Reorder buttons */}
+                <div className="flex flex-col gap-1">
+                  <button
+                    type="button"
+                    onClick={() => handleImageReorder(index, Math.max(0, index - 1))}
+                    disabled={index === 0 || uploadingImages.size > 0}
+                    className="px-2 py-1 text-xs text-slate-600 hover:text-slate-800 border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Move up"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleImageReorder(index, Math.min((formData.images || []).length - 1, index + 1))}
+                    disabled={index === (formData.images || []).length - 1 || uploadingImages.size > 0}
+                    className="px-2 py-1 text-xs text-slate-600 hover:text-slate-800 border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Move down"
+                  >
+                    ↓
+                  </button>
+                </div>
+
                 <button
                   type="button"
                   onClick={() => handleImageRemove(index)}
@@ -450,9 +554,10 @@ export default function ProductForm({ product, isEditing = false }: ProductFormP
             <button
               type="button"
               onClick={handleImageAdd}
-              className="px-4 py-2 text-slate-600 hover:text-slate-800 border border-slate-300 rounded-lg hover:bg-slate-50"
+              disabled={uploadingImages.size > 0}
+              className="px-4 py-2 text-slate-600 hover:text-slate-800 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Add Image
+              Add Empty Image Slot
             </button>
           </div>
         </div>

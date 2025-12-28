@@ -9,7 +9,10 @@ interface Product {
   images: string[];
   price: number;
   material: string;
-  category: string;
+  category: {
+    _id: string;
+    name: string;
+  };
 }
 
 export default function ProductListing() {
@@ -17,15 +20,14 @@ export default function ProductListing() {
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [typedText, setTypedText] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("newest");
+  const [categories, setCategories] = useState<string[]>([]);
   const fullText = "Our Creations";
 
   useEffect(() => {
-    fetch("/api/products")
-      .then((res) => res.json())
-      .then((data) => {
-        setProducts(data);
-        setLoading(false);
-      });
+    fetchProducts();
+    fetchCategories();
 
     // Load favorites from localStorage
     const savedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]");
@@ -43,6 +45,37 @@ export default function ProductListing() {
     typeWriter();
   }, []);
 
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (selectedCategory !== "all") params.append("category", selectedCategory);
+      if (sortBy !== "newest") params.append("sort", sortBy);
+
+      const response = await fetch(`/api/products?${params.toString()}`);
+      const data = await response.json();
+      setProducts(data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("/api/categories");
+      const data = await response.json();
+      setCategories(data.map((cat: any) => cat.name));
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [selectedCategory, sortBy]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -52,18 +85,63 @@ export default function ProductListing() {
   }
 
   return (
-    <div className="min-h-screen py-12">
+    <div className="min-h-screen py-8 sm:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-7xl font-bold text-[#442D1C] mb-6 serif">
+        <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-[#442D1C] mb-4 sm:mb-6 serif">
             {typedText}
             <span className="typewriter-cursor">|</span>
           </h1>
         </div>
 
+        {/* Filters Section */}
+        <div className="mb-8 sm:mb-12">
+          <div className="bg-white/90 elegant-rounded-xl shadow-lg border-2 border-[#EDD8B4] p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-center">
+              {/* Category Filter */}
+              <div className="flex flex-col sm:flex-row items-center gap-2">
+                <label htmlFor="category" className="text-[#442D1C] font-semibold text-sm sm:text-base">
+                  Category:
+                </label>
+                <select
+                  id="category"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="bg-[#EDD8B4]/30 border border-[#8E5022]/30 rounded-lg px-3 py-2 text-[#442D1C] focus:outline-none focus:ring-2 focus:ring-[#8E5022]/50 focus:border-[#8E5022] transition-all duration-300"
+                >
+                  <option value="all">All Categories</option>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Sort Filter */}
+              <div className="flex flex-col sm:flex-row items-center gap-2">
+                <label htmlFor="sort" className="text-[#442D1C] font-semibold text-sm sm:text-base">
+                  Sort by:
+                </label>
+                <select
+                  id="sort"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="bg-[#EDD8B4]/30 border border-[#8E5022]/30 rounded-lg px-3 py-2 text-[#442D1C] focus:outline-none focus:ring-2 focus:ring-[#8E5022]/50 focus:border-[#8E5022] transition-all duration-300"
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {products.map((p) => (
               <Link href={`/products/${p.slug}`} key={p._id}>
                 <div className="group bg-white/90 elegant-rounded-xl shadow-lg border-2 border-[#EDD8B4] overflow-hidden hover:shadow-xl transition-all duration-300 hover-lift">
@@ -71,25 +149,26 @@ export default function ProductListing() {
                   <div className="relative overflow-hidden">
                     <img
                       src={p.images?.[0] || '/images/placeholder.png'}
-                      className="w-full h-48 object-cover transition-opacity duration-500 group-hover:opacity-0"
+                      className="w-full h-40 sm:h-48 object-cover transition-opacity duration-500 group-hover:opacity-0"
                       alt={p.title}
                     />
                     <img
                       src={p.images?.[1] || p.images?.[0] || '/images/placeholder.png'}
-                      className="absolute top-0 left-0 w-full h-48 object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                      className="absolute top-0 left-0 w-full h-40 sm:h-48 object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                       alt={p.title}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
 
                   {/* Content */}
-                  <div className="p-4 bg-gradient-to-br from-white to-[#EDD8B4]/30 relative">
-                    <h2 className="font-bold text-lg text-[#442D1C] mb-2 leading-tight serif">
+                  <div className="p-3 sm:p-4 bg-gradient-to-br from-white to-[#EDD8B4]/30 relative">
+                    <h2 className="font-bold text-base sm:text-lg text-[#442D1C] mb-2 leading-tight serif">
                       {p.title}
                     </h2>
-                    <p className="text-[#652810] mb-3 font-medium italic text-sm">{p.material}</p>
+                    <p className="text-[#652810] mb-1 font-medium italic text-xs sm:text-sm">{p.material}</p>
+                    <p className="text-[#8E5022] mb-3 font-medium text-xs sm:text-sm">{p.category?.name}</p>
                     <div className="flex items-center justify-between">
-                      <p className="text-xl font-bold text-[#8E5022]">₹{p.price}</p>
+                      <p className="text-lg sm:text-xl font-bold text-[#8E5022]">₹{p.price}</p>
                       {/* Favorite Heart Icon */}
                       <button
                         onClick={(e) => {

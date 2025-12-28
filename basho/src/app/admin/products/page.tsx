@@ -9,7 +9,10 @@ interface Product {
   slug: string;
   description: string;
   price: number;
-  category: string;
+  category?: {
+    _id: string;
+    name: string;
+  };
   stock: number;
   isPublished: boolean;
   images: string[];
@@ -85,7 +88,7 @@ export default function AdminProducts() {
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filterCategory === 'all' || product.category === filterCategory;
+    const matchesCategory = filterCategory === 'all' || product.category?.name === filterCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -187,7 +190,7 @@ export default function AdminProducts() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-800">
-                      {product.category}
+                      {product.category?.name || 'No Category'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">

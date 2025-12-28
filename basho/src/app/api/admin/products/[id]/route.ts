@@ -9,7 +9,7 @@ export async function GET(
   try {
     await connectDB();
     const { id } = await params;
-    const product = await Product.findById(id);
+    const product = await Product.findById(id).populate('category');
     if (!product) {
       return NextResponse.json(
         { error: 'Product not found' },
@@ -46,7 +46,7 @@ export async function PUT(
       id,
       body,
       { new: true, runValidators: true }
-    );
+    ).populate('category');
 
     if (!product) {
       return NextResponse.json(

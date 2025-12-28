@@ -74,12 +74,6 @@ export default function AdminLayout({
               <h1 className="text-xl font-bold text-slate-900">Basho Admin</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <a
-                href="/admin/dashboard"
-                className="text-slate-700 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Dashboard
-              </a>
               <form action="/api/admin/auth" method="DELETE" className="inline">
                 <button
                   type="submit"
@@ -92,9 +86,111 @@ export default function AdminLayout({
           </div>
         </div>
       </nav>
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        {children}
-      </main>
+
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="w-64 bg-white shadow-sm border-r border-slate-200 min-h-[calc(100vh-4rem)]">
+          <nav className="mt-8">
+            <div className="px-4 space-y-2">
+              <a
+                href="/admin/dashboard"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg ${
+                  pathname === '/admin/dashboard' || pathname === '/admin'
+                    ? 'bg-slate-100 text-slate-900'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                Dashboard
+              </a>
+              <a
+                href="/admin/products"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg ${
+                  pathname.startsWith('/admin/products')
+                    ? 'bg-slate-100 text-slate-900'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                Products
+              </a>
+              <a
+                href="/admin/categories"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg ${
+                  pathname.startsWith('/admin/categories')
+                    ? 'bg-slate-100 text-slate-900'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                Categories
+              </a>
+              <a
+                href="/admin/custom-orders"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg ${
+                  pathname.startsWith('/admin/custom-orders')
+                    ? 'bg-slate-100 text-slate-900'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                Custom Orders
+              </a>
+              <a
+                href="/admin/gallery"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg ${
+                  pathname.startsWith('/admin/gallery')
+                    ? 'bg-slate-100 text-slate-900'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                Gallery
+              </a>
+              <a
+                href="/admin/events"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg ${
+                  pathname.startsWith('/admin/events')
+                    ? 'bg-slate-100 text-slate-900'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                Events
+              </a>
+              <a
+                href="/admin/workshop-registrations"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg ${
+                  pathname.startsWith('/admin/workshop-registrations')
+                    ? 'bg-slate-100 text-slate-900'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                Workshops
+              </a>
+              <a
+                href="/admin/testimonials"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg ${
+                  pathname.startsWith('/admin/testimonials')
+                    ? 'bg-slate-100 text-slate-900'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                Testimonials
+              </a>
+              <a
+                href="/admin/payments"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg ${
+                  pathname.startsWith('/admin/payments')
+                    ? 'bg-slate-100 text-slate-900'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                Payments
+              </a>
+            </div>
+          </nav>
+        </div>
+
+        {/* Main content */}
+        <main className="flex-1 max-w-7xl py-6 px-6 lg:px-8">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

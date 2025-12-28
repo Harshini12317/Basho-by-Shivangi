@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 import { connectDB } from "@/lib/mongodb";
 import Product from "@/models/product";
+import Category from "@/models/Category";
 
 const dummyProducts = [
   {
@@ -66,10 +68,50 @@ const dummyProducts = [
   },
 ];
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    const products = await Product.find({ isPublished: true }).sort({ createdAt: -1 });
+
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get('category');
+    const sort = searchParams.get('sort');
+
+    let query: any = { isPublished: true };
+
+    // Add category filter if provided
+    if (category && category !== 'all') {
+      // Find category by name (case insensitive)
+      const categoryDoc = await Category.findOne({
+        name: { $regex: new RegExp(`^${category}$`, 'i') }
+      });
+      if (categoryDoc) {
+        query.category = categoryDoc._id;
+      }
+    }
+
+    // Build sort options
+    let sortOptions: any = { createdAt: -1 }; // default sort by newest
+    if (sort) {
+      switch (sort) {
+        case 'price-low':
+          sortOptions = { price: 1 };
+          break;
+        case 'price-high':
+          sortOptions = { price: -1 };
+          break;
+        case 'newest':
+          sortOptions = { createdAt: -1 };
+          break;
+        case 'oldest':
+          sortOptions = { createdAt: 1 };
+          break;
+      }
+    }
+
+    const products = await Product.find(query)
+      .populate('category', 'name')
+      .sort(sortOptions);
+
     return NextResponse.json(products);
   } catch (err: any) {
     console.error('GET /api/products error:', err);
