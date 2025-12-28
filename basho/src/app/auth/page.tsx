@@ -1,8 +1,40 @@
+"use client";
+
 import AuthContainer from "@/components/auth/AuthContainer";
-
-
-
+import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function AuthPage() {
-  return <AuthContainer />;
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error === "OAuthCallback") {
+      setErrorMsg("Email used was not registered.");
+      setTimeout(() => {
+        setErrorMsg(null);
+        router.replace("/auth");
+      }, 2500);
+    } else if (error === "AccessDenied") {
+      setErrorMsg("Access Denied: You do not have permission to sign in.");
+      setTimeout(() => {
+        setErrorMsg(null);
+        router.replace("/auth");
+      }, 2500);
+    }
+  }, [searchParams, router]);
+
+  return (
+    <>
+      {errorMsg && (
+        <div className="auth-notification-popup">
+          <span className="auth-notification-icon">&#9888;</span>
+          <span>{errorMsg}</span>
+        </div>
+      )}
+      <AuthContainer />
+    </>
+  );
 }

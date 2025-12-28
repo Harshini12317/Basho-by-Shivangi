@@ -9,64 +9,65 @@ import { signIn } from "next-auth/react";
 import { FiCheckCircle, FiXCircle } from "react-icons/fi";
 
 
+
 export default function AuthContainer() {
-
-
-  //
   const router = useRouter();
   const [isSignup, setIsSignup] = useState(false);
+  const [loginData, setLoginData] = useState({ username: "", password: "" });
+  const [signupData, setSignupData] = useState({ username: "", email: "", password: "" });
+  const [notification, setNotification] = useState<string | null>(null);
+  // Helper to show notification
+  const showNotification = (msg: string) => {
+    setNotification(msg);
+    setTimeout(() => setNotification(null), 2500);
+  };
 
-  const [loginData, setLoginData] = useState({
-    username: "",
-    password: "",
-  });
-
-  const [signupData, setSignupData] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
-  //
   const handleSignup = async () => {
-  if (!signupData.username || !signupData.email || !signupData.password) {
-    alert("Please fill all fields");
-    return;
-  }
-
-  try {
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: signupData.username,
-        email: signupData.email,
-        password: signupData.password,
-      }),
-    });
-
-
-    const data = await res.json();
-
-   if (!res.ok) {
-  if (res.status === 409) {
-    // User exists but may not be verified
-    setShowVerification(true);
-    return;
-  }
-
-  alert(data.message || "Signup failed");
-  return;
-}
-
-
-   setShowVerification(true);
- // move to login view
-  } catch (error) {
-    alert("Something went wrong");
-  }
-};
+    // Username validation
+    if (!signupData.username || signupData.username.length < 3) {
+      showNotification("Username must be at least 3 characters long.");
+      return;
+    }
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!signupData.email || !emailRegex.test(signupData.email)) {
+      showNotification("Please enter a valid email address.");
+      return;
+    }
+    // Password validation
+    if (!signupData.password) {
+      showNotification("Please enter a password.");
+      return;
+    }
+    const strongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+    if (!strongPassword.test(signupData.password)) {
+      showNotification("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
+      return;
+    }
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: signupData.username,
+          email: signupData.email,
+          password: signupData.password,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (res.status === 409) {
+          setShowVerification(true);
+          return;
+        }
+        showNotification(data.message || "Signup failed");
+        return;
+      }
+      setShowVerification(true);
+    } catch (error) {
+      showNotification("Something went wrong");
+    }
+  };
 
 //
 
@@ -112,23 +113,25 @@ const handleVerify = async () => {
 //
 // 🔐 LOGIN WITH NEXTAUTH (EMAIL)
 const handleLogin = async () => {
-  if (!loginData.username || !loginData.password) {
-    alert("Please fill all fields");
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!loginData.username || !emailRegex.test(loginData.username)) {
+    showNotification("Please enter a valid email address.");
     return;
   }
-
+  if (!loginData.password) {
+    showNotification("Please enter your password.");
+    return;
+  }
   const res = await signIn("credentials", {
-    email: loginData.username, // email
+    email: loginData.username,
     password: loginData.password,
     redirect: false,
   });
-
   if (res?.error) {
-    alert(res.error);
+    showNotification(res.error);
     return;
   }
-
-  // ✅ session created
   router.push("/");
 };
 
@@ -136,16 +139,21 @@ const handleLogin = async () => {
 
   return (
     <div className="auth-page">
+      {/* Notification Popup */}
+      {notification && (
+        <div className="auth-notification-popup">
+          <span className="auth-notification-icon">&#9888;</span>
+          <span>{notification}</span>
+        </div>
+      )}
       {/* Animated background */}
       <div className="auth-background-wrapper">
         <AuthBackground />
       </div>
-
       {/* Close */}
-      <button className="close-btn" onClick={() => router.push("/")}>
+      <button className="close-btn" onClick={() => router.push("/")}> 
         <FiX size={22} />
       </button>
-
       <div className={`auth-container ${isSignup ? "active" : ""}`}>
         {/* LOGIN */}
         <div className="form-panel login">
@@ -184,7 +192,7 @@ const handleLogin = async () => {
           <button
   type="button"
   className="social-btn"
-  onClick={() => signIn("google")}
+  onClick={() => signIn("google", { callbackUrl: "/" })}
 >
   <svg width="20" height="20" viewBox="0 0 24 24">
     <path
@@ -345,7 +353,33 @@ const handleLogin = async () => {
 
 
       <p className="resend">
-        Didn’t receive the code? <span>Resend</span>
+        Didn’t receive the code?{' '}
+        <span
+          style={{ cursor: 'pointer', color: '#2563eb', fontWeight: 500 }}
+          onClick={async () => {
+            if (!signupData.email) {
+              alert('No email found for resend.');
+              return;
+            }
+            try {
+              const res = await fetch('/api/auth/resend-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: signupData.email }),
+              });
+              const data = await res.json();
+              if (res.ok) {
+                alert('Verification code resent to your email.');
+              } else {
+                alert(data.message || 'Failed to resend code.');
+              }
+            } catch {
+              alert('Failed to resend code.');
+            }
+          }}
+        >
+          Resend
+        </span>
       </p>
     </div>
   </div>
