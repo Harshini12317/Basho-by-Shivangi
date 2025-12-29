@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
-import { FaShoppingBag, FaPaintBrush, FaCalendarAlt, FaUser, FaBoxOpen, FaMapMarkerAlt, FaPhone, FaPen, FaHeart, FaSearch, FaHeart } from "react-icons/fa";
+import { FaShoppingBag, FaPaintBrush, FaCalendarAlt, FaUser, FaBoxOpen, FaMapMarkerAlt, FaPhone, FaPen, FaHeart, FaSearch } from "react-icons/fa";
 
 type CustomOrder = {
   _id: string;
@@ -514,131 +514,6 @@ export default function ProfilePage() {
                         {userProfile?.address?.street ? <><FaPen /> Edit Address</> : "+ Add New Address"}
                      </button>
                   </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Custom Requests - Green Theme */}
-          <div className="bg-white rounded-[24px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border-2 border-green-100/50 p-6 hover:shadow-md transition-all duration-300 flex flex-col h-full">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2.5 rounded-xl bg-green-50 text-green-600">
-                <FaPaintBrush className="text-lg" />
-              </div>
-              <div>
-                <h2 className="text-base font-bold text-slate-800">Custom</h2>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Requests</p>
-              </div>
-            </div>
-
-            <div className="flex-1 flex flex-col justify-center">
-              {customOrders.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8 text-slate-300">
-                  <FaBoxOpen className="text-4xl mb-3 opacity-20" />
-                  <div className="text-xs font-medium">No records yet</div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {customOrders.map((co) => (
-                    <div key={co._id} className="p-3 rounded-xl bg-green-50/30 border border-green-100 flex justify-between items-center">
-                      <span className="text-sm font-medium text-slate-700 truncate max-w-[120px]">{co.description}</span>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                         co.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'
-                      }`}>{co.status}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Favorites - Purple Theme */}
-          <div className="bg-white rounded-[24px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border-2 border-purple-100/50 p-6 hover:shadow-md transition-all duration-300 flex flex-col h-full">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600">
-                <FaHeart className="text-lg" />
-              </div>
-              <div>
-                <h2 className="text-base font-bold text-slate-800">Favorites</h2>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Products</p>
-              </div>
-               {favorites.length > 0 && <span className="ml-auto w-5 h-5 flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full">{favorites.length}</span>}
-            </div>
-
-            <div className="flex-1 flex flex-col justify-center">
-              {favorites.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8 text-slate-300">
-                  <FaBoxOpen className="text-4xl mb-3 opacity-20" />
-                  <div className="text-xs font-medium">No records yet</div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                   {/* Favorites list would go here */}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Orders - Orange Theme */}
-          <div className="bg-white rounded-[24px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border-2 border-orange-100/50 p-6 hover:shadow-md transition-all duration-300 flex flex-col h-full">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2.5 rounded-xl bg-orange-50 text-orange-600">
-                <FaShoppingBag className="text-lg" />
-              </div>
-              <div>
-                <h2 className="text-base font-bold text-slate-800">Orders</h2>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Requests</p>
-              </div>
-            </div>
-            
-            <div className="flex-1 flex flex-col justify-center">
-              {productOrders.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8 text-slate-300">
-                  <FaBoxOpen className="text-4xl mb-3 opacity-20" />
-                  <div className="text-xs font-medium">No records yet</div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {productOrders.map((o) => (
-                    <div key={o.id} className="flex items-center justify-between p-3 rounded-xl bg-orange-50/30 border border-orange-100">
-                      <div>
-                        <div className="font-semibold text-slate-800 text-sm">{o.title}</div>
-                        <div className="text-slate-400 text-[10px] font-medium">Qty: {o.qty}</div>
-                      </div>
-                      <div className="text-slate-900 font-bold text-sm">₹{o.amount}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Workshops - Blue Theme */}
-          <div className="bg-white rounded-[24px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border-2 border-blue-100/50 p-6 hover:shadow-md transition-all duration-300 flex flex-col h-full">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600">
-                <FaCalendarAlt className="text-lg" />
-              </div>
-              <div>
-                <h2 className="text-base font-bold text-slate-800">Workshops</h2>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Registrations</p>
-              </div>
-            </div>
-
-            <div className="flex-1 flex flex-col justify-center">
-              {registrations.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8 text-slate-300">
-                  <FaBoxOpen className="text-4xl mb-3 opacity-20" />
-                  <div className="text-xs font-medium">No records yet</div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {registrations.map((r) => (
-                    <div key={r._id} className="p-3 rounded-xl bg-blue-50/30 border border-blue-100">
-                      <div className="font-semibold text-slate-800 text-sm mb-1">{r.workshopSlug}</div>
-                      <div className="text-slate-400 text-[10px]">Registered: {r.name}</div>
-                    </div>
-                  ))}
                 </div>
               )}
             </div>
