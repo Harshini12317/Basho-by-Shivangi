@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
-import { FaShoppingBag, FaPaintBrush, FaCalendarAlt, FaUser, FaBoxOpen } from "react-icons/fa";
+import { FaShoppingBag, FaPaintBrush, FaCalendarAlt, FaUser, FaBoxOpen, FaMapMarkerAlt, FaPhone, FaPen } from "react-icons/fa";
 
 type CustomOrder = {
   _id: string;
@@ -38,11 +38,42 @@ export default function ProfilePage() {
   const [customOrders, setCustomOrders] = useState<CustomOrder[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [productOrders, setProductOrders] = useState<ProductOrder[]>([]);
+  
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [addressForm, setAddressForm] = useState({
+    street: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: "",
+    phone: ""
+  });
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
 
   const userEmail = session?.user?.email || "";
   const userName = session?.user?.name || "";
 
   useEffect(() => {
+    if (session?.user?.email) {
+      fetch("/api/user/profile")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && !data.error) {
+            setUserProfile(data);
+            setAddressForm({
+              street: data.address?.street || "",
+              city: data.address?.city || "",
+              state: data.address?.state || "",
+              zip: data.address?.zip || "",
+              country: data.address?.country || "",
+              phone: data.phone || ""
+            });
+          }
+        })
+        .catch((err) => console.error("Failed to fetch profile", err));
+    }
+
     // Custom Orders
     fetch("/api/custom-orders")
       .then((res) => res.json())
@@ -72,6 +103,38 @@ export default function ProfilePage() {
       setProductOrders([]);
     }
   }, [userEmail]);
+
+  const handleSaveAddress = async () => {
+    setIsSavingAddress(true);
+    try {
+      const res = await fetch("/api/user/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          address: {
+            street: addressForm.street,
+            city: addressForm.city,
+            state: addressForm.state,
+            zip: addressForm.zip,
+            country: addressForm.country
+          },
+          phone: addressForm.phone
+        })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        setUserProfile(data);
+        setIsEditingAddress(false);
+      } else {
+        console.error("Failed to save address", data.error);
+      }
+    } catch (err) {
+      console.error("Error saving address", err);
+    } finally {
+      setIsSavingAddress(false);
+    }
+  };
 
   const isLoading = status === "loading";
   const isAuthed = status === "authenticated";
@@ -241,6 +304,120 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Address Book */}
+          <div className="bg-white rounded-3xl shadow-sm border border-[#EDD8B4]/30 p-6 hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
+            <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-xl bg-blue-50 text-blue-600">
+                  <FaMapMarkerAlt className="text-xl" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-slate-800">Address Book</h2>
+                  <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Shipping Details</p>
+                </div>
+              </div>
+              {!isEditingAddress && (
+                <button 
+                  onClick={() => setIsEditingAddress(true)}
+                  className="p-2 text-slate-400 hover:text-[#E76F51] transition-colors"
+                >
+                  <FaPen />
+                </button>
+              )}
+            </div>
+
+            <div className="flex-1">
+              {isEditingAddress ? (
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    placeholder="Street Address"
+                    value={addressForm.street}
+                    onChange={(e) => setAddressForm({...addressForm, street: e.target.value})}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#E2C48D]/50 text-sm"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      placeholder="City"
+                      value={addressForm.city}
+                      onChange={(e) => setAddressForm({...addressForm, city: e.target.value})}
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#E2C48D]/50 text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="State"
+                      value={addressForm.state}
+                      onChange={(e) => setAddressForm({...addressForm, state: e.target.value})}
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#E2C48D]/50 text-sm"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      placeholder="Zip Code"
+                      value={addressForm.zip}
+                      onChange={(e) => setAddressForm({...addressForm, zip: e.target.value})}
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#E2C48D]/50 text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Country"
+                      value={addressForm.country}
+                      onChange={(e) => setAddressForm({...addressForm, country: e.target.value})}
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#E2C48D]/50 text-sm"
+                    />
+                  </div>
+                  <input
+                    type="tel"
+                    placeholder="Phone Number"
+                    value={addressForm.phone}
+                    onChange={(e) => setAddressForm({...addressForm, phone: e.target.value})}
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#E2C48D]/50 text-sm"
+                  />
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      onClick={handleSaveAddress}
+                      disabled={isSavingAddress}
+                      className="flex-1 bg-[#E76F51] text-white py-2 rounded-lg text-sm font-semibold hover:bg-[#D35400] disabled:opacity-50"
+                    >
+                      {isSavingAddress ? "Saving..." : "Save"}
+                    </button>
+                    <button
+                      onClick={() => setIsEditingAddress(false)}
+                      className="flex-1 bg-slate-100 text-slate-600 py-2 rounded-lg text-sm font-semibold hover:bg-slate-200"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {userProfile?.address?.street ? (
+                    <div className="p-4 rounded-2xl bg-[#F9F9F9] border border-slate-100">
+                      <div className="font-semibold text-slate-800 mb-1">{userProfile.address.street}</div>
+                      <div className="text-slate-600 text-sm">
+                        {userProfile.address.city}, {userProfile.address.state} {userProfile.address.zip}
+                      </div>
+                      <div className="text-slate-600 text-sm">{userProfile.address.country}</div>
+                      {userProfile.phone && (
+                        <div className="flex items-center gap-2 mt-3 text-sm text-slate-500 border-t border-slate-200 pt-2">
+                          <FaPhone className="text-xs" />
+                          <span>{userProfile.phone}</span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-10 text-slate-400 border-2 border-dashed border-slate-100 rounded-xl cursor-pointer hover:border-[#E2C48D] hover:text-[#E76F51] transition-all" onClick={() => setIsEditingAddress(true)}>
+                      <FaMapMarkerAlt className="text-3xl mb-2 opacity-30" />
+                      <div className="text-sm font-medium">Add Address</div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

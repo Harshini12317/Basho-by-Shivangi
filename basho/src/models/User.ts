@@ -33,6 +33,15 @@ const UserSchema = new Schema(
     verificationCodeExpires: {
       type: Date,
     },
+    
+    address: {
+      street: { type: String, default: "" },
+      city: { type: String, default: "" },
+      state: { type: String, default: "" },
+      zip: { type: String, default: "" },
+      country: { type: String, default: "" },
+    },
+    phone: { type: String, default: "" },
   },
   {
     timestamps: true, // adds createdAt & updatedAt
