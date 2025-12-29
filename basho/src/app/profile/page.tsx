@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
-import { FaShoppingBag, FaPaintBrush, FaCalendarAlt, FaUser, FaBoxOpen, FaMapMarkerAlt, FaPhone, FaPen } from "react-icons/fa";
+import { FaShoppingBag, FaPaintBrush, FaCalendarAlt, FaUser, FaBoxOpen, FaMapMarkerAlt, FaPhone, FaPen, FaHeart, FaSearch } from "react-icons/fa";
 
 type CustomOrder = {
   _id: string;
@@ -38,6 +38,7 @@ export default function ProfilePage() {
   const [customOrders, setCustomOrders] = useState<CustomOrder[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [productOrders, setProductOrders] = useState<ProductOrder[]>([]);
+  const [favorites, setFavorites] = useState<any[]>([]);
   
   const [userProfile, setUserProfile] = useState<any>(null);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
@@ -102,6 +103,9 @@ export default function ProfilePage() {
     } catch {
       setProductOrders([]);
     }
+
+    // Favorites placeholder (demo)
+    setFavorites([]);
   }, [userEmail]);
 
   const handleSaveAddress = async () => {
@@ -177,158 +181,58 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="bg-[#F8F7F2] min-h-screen py-12 px-4 sm:px-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="bg-[#FDFBF7] min-h-screen py-8 px-4 sm:px-8 font-sans">
+      <div className="max-w-7xl mx-auto">
         {/* Profile Header */}
-        <div className="bg-white rounded-[32px] shadow-sm border border-[#EDD8B4]/50 p-8 mb-10 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-[#FFF5E6] to-transparent rounded-bl-full -mr-16 -mt-16 opacity-50"></div>
+        <div className="bg-white rounded-[30px] shadow-sm border border-[#EAEAEA] p-6 mb-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
           
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8 relative z-10">
-            <div className="flex items-center gap-6">
-              <div className="w-20 h-20 rounded-full bg-[#FDFBF7] border-2 border-[#E2C48D] flex items-center justify-center text-[#8B4513] shadow-sm">
-                 <FaUser className="text-3xl opacity-80" />
-              </div>
-              <div>
-                <div className="text-xs font-bold uppercase tracking-widest text-[#E76F51] mb-1">My Account</div>
-                <h1 className="text-3xl md:text-4xl font-serif font-bold text-slate-800 mb-1">{userName}</h1>
-                <p className="text-slate-500 font-medium flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-green-400"></span>
-                  {userEmail}
-                </p>
-              </div>
+          <div className="flex items-center gap-5 z-10 w-full md:w-auto">
+            <div className="w-16 h-16 rounded-full bg-[#FFF5E6] border border-[#E2C48D] flex items-center justify-center text-[#8B4513] text-2xl font-bold shadow-sm">
+              {userName ? userName.charAt(0).toUpperCase() : <FaUser />}
             </div>
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-[#E76F51] mb-0.5">My Account</div>
+              <h1 className="text-2xl font-serif font-bold text-slate-800 leading-tight">{userName}</h1>
+              <p className="text-slate-400 text-sm font-medium flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                {userEmail}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex-1 max-w-xl w-full px-4 relative z-10">
+             <div className="relative">
+                <input 
+                  type="text" 
+                  placeholder="Search for products, workshops..." 
+                  className="w-full pl-6 pr-12 py-3 rounded-full bg-[#F9F9F9] border-none text-sm text-slate-600 focus:ring-2 focus:ring-[#E2C48D]/30 outline-none transition-all placeholder:text-slate-400"
+                />
+                <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
+             </div>
+          </div>
             
-            <Link 
+          <div className="flex items-center gap-6 z-10 w-full md:w-auto justify-end">
+             <div className="flex items-center gap-4 text-sm font-medium text-slate-500">
+                <Link href="/products" className="hover:text-[#E76F51] transition-colors border-b-2 border-transparent hover:border-[#E76F51] pb-0.5">Shop</Link>
+                <Link href="#" className="hover:text-[#E76F51] transition-colors">Help</Link>
+                <button onClick={() => {}} className="hover:text-[#E76F51] transition-colors">Logout</button>
+             </div>
+             <Link 
               href="/products" 
-              className="group flex items-center gap-3 px-8 py-3.5 rounded-full bg-[#E76F51] text-white shadow-lg shadow-orange-200 hover:bg-[#D35400] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#E76F51] text-white shadow-md shadow-orange-100 hover:bg-[#D35400] hover:shadow-lg transition-all duration-300 text-sm font-semibold"
             >
-              <FaShoppingBag className="text-lg" />
-              <span className="font-semibold tracking-wide">Shop Products</span>
+              <FaShoppingBag />
+              <span>Shop Products</span>
             </Link>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Products Ordered */}
-          <div className="bg-white rounded-3xl shadow-sm border border-[#EDD8B4]/30 p-6 hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
-            <div className="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
-              <div className="p-3 rounded-xl bg-orange-50 text-orange-600">
-                <FaShoppingBag className="text-xl" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-slate-800">Orders</h2>
-                <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Products</p>
-              </div>
-            </div>
-            
-            <div className="flex-1">
-              {productOrders.length === 0 ? (
-                emptyState
-              ) : (
-                <div className="space-y-4">
-                  {productOrders.map((o) => (
-                    <div key={o.id} className="flex items-center justify-between p-4 rounded-2xl bg-[#F9F9F9] border border-slate-100 hover:border-[#E2C48D] transition-colors group">
-                      <div>
-                        <div className="font-semibold text-slate-800 group-hover:text-[#E76F51] transition-colors">{o.title}</div>
-                        <div className="text-slate-500 text-xs mt-1 font-medium bg-white px-2 py-1 rounded-md inline-block shadow-sm">Qty: {o.qty}</div>
-                      </div>
-                      <div className="text-slate-900 font-bold bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-100">₹{o.amount}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Custom Orders */}
-          <div className="bg-white rounded-3xl shadow-sm border border-[#EDD8B4]/30 p-6 hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
-            <div className="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
-              <div className="p-3 rounded-xl bg-purple-50 text-purple-600">
-                <FaPaintBrush className="text-xl" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-slate-800">Custom</h2>
-                <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Requests</p>
-              </div>
-            </div>
-
-            <div className="flex-1">
-              {customOrders.length === 0 ? (
-                emptyState
-              ) : (
-                <div className="space-y-4">
-                  {customOrders.map((co) => (
-                    <div key={co._id} className="p-4 rounded-2xl bg-[#F9F9F9] border border-slate-100 hover:border-[#E2C48D] transition-colors">
-                      <div className="font-semibold text-slate-800 mb-2">{co.description}</div>
-                      <div className="flex items-center justify-between">
-                        <div className={`text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wide ${
-                          co.status === 'completed' ? 'bg-green-100 text-green-700' : 
-                          co.status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-600'
-                        }`}>
-                          {co.status}
-                        </div>
-                        {typeof co.quotedPrice === "number" && (
-                          <div className="text-slate-900 font-bold text-sm">₹{co.quotedPrice}</div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Workshop/Event Registrations */}
-          <div className="bg-white rounded-3xl shadow-sm border border-[#EDD8B4]/30 p-6 hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
-            <div className="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
-              <div className="p-3 rounded-xl bg-teal-50 text-teal-600">
-                <FaCalendarAlt className="text-xl" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-slate-800">Workshops</h2>
-                <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Registrations</p>
-              </div>
-            </div>
-
-            <div className="flex-1">
-              {registrations.length === 0 ? (
-                emptyState
-              ) : (
-                <div className="space-y-4">
-                  {registrations.map((r) => (
-                    <div key={r._id} className="p-4 rounded-2xl bg-[#F9F9F9] border border-slate-100 hover:border-[#E2C48D] transition-colors group">
-                      <div className="font-semibold text-slate-800 mb-2 group-hover:text-teal-700 transition-colors">{r.workshopSlug}</div>
-                      <div className="text-slate-500 text-xs flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
-                        Registered as: <span className="font-medium text-slate-700">{r.name}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Address Book */}
-          <div className="bg-white rounded-3xl shadow-sm border border-[#EDD8B4]/30 p-6 hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
-            <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-blue-50 text-blue-600">
-                  <FaMapMarkerAlt className="text-xl" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold text-slate-800">Address Book</h2>
-                  <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Shipping Details</p>
-                </div>
-              </div>
-              {!isEditingAddress && (
-                <button 
-                  onClick={() => setIsEditingAddress(true)}
-                  className="p-2 text-slate-400 hover:text-[#E76F51] transition-colors"
-                >
-                  <FaPen />
-                </button>
-              )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          {/* Address Book - Styled as "Shipping Address" Card */}
+          <div className="bg-white rounded-[24px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border border-slate-100 p-6 flex flex-col h-full relative overflow-hidden group hover:shadow-md transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+               <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wide">Shipping Address</h2>
             </div>
 
             <div className="flex-1">
@@ -339,89 +243,214 @@ export default function ProfilePage() {
                     placeholder="Street Address"
                     value={addressForm.street}
                     onChange={(e) => setAddressForm({...addressForm, street: e.target.value})}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#E2C48D]/50 text-sm"
+                    className="w-full px-3 py-2 rounded-lg bg-slate-50 border-none focus:ring-1 focus:ring-slate-200 text-sm"
                   />
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-2">
                     <input
                       type="text"
                       placeholder="City"
                       value={addressForm.city}
                       onChange={(e) => setAddressForm({...addressForm, city: e.target.value})}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#E2C48D]/50 text-sm"
+                      className="w-full px-3 py-2 rounded-lg bg-slate-50 border-none focus:ring-1 focus:ring-slate-200 text-sm"
                     />
                     <input
                       type="text"
                       placeholder="State"
                       value={addressForm.state}
                       onChange={(e) => setAddressForm({...addressForm, state: e.target.value})}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#E2C48D]/50 text-sm"
+                      className="w-full px-3 py-2 rounded-lg bg-slate-50 border-none focus:ring-1 focus:ring-slate-200 text-sm"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-2">
                     <input
                       type="text"
-                      placeholder="Zip Code"
+                      placeholder="Zip"
                       value={addressForm.zip}
                       onChange={(e) => setAddressForm({...addressForm, zip: e.target.value})}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#E2C48D]/50 text-sm"
+                      className="w-full px-3 py-2 rounded-lg bg-slate-50 border-none focus:ring-1 focus:ring-slate-200 text-sm"
                     />
                     <input
                       type="text"
                       placeholder="Country"
                       value={addressForm.country}
                       onChange={(e) => setAddressForm({...addressForm, country: e.target.value})}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#E2C48D]/50 text-sm"
+                      className="w-full px-3 py-2 rounded-lg bg-slate-50 border-none focus:ring-1 focus:ring-slate-200 text-sm"
                     />
                   </div>
                   <input
                     type="tel"
-                    placeholder="Phone Number"
+                    placeholder="Phone"
                     value={addressForm.phone}
                     onChange={(e) => setAddressForm({...addressForm, phone: e.target.value})}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#E2C48D]/50 text-sm"
+                    className="w-full px-3 py-2 rounded-lg bg-slate-50 border-none focus:ring-1 focus:ring-slate-200 text-sm"
                   />
                   <div className="flex gap-2 pt-2">
-                    <button
-                      onClick={handleSaveAddress}
-                      disabled={isSavingAddress}
-                      className="flex-1 bg-[#E76F51] text-white py-2 rounded-lg text-sm font-semibold hover:bg-[#D35400] disabled:opacity-50"
-                    >
-                      {isSavingAddress ? "Saving..." : "Save"}
-                    </button>
-                    <button
-                      onClick={() => setIsEditingAddress(false)}
-                      className="flex-1 bg-slate-100 text-slate-600 py-2 rounded-lg text-sm font-semibold hover:bg-slate-200"
-                    >
-                      Cancel
-                    </button>
+                    <button onClick={handleSaveAddress} disabled={isSavingAddress} className="flex-1 bg-slate-800 text-white py-1.5 rounded-lg text-xs font-bold hover:bg-slate-700">SAVE</button>
+                    <button onClick={() => setIsEditingAddress(false)} className="flex-1 bg-slate-100 text-slate-500 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-200">CANCEL</button>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="h-full flex flex-col justify-between">
                   {userProfile?.address?.street ? (
-                    <div className="p-4 rounded-2xl bg-[#F9F9F9] border border-slate-100">
-                      <div className="font-semibold text-slate-800 mb-1">{userProfile.address.street}</div>
-                      <div className="text-slate-600 text-sm">
-                        {userProfile.address.city}, {userProfile.address.state} {userProfile.address.zip}
-                      </div>
-                      <div className="text-slate-600 text-sm">{userProfile.address.country}</div>
-                      {userProfile.phone && (
-                        <div className="flex items-center gap-2 mt-3 text-sm text-slate-500 border-t border-slate-200 pt-2">
-                          <FaPhone className="text-xs" />
-                          <span>{userProfile.phone}</span>
+                     <div className="flex items-start justify-between">
+                        <div>
+                           <div className="font-bold text-slate-800 text-base mb-1">{userName}</div>
+                           <div className="text-slate-500 text-sm leading-relaxed">
+                              {userProfile.address.street},<br />
+                              {userProfile.address.city}, {userProfile.address.state} {userProfile.address.zip}<br />
+                              {userProfile.address.country}
+                           </div>
+                           {userProfile.phone && <div className="text-slate-400 text-xs mt-2">{userProfile.phone}</div>}
                         </div>
-                      )}
-                    </div>
+                        <div className="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center text-purple-600">
+                           <FaMapMarkerAlt />
+                        </div>
+                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center py-10 text-slate-400 border-2 border-dashed border-slate-100 rounded-xl cursor-pointer hover:border-[#E2C48D] hover:text-[#E76F51] transition-all" onClick={() => setIsEditingAddress(true)}>
-                      <FaMapMarkerAlt className="text-3xl mb-2 opacity-30" />
-                      <div className="text-sm font-medium">Add Address</div>
-                    </div>
+                     <div className="flex flex-col items-center justify-center h-40 text-slate-300">
+                        <FaMapMarkerAlt className="text-3xl mb-2 opacity-20" />
+                        <span className="text-xs font-medium">No address set</span>
+                     </div>
                   )}
+                  
+                  <div className="flex items-center gap-2 mt-6">
+                     <button 
+                        onClick={() => setIsEditingAddress(true)}
+                        className="flex-1 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-bold transition-colors flex items-center justify-center gap-2"
+                     >
+                        {userProfile?.address?.street ? <><FaPen /> Edit Address</> : "+ Add New Address"}
+                     </button>
+                  </div>
                 </div>
               )}
             </div>
           </div>
+
+          {/* Custom Requests - Green Theme */}
+          <div className="bg-white rounded-[24px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border-2 border-green-100/50 p-6 hover:shadow-md transition-all duration-300 flex flex-col h-full">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 rounded-xl bg-green-50 text-green-600">
+                <FaPaintBrush className="text-lg" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-800">Custom</h2>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Requests</p>
+              </div>
+            </div>
+
+            <div className="flex-1 flex flex-col justify-center">
+              {customOrders.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-slate-300">
+                  <FaBoxOpen className="text-4xl mb-3 opacity-20" />
+                  <div className="text-xs font-medium">No records yet</div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {customOrders.map((co) => (
+                    <div key={co._id} className="p-3 rounded-xl bg-green-50/30 border border-green-100 flex justify-between items-center">
+                      <span className="text-sm font-medium text-slate-700 truncate max-w-[120px]">{co.description}</span>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                         co.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'
+                      }`}>{co.status}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Favorites - Purple Theme */}
+          <div className="bg-white rounded-[24px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border-2 border-purple-100/50 p-6 hover:shadow-md transition-all duration-300 flex flex-col h-full">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600">
+                <FaHeart className="text-lg" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-800">Favorites</h2>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Products</p>
+              </div>
+               {favorites.length > 0 && <span className="ml-auto w-5 h-5 flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full">{favorites.length}</span>}
+            </div>
+
+            <div className="flex-1 flex flex-col justify-center">
+              {favorites.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-slate-300">
+                  <FaBoxOpen className="text-4xl mb-3 opacity-20" />
+                  <div className="text-xs font-medium">No records yet</div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                   {/* Favorites list would go here */}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Orders - Orange Theme */}
+          <div className="bg-white rounded-[24px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border-2 border-orange-100/50 p-6 hover:shadow-md transition-all duration-300 flex flex-col h-full">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 rounded-xl bg-orange-50 text-orange-600">
+                <FaShoppingBag className="text-lg" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-800">Orders</h2>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Requests</p>
+              </div>
+            </div>
+            
+            <div className="flex-1 flex flex-col justify-center">
+              {productOrders.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-slate-300">
+                  <FaBoxOpen className="text-4xl mb-3 opacity-20" />
+                  <div className="text-xs font-medium">No records yet</div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {productOrders.map((o) => (
+                    <div key={o.id} className="flex items-center justify-between p-3 rounded-xl bg-orange-50/30 border border-orange-100">
+                      <div>
+                        <div className="font-semibold text-slate-800 text-sm">{o.title}</div>
+                        <div className="text-slate-400 text-[10px] font-medium">Qty: {o.qty}</div>
+                      </div>
+                      <div className="text-slate-900 font-bold text-sm">₹{o.amount}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Workshops - Blue Theme */}
+          <div className="bg-white rounded-[24px] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.05)] border-2 border-blue-100/50 p-6 hover:shadow-md transition-all duration-300 flex flex-col h-full">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600">
+                <FaCalendarAlt className="text-lg" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-800">Workshops</h2>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Registrations</p>
+              </div>
+            </div>
+
+            <div className="flex-1 flex flex-col justify-center">
+              {registrations.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-slate-300">
+                  <FaBoxOpen className="text-4xl mb-3 opacity-20" />
+                  <div className="text-xs font-medium">No records yet</div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {registrations.map((r) => (
+                    <div key={r._id} className="p-3 rounded-xl bg-blue-50/30 border border-blue-100">
+                      <div className="font-semibold text-slate-800 text-sm mb-1">{r.workshopSlug}</div>
+                      <div className="text-slate-400 text-[10px]">Registered: {r.name}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
