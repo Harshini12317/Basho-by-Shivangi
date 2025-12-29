@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 interface Product {
   _id: string;
@@ -19,19 +20,27 @@ export default function ProductListing() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [wishlistSlugs, setWishlistSlugs] = useState<string[]>([]);
+  const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false);
   const [typedText, setTypedText] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("newest");
   const [categories, setCategories] = useState<string[]>([]);
   const fullText = "Our Creations";
+  const { data: session } = useSession();
 
   useEffect(() => {
     fetchProducts();
     fetchCategories();
 
-    // Load favorites from localStorage
+    // Load favorites from localStorage (for non-authenticated users)
     const savedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]");
     setFavorites(savedFavorites);
+
+    // For authenticated users, also fetch wishlist from API
+    if (session?.user) {
+      fetchWishlist();
+    }
 
     // Typewriter effect
     let index = 0;
@@ -43,7 +52,14 @@ export default function ProductListing() {
       }
     };
     typeWriter();
-  }, []);
+    // Listen for localStorage changes
+    const handleStorageChange = () => {
+      const updatedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+      setFavorites(updatedFavorites);
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);  }, [session]); // Added session to dependencies
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -69,6 +85,89 @@ export default function ProductListing() {
       setCategories(data.map((cat: any) => cat.name));
     } catch (error) {
       console.error("Error fetching categories:", error);
+    }
+  };
+
+  const fetchWishlist = async () => {
+    if (!session?.user || isUpdatingWishlist) return;
+    
+    try {
+      const response = await fetch("/api/wishlist");
+      if (response.ok) {
+        const wishlistData = await response.json();
+        // Update favorites state with product IDs from wishlist
+        // We need to map slugs back to IDs, but since we don't have the product data yet,
+        // we'll store the slugs and check against them in isInWishlist
+        const wishlistSlugs = wishlistData.items?.map((item: any) => item.productSlug) || [];
+        // For now, we'll use a separate state for wishlist slugs
+        setWishlistSlugs(wishlistSlugs);
+      }
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+    }
+  };
+
+  const isInWishlist = (product: Product) => {
+    if (session?.user) {
+      // For authenticated users, check wishlist slugs
+      return wishlistSlugs.includes(product.slug);
+    } else {
+      // For non-authenticated users, check localStorage favorites
+      return favorites.includes(product._id);
+    }
+  };
+
+  const toggleWishlist = async (product: Product) => {
+    if (!session) {
+      // For non-authenticated users, use localStorage
+      const newFavorites = favorites.includes(product._id)
+        ? favorites.filter(id => id !== product._id)
+        : [...favorites, product._id];
+      setFavorites(newFavorites);
+      localStorage.setItem("favorites", JSON.stringify(newFavorites));
+      return;
+    }
+
+    // For authenticated users, use optimistic updates for better UX
+    const wasInWishlist = wishlistSlugs.includes(product.slug);
+    
+    // Optimistically update the UI immediately
+    const optimisticSlugs = wasInWishlist
+      ? wishlistSlugs.filter(slug => slug !== product.slug)
+      : [...wishlistSlugs, product.slug];
+    setWishlistSlugs(optimisticSlugs);
+    setIsUpdatingWishlist(true);
+
+    try {
+      const response = await fetch("/api/wishlist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productSlug: product.slug,
+          productTitle: product.title,
+          productImage: product.images?.[0] || '/images/product1.png',
+          productPrice: product.price,
+        }),
+      });
+
+      if (response.ok) {
+        const updatedWishlist = await response.json();
+        // Update with the actual server state
+        const updatedSlugs = updatedWishlist.items?.map((item: any) => item.productSlug) || [];
+        setWishlistSlugs(updatedSlugs);
+        setIsUpdatingWishlist(false);
+      } else {
+        // Revert optimistic update on error
+        setWishlistSlugs(wishlistSlugs);
+        setIsUpdatingWishlist(false);
+        console.error("Failed to update wishlist");
+      }
+    } catch (error) {
+      // Revert optimistic update on error
+      setWishlistSlugs(wishlistSlugs);
+      console.error("Error updating wishlist:", error);
     }
   };
 
@@ -173,16 +272,12 @@ export default function ProductListing() {
                       <button
                         onClick={(e) => {
                           e.preventDefault();
-                          const newFavorites = favorites.includes(p._id)
-                            ? favorites.filter(id => id !== p._id)
-                            : [...favorites, p._id];
-                          setFavorites(newFavorites);
-                          localStorage.setItem("favorites", JSON.stringify(newFavorites));
+                          toggleWishlist(p);
                         }}
                         className="w-10 h-10 bg-white/95 backdrop-blur-sm elegant-rounded-full flex items-center justify-center shadow-lg hover:bg-[#EDD8B4]/30 hover:shadow-xl transition-all duration-300 hover:scale-110 border border-[#EDD8B4]/50 hover:border-[#8E5022]/30"
                       >
-                        <span className={`text-xl transition-colors duration-300 ${favorites.includes(p._id) ? 'text-[#442D1C]' : 'text-gray-400'} hover:text-[#652810]`}>
-                          {favorites.includes(p._id) ? '♥' : '♡'}
+                        <span className={`text-xl transition-colors duration-300 ${isInWishlist(p) ? 'text-red-600' : 'text-gray-400'} hover:text-red-500`}>
+                          {isInWishlist(p) ? '♥' : '♡'}
                         </span>
                       </button>
                     </div>

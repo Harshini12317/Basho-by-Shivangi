@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 interface CheckoutItem {
   productSlug: string;
@@ -25,19 +26,48 @@ export default function CheckoutPage() {
     gstNumber: "",
   });
   const [gstIncluded, setGstIncluded] = useState(false);
+  const { data: session, status } = useSession();
 
   useEffect(() => {
-    const checkoutData = localStorage.getItem("checkout");
-    if (checkoutData) {
-      try {
-        setCheckoutItems(JSON.parse(checkoutData));
-      } catch (error) {
-        console.error("Error parsing checkout data from localStorage:", error);
-        // Clear corrupted data
-        localStorage.removeItem("checkout");
+    const loadCartData = async () => {
+      if (status === "loading") return;
+
+      if (session) {
+        // Load from API for authenticated users
+        try {
+          const response = await fetch("/api/cart");
+          if (response.ok) {
+            const cartData = await response.json();
+            setCheckoutItems(cartData.items || []);
+          } else {
+            console.error("Failed to load cart from API");
+            // Fallback to localStorage
+            loadFromLocalStorage();
+          }
+        } catch (error) {
+          console.error("Error loading cart:", error);
+          loadFromLocalStorage();
+        }
+      } else {
+        // Load from localStorage for non-authenticated users
+        loadFromLocalStorage();
       }
-    }
-  }, []);
+    };
+
+    const loadFromLocalStorage = () => {
+      const checkoutData = localStorage.getItem("checkout");
+      if (checkoutData) {
+        try {
+          setCheckoutItems(JSON.parse(checkoutData));
+        } catch (error) {
+          console.error("Error parsing checkout data from localStorage:", error);
+          localStorage.removeItem("checkout");
+        }
+      }
+    };
+
+    loadCartData();
+  }, [session, status]);
 
   useEffect(() => {
     if (checkoutItems.length > 0) {
@@ -209,7 +239,7 @@ export default function CheckoutPage() {
                 <div key={item.productSlug} className="flex items-center mb-6 p-4 bg-[#EDD8B4]/30 elegant-rounded-xl border border-[#8E5022]/20 clay-morphism hover-lift">
                   {product && (
                     <img
-                      src="/images/product1.png"
+                      src={product.images?.[0] || '/images/product1.png'}
                       className="w-20 h-20 object-cover elegant-rounded-lg border-2 border-white shadow-md mr-4"
                       alt={product.title}
                     />

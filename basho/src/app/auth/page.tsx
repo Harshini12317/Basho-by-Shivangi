@@ -18,7 +18,7 @@ export default function AuthPage() {
         router.replace("/auth");
       }, 2500);
     } else if (error === "AccessDenied") {
-      setErrorMsg("Access Denied: You do not have permission to sign in.");
+      setErrorMsg("Sign-up first to continue.");
       setTimeout(() => {
         setErrorMsg(null);
         router.replace("/auth");

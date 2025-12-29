@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 interface Product {
   _id: string;
@@ -17,6 +19,11 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
   const [slug, setSlug] = useState<string>("");
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false);
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     params.then((resolvedParams) => {
@@ -25,7 +32,46 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         .then((res) => res.json())
         .then(setProduct);
     });
+
+    // Load favorites from localStorage
+    const savedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+    setFavorites(savedFavorites);
+
+    // Listen for localStorage changes
+    const handleStorageChange = () => {
+      const updatedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+      setFavorites(updatedFavorites);
+    };
+
+    // Listen for visibility changes to refresh wishlist status
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        const updatedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+        setFavorites(updatedFavorites);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [params]);
+
+  useEffect(() => {
+    if (product) {
+      if (session && isInitialLoad && !isUpdatingWishlist) {
+        // For authenticated users, check API only on initial load
+        checkWishlistStatus();
+      } else if (!session) {
+        // For non-authenticated users, check localStorage
+        setIsInWishlist(favorites.includes(product._id));
+        setIsInitialLoad(false);
+      }
+    }
+  }, [session, product, favorites, isInitialLoad, isUpdatingWishlist]);
 
   if (!product) {
     return (
@@ -35,18 +81,129 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     );
   }
 
-  const addToCheckout = () => {
-    const checkoutData = [
-      {
-        productSlug: slug,
-        qty: 1,
-        price: product!.price,
-        weight: product!.weight,
-      },
-    ];
+  const addToCheckout = async () => {
+    if (status === "loading") {
+      return; // Wait for session to load
+    }
 
-    localStorage.setItem("checkout", JSON.stringify(checkoutData));
-    window.location.href = "/checkout";
+    if (!session) {
+      alert("Please sign in to add items to your cart.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productSlug: slug,
+          qty: 1,
+          price: product!.price,
+          weight: product!.weight,
+        }),
+      });
+
+      if (response.ok) {
+        alert("Item added to cart successfully!");
+        // Trigger cart update in navbar
+        window.dispatchEvent(new Event('cartUpdated'));
+        // Optionally redirect to cart/checkout page
+        // window.location.href = "/checkout";
+      } else {
+        const error = await response.json();
+        alert(`Failed to add item to cart: ${error.error}`);
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      alert("An error occurred while adding the item to cart.");
+    }
+  };
+
+  const checkWishlistStatus = async () => {
+    if (!session || !slug || isUpdatingWishlist) return;
+
+    try {
+      const response = await fetch("/api/wishlist");
+      if (response.ok) {
+        const wishlistData = await response.json();
+        const isInWishlist = wishlistData.items?.some((item: any) => item.productSlug === slug) || false;
+        setIsInWishlist(isInWishlist);
+        setIsInitialLoad(false);
+      }
+    } catch (error) {
+      console.error("Error checking wishlist status:", error);
+      setIsInitialLoad(false);
+    }
+  };
+
+  const toggleWishlist = async () => {
+    if (status === "loading") {
+      return;
+    }
+
+    if (!session) {
+      // For non-authenticated users, use localStorage
+      if (!product) return;
+      const newFavorites = favorites.includes(product._id)
+        ? favorites.filter(id => id !== product._id)
+        : [...favorites, product._id];
+      setFavorites(newFavorites);
+      localStorage.setItem("favorites", JSON.stringify(newFavorites));
+      setIsInWishlist(!isInWishlist);
+      alert(isInWishlist ? "Removed from wishlist!" : "Added to wishlist!");
+      return;
+    }
+
+    // For authenticated users, use optimistic updates for better UX
+    if (!product) return;
+
+    // Optimistically update the UI immediately
+    const wasInWishlist = isInWishlist;
+    setIsInWishlist(!wasInWishlist);
+    setIsUpdatingWishlist(true);
+
+    try {
+      const response = await fetch("/api/wishlist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productSlug: slug,
+          productTitle: product.title,
+          productImage: product.images?.[0] || '/images/product1.png',
+          productPrice: product.price,
+        }),
+      });
+
+      if (response.ok) {
+        const updatedWishlist = await response.json();
+        const isNowInWishlist = updatedWishlist.items?.some((item: any) => item.productSlug === slug) || false;
+        
+        // Update with the actual server state
+        setIsInWishlist(isNowInWishlist);
+        setIsUpdatingWishlist(false);
+        
+        // For authenticated users, we don't need to sync with localStorage
+        // The wishlist is managed server-side
+        
+        alert(isNowInWishlist ? "Added to wishlist!" : "Removed from wishlist!");
+      } else {
+        // Revert optimistic update on error
+        setIsInWishlist(wasInWishlist);
+        setIsUpdatingWishlist(false);
+        const error = await response.json();
+        alert(`Failed to update wishlist: ${error.error}`);
+      }
+    } catch (error) {
+      // Revert optimistic update on error
+      setIsInWishlist(wasInWishlist);
+      setIsUpdatingWishlist(false);
+      console.error("Error updating wishlist:", error);
+      alert("An error occurred while updating your wishlist.");
+    }
   };
 
   return (
@@ -95,9 +252,23 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             <div className="p-8 lg:p-12 space-y-6">
               {/* Title and Basic Info */}
               <div className="space-y-4">
-                <h1 className="text-3xl lg:text-4xl font-bold text-[#442D1C] leading-tight serif">
-                  {product.title}
-                </h1>
+                <div className="flex items-center justify-between">
+                  <h1 className="text-3xl lg:text-4xl font-bold text-[#442D1C] leading-tight serif">
+                    {product.title}
+                  </h1>
+                  <button
+                    key={isInWishlist ? 'filled' : 'empty'}
+                    onClick={toggleWishlist}
+                    className={`p-3 rounded-full transition-all duration-300 ${
+                      isInWishlist
+                        ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                        : 'bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-red-400'
+                    }`}
+                    title={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+                  >
+                    {isInWishlist ? <FaHeart className="text-xl text-red-600" /> : <FaRegHeart className="text-xl text-gray-400" />}
+                  </button>
+                </div>
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="text-[#652810] font-semibold text-base italic bg-[#EDD8B4]/50 px-3 py-1 elegant-rounded-lg">
                     {product.material}

@@ -1,16 +1,82 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiSearch, FiShoppingBag, FiMenu, FiX } from "react-icons/fi";
 import { FaTwitter, FaInstagram, FaPinterestP } from "react-icons/fa";
 import { MdAccountCircle, MdHistory, MdFavoriteBorder, MdSettings, MdLogout } from "react-icons/md";
+import { useSession } from "next-auth/react";
 import "./Navbar.css";
 
 
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cartItemCount, setCartItemCount] = useState(0);
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    const updateCartCount = async () => {
+      if (session) {
+        // Fetch cart count from API for authenticated users
+        try {
+          const response = await fetch("/api/cart");
+          if (response.ok) {
+            const cartData = await response.json();
+            const totalItems = cartData.items?.reduce((total: number, item: any) => total + item.qty, 0) || 0;
+            setCartItemCount(totalItems);
+          }
+        } catch (error) {
+          console.error("Error fetching cart count:", error);
+          setCartItemCount(0);
+        }
+      } else {
+        // Get cart count from localStorage for non-authenticated users
+        try {
+          const checkoutData = localStorage.getItem("checkout");
+          if (checkoutData) {
+            const items = JSON.parse(checkoutData);
+            const totalItems = items.reduce((total: number, item: any) => total + item.qty, 0);
+            setCartItemCount(totalItems);
+          } else {
+            setCartItemCount(0);
+          }
+        } catch (error) {
+          console.error("Error parsing localStorage cart data:", error);
+          setCartItemCount(0);
+        }
+      }
+    };
+
+    updateCartCount();
+
+    // Listen for storage changes (for localStorage updates)
+    const handleStorageChange = () => {
+      updateCartCount();
+    };
+
+    // Listen for visibility changes to update cart count when user returns to tab
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        updateCartCount();
+      }
+    };
+
+    // Listen for custom cart update events
+    const handleCartUpdate = () => {
+      updateCartCount();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("cartUpdated", handleCartUpdate);
+    
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+    };
+  }, [session]);
   return (
     <div className="navbar-inner">
 
@@ -52,12 +118,23 @@ export default function Navbar() {
 
   {/* RIGHT ICONS */}
  <div className="nav-icons">
-  <button aria-label="Search">
-    <FiSearch />
-  </button>
+  {session ? (
+    <Link href="/profile" aria-label="Profile">
+      <MdAccountCircle />
+    </Link>
+  ) : (
+    <Link href="/auth" aria-label="Login" className="nav-login-text">
+      Login
+    </Link>
+  )}
 
-  <Link href="/checkout" aria-label="Cart">
+  <Link href="/checkout" aria-label="Cart" className="nav-cart-container">
     <FiShoppingBag />
+    {cartItemCount > 0 && (
+      <span className="nav-cart-badge">
+        {cartItemCount > 99 ? '99+' : cartItemCount}
+      </span>
+    )}
   </Link>
 
   <div className="menu-container">

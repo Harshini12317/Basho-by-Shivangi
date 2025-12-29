@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useSession, signIn } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
-import { FaShoppingBag, FaPaintBrush, FaCalendarAlt, FaUser, FaBoxOpen, FaMapMarkerAlt, FaPhone, FaPen } from "react-icons/fa";
+import { FaShoppingBag, FaPaintBrush, FaCalendarAlt, FaUser, FaBoxOpen, FaMapMarkerAlt, FaPhone, FaPen, FaHeart } from "react-icons/fa";
 
 type CustomOrder = {
   _id: string;
@@ -33,11 +33,20 @@ type ProductOrder = {
   createdAt: string;
 };
 
+type WishlistItem = {
+  productSlug: string;
+  productTitle: string;
+  productImage: string;
+  productPrice: number;
+  addedAt: string;
+};
+
 export default function ProfilePage() {
   const { data: session, status } = useSession();
   const [customOrders, setCustomOrders] = useState<CustomOrder[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [productOrders, setProductOrders] = useState<ProductOrder[]>([]);
+  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   
   const [userProfile, setUserProfile] = useState<any>(null);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
@@ -102,6 +111,16 @@ export default function ProfilePage() {
     } catch {
       setProductOrders([]);
     }
+
+    // Wishlist
+    fetch("/api/wishlist")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && !data.error) {
+          setWishlistItems(data.items || []);
+        }
+      })
+      .catch(() => setWishlistItems([]));
   }, [userEmail]);
 
   const handleSaveAddress = async () => {
@@ -133,6 +152,23 @@ export default function ProfilePage() {
       console.error("Error saving address", err);
     } finally {
       setIsSavingAddress(false);
+    }
+  };
+
+  const removeFromWishlist = async (productSlug: string) => {
+    try {
+      const response = await fetch(`/api/wishlist?productSlug=${encodeURIComponent(productSlug)}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        const updatedWishlist = await response.json();
+        setWishlistItems(updatedWishlist.items || []);
+      } else {
+        console.error("Failed to remove from wishlist");
+      }
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
     }
   };
 
@@ -198,17 +234,25 @@ export default function ProfilePage() {
               </div>
             </div>
             
-            <Link 
-              href="/products" 
-              className="group flex items-center gap-3 px-8 py-3.5 rounded-full bg-[#E76F51] text-white shadow-lg shadow-orange-200 hover:bg-[#D35400] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
-            >
-              <FaShoppingBag className="text-lg" />
-              <span className="font-semibold tracking-wide">Shop Products</span>
-            </Link>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => signOut()}
+                className="group flex items-center gap-3 px-6 py-3.5 rounded-full bg-slate-100 text-slate-700 shadow-md hover:bg-slate-200 hover:shadow-lg transition-all duration-300"
+              >
+                <span className="font-semibold tracking-wide">Logout</span>
+              </button>
+              <Link 
+                href="/products" 
+                className="group flex items-center gap-3 px-8 py-3.5 rounded-full bg-[#E76F51] text-white shadow-lg shadow-orange-200 hover:bg-[#D35400] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+              >
+                <FaShoppingBag className="text-lg" />
+                <span className="font-semibold tracking-wide">Shop Products</span>
+              </Link>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-8">
           {/* Products Ordered */}
           <div className="bg-white rounded-3xl shadow-sm border border-[#EDD8B4]/30 p-6 hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
             <div className="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
@@ -303,6 +347,59 @@ export default function ProfilePage() {
                         Registered as: <span className="font-medium text-slate-700">{r.name}</span>
                       </div>
                     </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Wishlist */}
+          <div className="bg-white rounded-3xl shadow-sm border border-[#EDD8B4]/30 p-6 hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
+            <div className="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
+              <div className="p-3 rounded-xl bg-red-50 text-red-600">
+                <FaHeart className="text-xl" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-800">Wishlist</h2>
+                <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Saved Items</p>
+              </div>
+            </div>
+
+            <div className="flex-1">
+              {wishlistItems.length === 0 ? (
+                emptyState
+              ) : (
+                <div className="space-y-4">
+                  {wishlistItems.map((item) => (
+                    <Link key={item.productSlug} href={`/products/${item.productSlug}`} className="block">
+                      <div className="p-4 rounded-2xl bg-[#F9F9F9] border border-slate-100 hover:border-[#E2C48D] transition-colors group cursor-pointer">
+                        <div className="flex items-center gap-3 mb-3">
+                          <img
+                            src={item.productImage}
+                            alt={item.productTitle}
+                            className="w-12 h-12 object-cover rounded-lg border border-slate-200"
+                          />
+                          <div className="flex-1">
+                            <div className="font-semibold text-slate-800 group-hover:text-red-700 transition-colors text-sm">{item.productTitle}</div>
+                            <div className="text-slate-900 font-bold text-sm">₹{item.productPrice}</div>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              removeFromWishlist(item.productSlug);
+                            }}
+                            className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                            title="Remove from wishlist"
+                          >
+                            <FaHeart className="text-sm fill-current" />
+                          </button>
+                        </div>
+                        <div className="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                          View Product →
+                        </div>
+                      </div>
+                    </Link>
                   ))}
                 </div>
               )}
