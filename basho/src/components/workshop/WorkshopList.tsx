@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Link from 'next/link';
 import { FaLeaf, FaHandSparkles, FaStar, FaChair, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
@@ -97,6 +97,45 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
     return `/images/${src}`;
   };
   const studentScrollerRef = useRef<HTMLDivElement>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
+  const [reg, setReg] = useState({ name: '', email: '' });
+  const [regStatus, setRegStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const openModal = (slug: string) => {
+    setSelectedSlug(slug);
+    setShowModal(true);
+    setRegStatus('idle');
+  };
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedSlug(null);
+    setReg({ name: '', email: '' });
+  };
+  const submitRegistration = async () => {
+    if (!selectedSlug || !reg.name || !reg.email) {
+      setRegStatus('error');
+      return;
+    }
+    try {
+      setRegStatus('loading');
+      const res = await fetch('/api/workshop/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ workshopSlug: selectedSlug, name: reg.name, email: reg.email }),
+      });
+      if (!res.ok) {
+        setRegStatus('error');
+        return;
+      }
+      setRegStatus('success');
+      setTimeout(() => {
+        closeModal();
+      }, 900);
+    } catch {
+      setRegStatus('error');
+    }
+  };
 
   return (
     <div className="bg-[#F8F7F2] min-h-screen py-16 px-4 sm:px-8">
@@ -106,10 +145,19 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
             <h2 className="text-3xl md:text-4xl font-semibold">Pottery Workshop</h2>
           </div>
         </div>
+
+        <div className="sticky top-0 z-20 -mx-8 md:-mx-16 bg-white/80 backdrop-blur border-b border-[#EDD8B4]">
+          <div className="max-w-6xl mx-auto px-8 md:px-16">
+            <div className="flex items-center gap-3 py-3">
+              <a href="#workshops" className="px-4 py-2 rounded-full bg-[#FFF8F2] ring-1 ring-[#E2C48D] text-slate-900 hover:bg-white">Workshops</a>
+              <a href="#events" className="px-4 py-2 rounded-full bg-[#FFF8F2] ring-1 ring-[#E2C48D] text-slate-900 hover:bg-white">Events</a>
+            </div>
+          </div>
+        </div>
         
         
         {/* Workshop Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
+        <div id="workshops" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24 scroll-mt-24">
           {finalList.map((ws, idx) => (
             <Link key={`${ws.slug}-${idx}`} href={`/workshop/${ws.slug}`} className="group cursor-pointer">
               <div className="bg-[#F9F9F9] rounded-2xl overflow-hidden shadow-sm transition-all hover:shadow-lg">
@@ -252,6 +300,7 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">All Levels</span>
               </div>
               <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Book Date Night</Link>
+              <button onClick={() => openModal('date-night')} className="inline-block mt-3 ml-2 bg-white text-slate-900 px-4 py-2 rounded-full ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">Register Interest</button>
             </div>
           </div>
 
@@ -271,6 +320,7 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">All Ages</span>
               </div>
               <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Plan A Birthday Bash</Link>
+              <button onClick={() => openModal('birthday-bash')} className="inline-block mt-3 ml-2 bg-white text-slate-900 px-4 py-2 rounded-full ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">Register Interest</button>
             </div>
           </div>
           
@@ -290,8 +340,51 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Creative Thinking</span>
               </div>
               <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Book Team Session</Link>
+              <button onClick={() => openModal('team-building')} className="inline-block mt-3 ml-2 bg-white text-slate-900 px-4 py-2 rounded-full ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">Register Interest</button>
             </div>
           </div>
+
+          {showModal && (
+            <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/30">
+              <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-lg ring-1 ring-[#E2C48D]">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Register Interest</h3>
+                  <button onClick={closeModal} className="text-slate-600 hover:text-slate-900">✕</button>
+                </div>
+                <div className="space-y-3">
+                  <input
+                    className="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-[#E2C48D]"
+                    placeholder="Your Name"
+                    value={reg.name}
+                    onChange={(e) => setReg((r) => ({ ...r, name: e.target.value }))}
+                  />
+                  <input
+                    className="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-[#E2C48D]"
+                    placeholder="Email"
+                    value={reg.email}
+                    onChange={(e) => setReg((r) => ({ ...r, email: e.target.value }))}
+                  />
+                </div>
+                <div className="mt-4 flex items-center gap-3">
+                  <button
+                    onClick={submitRegistration}
+                    className="px-4 py-2 rounded-full bg-[#E76F51] text-white shadow-md hover:bg-[#D35400]"
+                  >
+                    {regStatus === 'loading' ? 'Submitting...' : 'Submit'}
+                  </button>
+                  <button onClick={closeModal} className="px-4 py-2 rounded-full bg-white ring-1 ring-[#E2C48D] text-slate-900">
+                    Cancel
+                  </button>
+                </div>
+                {regStatus === 'error' && (
+                  <div className="mt-3 text-sm text-red-600">Please fill all fields correctly.</div>
+                )}
+                {regStatus === 'success' && (
+                  <div className="mt-3 text-sm text-green-600">Registered! We will contact you soon.</div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

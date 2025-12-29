@@ -46,7 +46,6 @@ export default function Navbar() {
       <Link href="/products">Products</Link>
       <Link href="/media?tab=Media">Media</Link>
       <Link href="/workshop">Workshop</Link>
-      <Link href="/workshop#events">Events</Link>
     </div>
 
   </div>
