@@ -155,10 +155,6 @@ export async function DELETE(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const productSlug = searchParams.get('productSlug');
 
-    if (!productSlug) {
-      return NextResponse.json({ error: "Product slug required" }, { status: 400 });
-    }
-
     await connectDB();
 
     // Find user by email
@@ -174,10 +170,15 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Cart not found" }, { status: 404 });
     }
 
-    // Remove item from cart
-    cart.items = cart.items.filter(
-      (item: any) => item.productSlug !== productSlug
-    );
+    if (productSlug) {
+      // Remove specific item from cart
+      cart.items = cart.items.filter(
+        (item: any) => item.productSlug !== productSlug
+      );
+    } else {
+      // Clear entire cart
+      cart.items = [];
+    }
 
     await cart.save();
 

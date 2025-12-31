@@ -34,13 +34,15 @@ const UserSchema = new Schema(
       type: Date,
     },
     
-    address: {
-      street: { type: String, default: "" },
-      city: { type: String, default: "" },
-      state: { type: String, default: "" },
-      zip: { type: String, default: "" },
-      country: { type: String, default: "" },
-    },
+    addresses: [{
+      _id: { type: String, default: () => require('crypto').randomUUID() },
+      label: { type: String, default: "Home" },
+      street: { type: String, required: true },
+      city: { type: String, required: true },
+      state: { type: String, required: true },
+      zip: { type: String, required: true },
+      isDefault: { type: Boolean, default: false },
+    }],
     phone: { type: String, default: "" },
   },
   {

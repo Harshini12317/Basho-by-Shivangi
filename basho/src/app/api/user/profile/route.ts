@@ -35,12 +35,22 @@ export async function PUT(req: Request) {
     }
 
     const body = await req.json();
-    const { address, phone } = body;
+    const { addresses, phone } = body;
 
     await connectDB();
+    
+    // Prepare update object
+    const updateData: any = {};
+    if (addresses !== undefined) {
+      updateData.addresses = addresses;
+    }
+    if (phone !== undefined) {
+      updateData.phone = phone;
+    }
+
     const updatedUser = await User.findOneAndUpdate(
       { email: session.user.email },
-      { $set: { address, phone } },
+      { $set: updateData },
       { new: true, runValidators: true }
     ).select("-password");
 

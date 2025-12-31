@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { sendPaymentSuccessEmail } from '@/lib/email';
+import { connectDB } from '@/lib/mongodb';
+import Order from '@/models/Order';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,6 +30,40 @@ export async function POST(request: NextRequest) {
         orderDetails
       });
 
+      // Get user session to save order
+      const session = await getServerSession(authOptions);
+      let userId = null;
+      if (session?.user?.email) {
+        await connectDB();
+        const User = (await import('@/models/User')).default;
+        const user = await User.findOne({ email: session.user.email });
+        userId = user?._id;
+      }
+
+      // Save order to database if user is logged in
+      if (userId) {
+        try {
+          await connectDB();
+          const order = new Order({
+            userId,
+            items: orderDetails.items,
+            totalAmount: orderDetails.totalAmount,
+            subtotal: orderDetails.subtotal,
+            shippingAmount: orderDetails.shippingAmount,
+            gstAmount: orderDetails.gstAmount,
+            paymentId: razorpay_payment_id,
+            razorpayOrderId: razorpay_order_id,
+            customer: orderDetails.customer,
+            address: orderDetails.address,
+          });
+          await order.save();
+          console.log('Order saved:', order._id);
+        } catch (dbError) {
+          console.error('Error saving order to database:', dbError);
+          // Don't fail payment verification if DB save fails
+        }
+      }
+
       // Send confirmation emails to customer and owner
       try {
         await sendPaymentSuccessEmail(
@@ -41,9 +79,6 @@ export async function POST(request: NextRequest) {
         console.error('Error sending confirmation emails:', emailError);
         // Don't fail the payment verification if email fails
       }
-
-      // You can save this to your database here
-      // Example: await saveOrderToDatabase(orderDetails);
 
       return NextResponse.json({
         success: true,
