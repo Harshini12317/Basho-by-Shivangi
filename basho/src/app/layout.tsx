@@ -5,7 +5,8 @@ import "./globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
 import Footer from "@/components/Footer";
 import SessionProviderWrapper from "@/components/auth/SessionProviderWrapper";
-
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -24,40 +25,30 @@ export const metadata: Metadata = {
   description: "Handcrafted pottery and custom tableware",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession(authOptions); // ✅ correct
+
   return (
-    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
-          strategy="beforeInteractive"
+          strategy="lazyOnload"
         />
       </head>
 
       <body
-        className={`
-          ${inter.variable}
-          ${playfair.variable}
-          antialiased
-          min-h-screen
-          bg-[var(--bg-primary)]
-          text-[var(--text-primary)]
-          overflow-x-hidden
-        `}
+        className={`${inter.variable} ${playfair.variable} antialiased min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]`}
       >
-      <SessionProviderWrapper>
-    <NavbarWrapper />
-
-    <main className="relative">
-      {children}
-    </main>
-
-    <Footer />
-  </SessionProviderWrapper>
+        <SessionProviderWrapper session={session}>
+          <NavbarWrapper />
+          <main className="relative">{children}</main>
+          <Footer />
+        </SessionProviderWrapper>
       </body>
     </html>
   );

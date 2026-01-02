@@ -1,91 +1,93 @@
-import { NextAuthOptions } from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { connectDB } from "@/lib/mongodb";
-import User from "@/models/User";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { connectDB } from "@/lib/mongodb";
+import User from "@/models/User";
 
 export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/auth",
-    error: "/auth", // Redirect all errors to your custom auth page
+    error: "/auth",
   },
+
+  session: {
+    strategy: "jwt",
+  },
+
   providers: [
     CredentialsProvider({
-    name: "Credentials",
-    credentials: {
-      email: { label: "Email", type: "text" },
-      password: { label: "Password", type: "password" },
-    },
-    async authorize(credentials) {
-      if (!credentials?.email || !credentials?.password) {
-        throw new Error("Missing credentials");
-      }
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
 
-      await connectDB();
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
 
-      const user = await User.findOne({ email: credentials.email });
+        await connectDB();
 
-      if (!user) {
-        throw new Error("User not found");
-      }
+        const user = await User.findOne({ email: credentials.email });
 
-      if (!user.isVerified) {
-        throw new Error("Email not verified");
-      }
+        if (!user || !user.isVerified) return null;
 
-      const isValid = await bcrypt.compare(
-        credentials.password,
-        user.password
-      );
+        const isValid = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
 
-      if (!isValid) {
-        throw new Error("Invalid password");
-      }
+        if (!isValid) return null;
 
-      return {
-        id: user._id.toString(),
-        name: user.name,
-        email: user.email,
-      };
-    },
-  }),
+        return {
+          id: user._id.toString(),
+          name: user.name,
+          email: user.email,
+        };
+      },
+    }),
 
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
-  session: {
-    strategy: "jwt",
-  },
+
   callbacks: {
     async signIn({ user, account }) {
-      try {
-        await connectDB();
-        const existingUser = await User.findOne({ email: user.email });
+      // Only run DB logic for Google login
+      if (account?.provider !== "google") return true;
 
-        if (account?.provider === "google") {
-          if (!existingUser) {
-            // If user does not exist, create and mark as verified
-            await User.create({
-              name: user.name,
-              email: user.email,
-              isVerified: true, // Google already verifies email
-              provider: "google",
-            });
-            return true;
-          } else if (!existingUser.isVerified) {
-            // If user exists but is not verified, deny sign in
-            return false;
-          }
-        }
-        // For credentials or verified Google users
-        return true;
-      } catch (error) {
-        console.error("Google sign-in error:", error);
-        return false;
+      await connectDB();
+
+      const existingUser = await User.findOne({ email: user.email }).lean();
+
+      if (!existingUser) {
+        await User.create({
+          name: user.name,
+          email: user.email,
+          isVerified: true,
+          provider: "google",
+        });
       }
+
+      return true;
+    },
+
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+      }
+      return session;
     },
   },
 };
+
+export default NextAuth(authOptions);
