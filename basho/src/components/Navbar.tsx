@@ -13,6 +13,7 @@ import "./Navbar.css";
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartItemCount, setCartItemCount] = useState(0);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -77,8 +78,18 @@ export default function Navbar() {
       window.removeEventListener("cartUpdated", handleCartUpdate);
     };
   }, [session]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <div className="navbar-inner">
+    <div className={`navbar-inner ${isScrolled ? 'navbar-scrolled' : ''}`}>
 
   {/* LEFT ICONS */}
  <div className="nav-socials">
@@ -104,8 +115,8 @@ export default function Navbar() {
 </div>
 
     <div className="nav-logo">
-      <span className="logo-main">BASHO</span>
-      <span className="logo-sub">BY SHIVANGI</span>
+      <span className="logo-main">basho</span>
+      <span className="logo-sub">BYY SHIVANGI</span>
     </div>
 
     <div className="nav-links right-links">

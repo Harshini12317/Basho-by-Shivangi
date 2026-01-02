@@ -29,6 +29,7 @@ export async function GET() {
           },
         },
         faqs: [],
+        hsnCode: '',
       });
       // Save without validation initially
       await staticData.save({ validateBeforeSave: false });
@@ -50,18 +51,18 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
 
-    let staticData = await StaticData.findOne();
+    // Use findOneAndUpdate for atomic update
+    const updatedData = await StaticData.findOneAndUpdate(
+      {}, // Find the first document (assuming there's only one)
+      { $set: body }, // Only update the provided fields
+      {
+        new: true, // Return the updated document
+        upsert: true, // Create if doesn't exist
+        runValidators: false // Skip validation for speed
+      }
+    );
 
-    if (!staticData) {
-      staticData = new StaticData(body);
-    } else {
-      // Update existing document
-      Object.assign(staticData, body);
-    }
-
-    await staticData.save({ validateBeforeSave: false });
-
-    return NextResponse.json(staticData);
+    return NextResponse.json(updatedData);
   } catch (error) {
     console.error('PUT /api/admin/static-data error:', error);
     return NextResponse.json(

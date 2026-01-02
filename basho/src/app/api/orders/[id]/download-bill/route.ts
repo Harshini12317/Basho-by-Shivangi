@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
 import Order from "@/models/Order";
+import StaticData from "@/models/StaticData";
 import { generateInvoicePDF } from "@/lib/invoice-pdf";
 
 export async function GET(
@@ -45,7 +46,9 @@ export async function GET(
     }
 
     // Generate PDF invoice
-    const pdfBuffer = await generateInvoicePDF(order);
+    const staticData = await StaticData.findOne();
+    const hsnCode = staticData?.hsnCode || '';
+    const pdfBuffer = await generateInvoicePDF({ ...order.toObject(), hsnCode });
 
     // Return PDF as downloadable file
     return new NextResponse(pdfBuffer, {

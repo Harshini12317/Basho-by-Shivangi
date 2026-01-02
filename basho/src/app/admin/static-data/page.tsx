@@ -25,6 +25,7 @@ interface StaticData {
     question: string;
     answer: string;
   }>;
+  hsnCode: string;
 }
 
 export default function StaticDataPage() {
@@ -36,6 +37,7 @@ export default function StaticDataPage() {
   const [editingStudio, setEditingStudio] = useState(false);
   const [editingContact, setEditingContact] = useState(false);
   const [editingFAQs, setEditingFAQs] = useState(false);
+  const [editingHSN, setEditingHSN] = useState(false);
 
   // Form data for each section
   const [studioForm, setStudioForm] = useState<StaticData['studioLocation']>({
@@ -56,6 +58,7 @@ export default function StaticDataPage() {
     },
   });
   const [faqsForm, setFaqsForm] = useState<StaticData['faqs']>([]);
+  const [hsnForm, setHsnForm] = useState<string>('');
 
   useEffect(() => {
     fetchStaticData();
@@ -71,6 +74,7 @@ export default function StaticDataPage() {
         setStudioForm(data.studioLocation);
         setContactForm(data.contactInfo);
         setFaqsForm(data.faqs);
+        setHsnForm(data.hsnCode || '');
       }
     } catch (error) {
       console.error('Failed to fetch static data:', error);
@@ -79,16 +83,22 @@ export default function StaticDataPage() {
     }
   };
 
-  const updateSection = async (section: 'studioLocation' | 'contactInfo' | 'faqs') => {
+  const updateSection = async (section: 'studioLocation' | 'contactInfo' | 'faqs' | 'hsnCode') => {
     if (!staticData) return;
 
     setSaving(true);
     try {
-      const updateData = {
-        ...staticData,
-        [section]: section === 'studioLocation' ? studioForm :
-                   section === 'contactInfo' ? contactForm : faqsForm,
-      };
+      let updateData: any = {};
+
+      if (section === 'studioLocation') {
+        updateData.studioLocation = studioForm;
+      } else if (section === 'contactInfo') {
+        updateData.contactInfo = contactForm;
+      } else if (section === 'faqs') {
+        updateData.faqs = faqsForm;
+      } else if (section === 'hsnCode') {
+        updateData.hsnCode = hsnForm;
+      }
 
       const response = await fetch('/api/admin/static-data', {
         method: 'PUT',
@@ -105,11 +115,13 @@ export default function StaticDataPage() {
         if (section === 'studioLocation') setStudioForm(updatedData.studioLocation);
         if (section === 'contactInfo') setContactForm(updatedData.contactInfo);
         if (section === 'faqs') setFaqsForm(updatedData.faqs);
+        if (section === 'hsnCode') setHsnForm(updatedData.hsnCode || '');
 
         // Exit edit mode
         if (section === 'studioLocation') setEditingStudio(false);
         if (section === 'contactInfo') setEditingContact(false);
         if (section === 'faqs') setEditingFAQs(false);
+        if (section === 'hsnCode') setEditingHSN(false);
       }
     } catch (error) {
       console.error('Failed to update static data:', error);
@@ -118,13 +130,14 @@ export default function StaticDataPage() {
     }
   };
 
-  const startEditing = (section: 'studio' | 'contact' | 'faqs') => {
+  const startEditing = (section: 'studio' | 'contact' | 'faqs' | 'hsn') => {
     if (section === 'studio') setEditingStudio(true);
     if (section === 'contact') setEditingContact(true);
     if (section === 'faqs') setEditingFAQs(true);
+    if (section === 'hsn') setEditingHSN(true);
   };
 
-  const cancelEditing = (section: 'studio' | 'contact' | 'faqs') => {
+  const cancelEditing = (section: 'studio' | 'contact' | 'faqs' | 'hsn') => {
     if (!staticData) return;
 
     // Reset form data to current static data
@@ -139,6 +152,10 @@ export default function StaticDataPage() {
     if (section === 'faqs') {
       setFaqsForm(staticData.faqs);
       setEditingFAQs(false);
+    }
+    if (section === 'hsn') {
+      setHsnForm(staticData.hsnCode || '');
+      setEditingHSN(false);
     }
   };
 
@@ -470,6 +487,57 @@ export default function StaticDataPage() {
               >
                 + Add FAQ
               </button>
+            </div>
+          )}
+        </div>
+
+        {/* HSN Code Card */}
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-slate-900">HSN Code</h2>
+            {!editingHSN ? (
+              <button
+                onClick={() => startEditing('hsn')}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Edit
+              </button>
+            ) : (
+              <div className="space-x-2">
+                <button
+                  onClick={() => updateSection('hsnCode')}
+                  disabled={saving}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {saving ? 'Saving...' : 'Save'}
+                </button>
+                <button
+                  onClick={() => cancelEditing('hsn')}
+                  disabled={saving}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
+
+          {!editingHSN ? (
+            <div className="space-y-2">
+              <p><strong>HSN Code:</strong> {staticData?.hsnCode || 'Not set'}</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">HSN Code</label>
+                <input
+                  type="text"
+                  value={hsnForm}
+                  onChange={(e) => setHsnForm(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter HSN code (e.g., 69010010)"
+                />
+              </div>
             </div>
           )}
         </div>

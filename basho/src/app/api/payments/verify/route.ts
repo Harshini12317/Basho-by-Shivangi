@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { sendPaymentSuccessEmail } from '@/lib/email';
 import { connectDB } from '@/lib/mongodb';
 import Order from '@/models/Order';
+import StaticData from '@/models/StaticData';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { generateInvoicePDF } from '@/lib/invoice-pdf';
@@ -67,6 +68,10 @@ export async function POST(request: NextRequest) {
 
           if (isGSTValid) {
             try {
+              // Fetch HSN code from static data
+              const staticData = await StaticData.findOne();
+              const hsnCode = staticData?.hsnCode || '';
+
               const pdfBuffer = await generateInvoicePDF({
                 ...order.toObject(),
                 razorpayOrderId: razorpay_order_id,
@@ -77,6 +82,7 @@ export async function POST(request: NextRequest) {
                 subtotal: orderDetails.subtotal,
                 shippingAmount: orderDetails.shippingAmount,
                 gstAmount: orderDetails.gstAmount,
+                hsnCode,
               });
 
               // Send invoice email with PDF attachment

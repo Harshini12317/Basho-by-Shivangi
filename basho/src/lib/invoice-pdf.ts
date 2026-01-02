@@ -52,8 +52,9 @@ export function generateInvoicePDF(order: any): Promise<Buffer> {
       doc.fontSize(11);
 
       doc.text("Item Description", 50, tableTop);
-      doc.text("Qty", 300, tableTop);
-      doc.text("Rate", 360, tableTop);
+      doc.text("HSN", 250, tableTop);
+      doc.text("Qty", 320, tableTop);
+      doc.text("Rate", 380, tableTop);
       doc.text("Amount", 450, tableTop);
 
       doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
@@ -62,9 +63,10 @@ export function generateInvoicePDF(order: any): Promise<Buffer> {
       let y = tableTop + 25;
 
       order.items.forEach((item: any) => {
-        doc.text(item.productSlug, 50, y, { width: 230 });
-        doc.text(item.qty.toString(), 300, y);
-        doc.text(`₹${item.price}`, 360, y);
+        doc.text(item.productSlug, 50, y, { width: 190 });
+        doc.text(order.hsnCode || '', 250, y);
+        doc.text(item.qty.toString(), 320, y);
+        doc.text(`₹${item.price}`, 380, y);
         doc.text(`₹${(item.price * item.qty).toFixed(2)}`, 450, y);
         y += 22;
       });

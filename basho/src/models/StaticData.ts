@@ -23,6 +23,7 @@ const StaticDataSchema = new Schema(
       question: { type: String, default: '' },
       answer: { type: String, default: '' },
     }],
+    hsnCode: { type: String, default: '' },
   },
   {
     timestamps: true,

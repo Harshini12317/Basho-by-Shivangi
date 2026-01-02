@@ -23,6 +23,9 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Basho by Shivangi",
   description: "Handcrafted pottery and custom tableware",
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default async function RootLayout({
@@ -46,7 +49,7 @@ export default async function RootLayout({
       >
         <SessionProviderWrapper session={session}>
           <NavbarWrapper />
-          <main className="relative">{children}</main>
+          <main className="relative pt-20">{children}</main>
           <Footer />
         </SessionProviderWrapper>
       </body>
