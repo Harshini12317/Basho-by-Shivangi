@@ -80,7 +80,7 @@ export function generateInvoicePDF(order: any): Promise<Buffer> {
 
       if (order.gstAmount > 0) {
         y += 18;
-        doc.text("GST (18%)", 350, y);
+        doc.text("Tax (18%)", 350, y);
         doc.text(`₹${order.gstAmount.toFixed(2)}`, 450, y);
       }
 

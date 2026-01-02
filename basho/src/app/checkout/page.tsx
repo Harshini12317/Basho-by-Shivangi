@@ -56,7 +56,7 @@ export default function CheckoutPage() {
     state: "",
     zip: ""
   });
-  const [gstIncluded, setGstIncluded] = useState(false);
+  const [gstIncluded, setGstIncluded] = useState(true); // Tax is always applied
   const [gstError, setGstError] = useState('');
   const { data: session, status } = useSession();
 
@@ -186,9 +186,9 @@ export default function CheckoutPage() {
   const totalWeight = checkoutItems.reduce((sum, item) => sum + item.weight * item.qty, 0);
   const shippingRate = 50; // per kg
   const shippingAmount = totalWeight * shippingRate;
-  const gstRate = 0.18;
-  const gstAmount = gstIncluded ? subtotal * gstRate : 0;
-  const totalAmount = Math.round((subtotal + shippingAmount + gstAmount) * 100) / 100; // Round to 2 decimal places
+  const taxRate = 0.18; // Tax rate (formerly GST)
+  const taxAmount = taxRate * subtotal; // Tax is always applied
+  const totalAmount = Math.round((subtotal + shippingAmount + taxAmount) * 100) / 100; // Round to 2 decimal places
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -316,12 +316,10 @@ export default function CheckoutPage() {
                   totalAmount,
                   subtotal,
                   shippingAmount,
-                  gstAmount,
+                  gstAmount: taxAmount, // Keep gstAmount for backward compatibility
                 },
               }),
             });
-
-            console.log('Payment verification request sent with customer:', customer);
 
             const verifyData = await verifyResponse.json();
 
@@ -365,7 +363,31 @@ export default function CheckoutPage() {
         prefill: {
           name: customer.name,
           email: customer.email,
-          contact: customer.phone,
+        },
+        customer: {
+          name: customer.name,
+          email: customer.email,
+        },
+        modal: {
+          escape: true,
+          confirm_close: true,
+          ondismiss: function() {
+            // Handle modal dismiss if needed
+          },
+          animation: true,
+          hide: ['contact'],
+        },
+        config: {
+          display: {
+            hide: [
+              {
+                method: 'paylater'
+              }
+            ],
+            preferences: {
+              show_default_blocks: true,
+            },
+          },
         },
         theme: {
           color: '#8E5022',
@@ -384,9 +406,9 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen py-16 grain-texture">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold serif text-[#442D1C] mb-8 text-center organic-float">Checkout</h1>
+          <h1 className="text-4xl font-bold text-[#442D1C] mb-8 text-center">Checkout</h1>
           <div className="bg-white/90 elegant-rounded-2xl p-8 shadow-lg border-2 border-[#EDD8B4] clay-morphism">
-            <p className="text-[#442D1C] text-center serif text-xl">No items in checkout.</p>
+            <p className="text-[#442D1C] text-center text-xl">No items in checkout.</p>
           </div>
         </div>
       </div>
@@ -396,11 +418,11 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen py-16 paper-texture">
       <div className="max-w-6xl mx-auto p-8">
-        <h1 className="text-4xl font-bold serif text-[#442D1C] mb-8 text-center organic-float">Checkout</h1>
+        <h1 className="text-4xl font-bold text-[#442D1C] mb-8 text-center">Checkout</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-white/90 elegant-rounded-2xl p-8 shadow-lg border-2 border-[#EDD8B4] clay-morphism">
-            <h2 className="text-2xl font-semibold serif text-[#442D1C] mb-6">Order Summary</h2>
+            <h2 className="text-2xl font-semibold text-[#442D1C] mb-6">Order Summary</h2>
             {checkoutItems.map((item) => {
               const product = products.find(p => p && p.slug === item.productSlug);
               return (
@@ -413,7 +435,7 @@ export default function CheckoutPage() {
                     />
                   )}
                   <div className="flex-1">
-                    <h3 className="font-semibold serif text-[#442D1C] text-lg">{product?.title || `Product ${item.productSlug}`}</h3>
+                    <h3 className="font-semibold text-[#442D1C] text-lg">{product?.title || `Product ${item.productSlug}`}</h3>
                     <div className="flex items-center gap-2 mt-2">
                       <button
                         onClick={() => updateQuantity(item.productSlug, item.qty - 1)}
@@ -435,7 +457,7 @@ export default function CheckoutPage() {
                         <FaTrash className="w-3 h-3" />
                       </button>
                     </div>
-                    <p className="text-[#8E5022] font-bold serif mt-1">₹{item.price} each</p>
+                    <p className="text-[#8E5022] font-bold mt-1">₹{item.price.toFixed(2)} each</p>
                   </div>
                 </div>
               );
@@ -443,44 +465,52 @@ export default function CheckoutPage() {
           </div>
 
           <div className="bg-white/90 elegant-rounded-2xl p-8 shadow-lg border-2 border-[#EDD8B4] clay-morphism">
-            <h2 className="text-2xl font-semibold serif text-[#442D1C] mb-6">Customer Details</h2>
+            <h2 className="text-2xl font-semibold text-[#442D1C] mb-6">Customer Details</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <input
-                type="text"
-                placeholder="Name"
-                value={customer.name}
-               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-  setCustomer({ ...customer, name: e.target.value })
-}
-
-                className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors"
-                required
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={customer.email}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-  setCustomer({ ...customer, email: e.target.value })
-}
-                className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors"
-                required
-              />
-              <input
-                type="tel"
-                placeholder="Phone"
-                value={customer.phone}
-               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-  setCustomer({ ...customer, phone: e.target.value })
-}
-  
-                className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors"
-                required
-              />
               <div>
+                <label className="block text-[#442D1C] font-medium mb-2">Full Name</label>
                 <input
                   type="text"
-                  placeholder="GST Number (Optional)"
+                  placeholder="Enter your full name"
+                  value={customer.name}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setCustomer({ ...customer, name: e.target.value })
+                  }
+                  className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-[#442D1C] font-medium mb-2">Email Address</label>
+                <input
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={customer.email}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setCustomer({ ...customer, email: e.target.value })
+                  }
+                  className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-[#442D1C] font-medium mb-2">Phone Number</label>
+                <input
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  value={customer.phone}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setCustomer({ ...customer, phone: e.target.value })
+                  }
+                  className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-[#442D1C] font-medium mb-2">GST Number <span className="text-sm text-gray-500">(Optional - For Invoice)</span></label>
+                <input
+                  type="text"
+                  placeholder="Enter GST number for invoice"
                   value={customer.gstNumber}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     const gstValue = e.target.value.toUpperCase();
@@ -488,14 +518,11 @@ export default function CheckoutPage() {
 
                     if (gstValue) {
                       if (validateGST(gstValue)) {
-                        setGstIncluded(true);
                         setGstError('');
                       } else {
-                        setGstIncluded(false);
                         setGstError('Invalid GST number format');
                       }
                     } else {
-                      setGstIncluded(false);
                       setGstError('');
                     }
                   }}
@@ -509,14 +536,14 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              <h3 className="text-xl font-semibold serif text-[#442D1C] mt-8 mb-4">Delivery Address</h3>
+              <h3 className="text-xl font-semibold text-[#442D1C] mt-8 mb-4">Delivery Address</h3>
               
               <div className="space-y-4">
                 {selectedAddressId && (
                   <div className="p-4 bg-[#EDD8B4]/30 elegant-rounded-xl border border-[#8E5022]/20 clay-morphism">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <p className="text-[#442D1C] mb-2 serif font-semibold">
+                        <p className="text-[#442D1C] mb-2 font-semibold">
                           Delivering to: {addresses.find(addr => addr._id === selectedAddressId)?.label}
                         </p>
                         <p className="text-[#442D1C]">{addresses.find(addr => addr._id === selectedAddressId)?.street}</p>
@@ -587,58 +614,73 @@ export default function CheckoutPage() {
                         <div className="mt-4 p-4 bg-[#EDD8B4]/10 rounded-xl border-2 border-dashed border-[#8E5022]/30">
                           <h5 className="text-[#442D1C] font-semibold mb-3">Or enter a new address:</h5>
                           <div className="space-y-3">
-                            <input
-                              type="text"
-                              placeholder="Label (e.g., Home, Work)"
-                              value={newAddressForm.label}
-                              onChange={(e) => {
-                                setNewAddressForm({...newAddressForm, label: e.target.value});
-                                setSelectedAddressId("");
-                              }}
-                              className="w-full p-2 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors text-sm"
-                            />
-                            <input
-                              type="text"
-                              placeholder="Street Address"
-                              value={newAddressForm.street}
-                              onChange={(e) => {
-                                setNewAddressForm({...newAddressForm, street: e.target.value});
-                                setSelectedAddressId("");
-                              }}
-                              className="w-full p-2 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors text-sm"
-                            />
-                            <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[#442D1C] font-medium text-sm mb-1">Address Label</label>
                               <input
                                 type="text"
-                                placeholder="City"
-                                value={newAddressForm.city}
+                                placeholder="e.g., Home, Work, Office"
+                                value={newAddressForm.label}
                                 onChange={(e) => {
-                                  setNewAddressForm({...newAddressForm, city: e.target.value});
-                                  setSelectedAddressId("");
-                                }}
-                                className="w-full p-2 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors text-sm"
-                              />
-                              <input
-                                type="text"
-                                placeholder="State"
-                                value={newAddressForm.state}
-                                onChange={(e) => {
-                                  setNewAddressForm({...newAddressForm, state: e.target.value});
+                                  setNewAddressForm({...newAddressForm, label: e.target.value});
                                   setSelectedAddressId("");
                                 }}
                                 className="w-full p-2 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors text-sm"
                               />
                             </div>
-                            <input
-                              type="text"
-                              placeholder="ZIP Code"
-                              value={newAddressForm.zip}
-                              onChange={(e) => {
-                                setNewAddressForm({...newAddressForm, zip: e.target.value});
-                                setSelectedAddressId("");
-                              }}
-                              className="w-full p-2 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors text-sm"
-                            />
+                            <div>
+                              <label className="block text-[#442D1C] font-medium text-sm mb-1">Street Address</label>
+                              <input
+                                type="text"
+                                placeholder="Enter complete street address"
+                                value={newAddressForm.street}
+                                onChange={(e) => {
+                                  setNewAddressForm({...newAddressForm, street: e.target.value});
+                                  setSelectedAddressId("");
+                                }}
+                                className="w-full p-2 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors text-sm"
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="block text-[#442D1C] font-medium text-sm mb-1">City</label>
+                                <input
+                                  type="text"
+                                  placeholder="Enter city name"
+                                  value={newAddressForm.city}
+                                  onChange={(e) => {
+                                    setNewAddressForm({...newAddressForm, city: e.target.value});
+                                    setSelectedAddressId("");
+                                  }}
+                                  className="w-full p-2 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors text-sm"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[#442D1C] font-medium text-sm mb-1">State</label>
+                                <input
+                                  type="text"
+                                  placeholder="Enter state name"
+                                  value={newAddressForm.state}
+                                  onChange={(e) => {
+                                    setNewAddressForm({...newAddressForm, state: e.target.value});
+                                    setSelectedAddressId("");
+                                  }}
+                                  className="w-full p-2 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors text-sm"
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-[#442D1C] font-medium text-sm mb-1">ZIP Code</label>
+                              <input
+                                type="text"
+                                placeholder="Enter ZIP/postal code"
+                                value={newAddressForm.zip}
+                                onChange={(e) => {
+                                  setNewAddressForm({...newAddressForm, zip: e.target.value});
+                                  setSelectedAddressId("");
+                                }}
+                                className="w-full p-2 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors text-sm"
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -694,10 +736,10 @@ export default function CheckoutPage() {
               </div>
 
               <div className="p-6 bg-[#EDD8B4]/30 elegant-rounded-xl border border-[#8E5022]/20 clay-morphism">
-                <p className="text-[#442D1C] mb-2 serif">Subtotal: <span className="font-bold">₹{subtotal}</span></p>
-                <p className="text-[#442D1C] mb-2 serif">Shipping (₹{shippingRate}/kg): <span className="font-bold">₹{shippingAmount}</span></p>
-                {gstIncluded && <p className="text-[#442D1C] mb-2 serif">GST (18%): <span className="font-bold">₹{gstAmount}</span></p>}
-                <p className="text-2xl font-bold text-[#8E5022] mt-4 serif">Total: ₹{totalAmount}</p>
+                <p className="text-[#442D1C] mb-2 font-medium">Subtotal: <span className="font-bold">₹{subtotal.toFixed(2)}</span></p>
+                <p className="text-[#442D1C] mb-2 font-medium">Shipping (₹{shippingRate.toFixed(2)}/kg): <span className="font-bold">₹{shippingAmount.toFixed(2)}</span></p>
+                <p className="text-[#442D1C] mb-2 font-medium">Tax (18%): <span className="font-bold">₹{taxAmount.toFixed(2)}</span></p>
+                <p className="text-2xl font-bold text-[#8E5022] mt-4">Total: ₹{totalAmount.toFixed(2)}</p>
               </div>
 
               <button

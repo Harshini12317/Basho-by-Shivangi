@@ -13,15 +13,6 @@ export const sendPaymentSuccessEmail = async (
   orderDetails: any,
   paymentId: string
 ) => {
-  console.log('sendPaymentSuccessEmail called with:', { customerEmail, paymentId });
-
-  if (!customerEmail) {
-    throw new Error('No recipients defined - customerEmail is empty');
-  }
-
-  if (!process.env.OWNER_EMAIL) {
-    throw new Error('No recipients defined - OWNER_EMAIL environment variable is not set');
-  }
   const customerMailOptions: any = {
     from: process.env.EMAIL_USER,
     to: customerEmail,
@@ -53,19 +44,12 @@ export const sendPaymentSuccessEmail = async (
 
   // Add PDF attachment if provided
   if (orderDetails.pdfInvoice) {
-    console.log('Adding PDF attachment, size:', orderDetails.pdfInvoice.length);
-    if (orderDetails.pdfInvoice.length === 0) {
-      console.error('PDF buffer is empty');
-    } else {
-      customerMailOptions.attachments = [{
-        filename: `invoice-${orderDetails.orderId || paymentId}.pdf`,
-        content: orderDetails.pdfInvoice,
-        contentType: 'application/pdf'
-      }];
-      customerMailOptions.subject = 'Payment Successful - Order Confirmed (Invoice Attached)';
-    }
-  } else {
-    console.log('No PDF attachment provided');
+    customerMailOptions.attachments = [{
+      filename: `invoice-${orderDetails.orderId || paymentId}.pdf`,
+      content: orderDetails.pdfInvoice,
+      contentType: 'application/pdf'
+    }];
+    customerMailOptions.subject = 'Payment Successful - Order Confirmed (Invoice Attached)';
   }
 
   const ownerMailOptions = {

@@ -17,13 +17,6 @@ export async function POST(request: NextRequest) {
       orderDetails
     } = await request.json();
 
-    console.log('Payment verification received:', {
-      razorpay_order_id,
-      razorpay_payment_id,
-      customerEmail: orderDetails?.customer?.email,
-      hasGST: !!orderDetails?.customer?.gstNumber
-    });
-
     // Verify payment signature
     const sign = razorpay_order_id + '|' + razorpay_payment_id;
     const expectedSign = crypto
@@ -71,11 +64,9 @@ export async function POST(request: NextRequest) {
           // Generate and send PDF invoice if GST is provided and valid
           const gstNumber = orderDetails.customer.gstNumber;
           const isGSTValid = gstNumber && validateGST(gstNumber);
-          console.log('GST check:', { gstNumber, isGSTValid });
 
           if (isGSTValid) {
             try {
-              console.log('Generating PDF for GST customer:', orderDetails.customer.email);
               const pdfBuffer = await generateInvoicePDF({
                 ...order.toObject(),
                 razorpayOrderId: razorpay_order_id,
@@ -87,10 +78,8 @@ export async function POST(request: NextRequest) {
                 shippingAmount: orderDetails.shippingAmount,
                 gstAmount: orderDetails.gstAmount,
               });
-              console.log('PDF generated successfully, size:', pdfBuffer.length);
 
               // Send invoice email with PDF attachment
-              console.log('Sending PDF invoice to:', orderDetails.customer.email);
               await sendPaymentSuccessEmail(
                 orderDetails.customer.email,
                 {
@@ -101,11 +90,9 @@ export async function POST(request: NextRequest) {
                 },
                 razorpay_payment_id
               );
-              console.log('PDF invoice sent to customer');
             } catch (pdfError) {
               console.error('Error generating/sending PDF invoice:', pdfError);
               // Still send regular email if PDF fails
-              console.log('PDF failed, sending regular email to:', orderDetails.customer.email);
               await sendPaymentSuccessEmail(
                 orderDetails.customer.email,
                 {
@@ -117,7 +104,6 @@ export async function POST(request: NextRequest) {
               );
             }
           } else {
-            console.log('No valid GST, sending regular email to:', orderDetails.customer.email);
             // Send regular confirmation email
             await sendPaymentSuccessEmail(
               orderDetails.customer.email,
@@ -136,7 +122,6 @@ export async function POST(request: NextRequest) {
       } else {
         // Send confirmation emails to customer (no DB save for guest users)
         try {
-          console.log('Sending email for guest user to:', orderDetails.customer.email);
           await sendPaymentSuccessEmail(
             orderDetails.customer.email,
             {
