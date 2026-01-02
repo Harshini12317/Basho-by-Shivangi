@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { FaMinus, FaPlus, FaTrash, FaMapMarkerAlt } from "react-icons/fa";
+import { validateGST } from '@/lib/gst-validation';
+import { FaMinus, FaPlus, FaTrash, FaMapMarkerAlt } from 'react-icons/fa';
 
 interface CheckoutItem {
   productSlug: string;
@@ -56,6 +57,7 @@ export default function CheckoutPage() {
     zip: ""
   });
   const [gstIncluded, setGstIncluded] = useState(false);
+  const [gstError, setGstError] = useState('');
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -186,10 +188,31 @@ export default function CheckoutPage() {
   const shippingAmount = totalWeight * shippingRate;
   const gstRate = 0.18;
   const gstAmount = gstIncluded ? subtotal * gstRate : 0;
-  const totalAmount = subtotal + shippingAmount + gstAmount;
+  const totalAmount = Math.round((subtotal + shippingAmount + gstAmount) * 100) / 100; // Round to 2 decimal places
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate customer details
+    if (!customer.name.trim()) {
+      alert("Please enter your name");
+      return;
+    }
+    if (!customer.email.trim()) {
+      alert("Please enter your email address");
+      return;
+    }
+    if (!customer.phone.trim()) {
+      alert("Please enter your phone number");
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(customer.email)) {
+      alert("Please enter a valid email address");
+      return;
+    }
 
     let addressToUse: Address;
 
@@ -297,6 +320,8 @@ export default function CheckoutPage() {
                 },
               }),
             });
+
+            console.log('Payment verification request sent with customer:', customer);
 
             const verifyData = await verifyResponse.json();
 
@@ -452,16 +477,37 @@ export default function CheckoutPage() {
                 className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors"
                 required
               />
-              <input
-                type="text"
-                placeholder="GST Number (Optional)"
-                value={customer.gstNumber}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setCustomer({ ...customer, gstNumber: e.target.value });
-                  setGstIncluded(!!e.target.value);
-                }}
-                className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors"
-              />
+              <div>
+                <input
+                  type="text"
+                  placeholder="GST Number (Optional)"
+                  value={customer.gstNumber}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const gstValue = e.target.value.toUpperCase();
+                    setCustomer({ ...customer, gstNumber: gstValue });
+
+                    if (gstValue) {
+                      if (validateGST(gstValue)) {
+                        setGstIncluded(true);
+                        setGstError('');
+                      } else {
+                        setGstIncluded(false);
+                        setGstError('Invalid GST number format');
+                      }
+                    } else {
+                      setGstIncluded(false);
+                      setGstError('');
+                    }
+                  }}
+                  className={`w-full p-4 border-2 ${gstError ? 'border-red-500' : 'border-[#EDD8B4]'} elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors`}
+                />
+                {gstError && (
+                  <p className="text-red-500 text-sm mt-1">{gstError}</p>
+                )}
+                {customer.gstNumber && !gstError && (
+                  <p className="text-green-600 text-sm mt-1">✓ Valid GST number - Invoice will be sent via email</p>
+                )}
+              </div>
 
               <h3 className="text-xl font-semibold serif text-[#442D1C] mt-8 mb-4">Delivery Address</h3>
               
