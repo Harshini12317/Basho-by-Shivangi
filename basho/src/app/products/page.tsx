@@ -25,6 +25,8 @@ export default function ProductListing() {
   const [typedText, setTypedText] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("newest");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
   const [categories, setCategories] = useState<string[]>([]);
   const fullText = "Our Creations";
   const { data: session } = useSession();
@@ -67,6 +69,7 @@ export default function ProductListing() {
       const params = new URLSearchParams();
       if (selectedCategory !== "all") params.append("category", selectedCategory);
       if (sortBy !== "newest") params.append("sort", sortBy);
+      if (debouncedSearchQuery.trim()) params.append("search", debouncedSearchQuery.trim());
 
       const response = await fetch(`/api/products?${params.toString()}`);
       const data = await response.json();
@@ -172,16 +175,16 @@ export default function ProductListing() {
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, [selectedCategory, sortBy]);
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300); // 300ms debounce delay
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-[#442D1C] text-xl">Loading...</div>
-      </div>
-    );
-  }
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [selectedCategory, sortBy, debouncedSearchQuery]);
 
   return (
     <div className="min-h-screen py-8 sm:py-12">
@@ -197,7 +200,7 @@ export default function ProductListing() {
         {/* Filters Section */}
         <div className="mb-8 sm:mb-12">
           <div className="bg-white/90 elegant-rounded-xl shadow-lg border-2 border-[#EDD8B4] p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-center">
+            <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 items-center justify-center">
               {/* Category Filter */}
               <div className="flex flex-col sm:flex-row items-center gap-2">
                 <label htmlFor="category" className="text-[#442D1C] font-semibold text-sm sm:text-base">
@@ -235,59 +238,84 @@ export default function ProductListing() {
                   <option value="price-high">Price: High to Low</option>
                 </select>
               </div>
+
+              {/* Search Input */}
+              <div className="flex flex-col sm:flex-row items-center gap-2 w-full lg:w-auto">
+                <div className="relative w-full sm:w-auto">
+                  <input
+                    id="search"
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search products by name..."
+                    className="bg-[#EDD8B4]/30 border border-[#8E5022]/30 rounded-lg pr-10 pl-3 py-2 text-[#442D1C] focus:outline-none focus:ring-2 focus:ring-[#8E5022]/50 focus:border-[#8E5022] transition-all duration-300 flex-1 sm:w-64"
+                  />
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#442D1C]">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {products.map((p) => (
-              <Link href={`/products/${p.slug}`} key={p._id}>
-                <div className="group bg-white/90 elegant-rounded-xl shadow-lg border-2 border-[#EDD8B4] overflow-hidden hover:shadow-xl transition-all duration-300 hover-lift">
-                  {/* Image container with hover effect */}
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={p.images?.[0] || '/images/placeholder.png'}
-                      className="w-full h-40 sm:h-48 object-cover transition-opacity duration-500 group-hover:opacity-0"
-                      alt={p.title}
-                    />
-                    <img
-                      src={p.images?.[1] || p.images?.[0] || '/images/placeholder.png'}
-                      className="absolute top-0 left-0 w-full h-40 sm:h-48 object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                      alt={p.title}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="text-[#442D1C] text-xl">Loading products...</div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {products.map((p) => (
+                <Link href={`/products/${p.slug}`} key={p._id}>
+                  <div className="group bg-white/90 elegant-rounded-xl shadow-lg border-2 border-[#EDD8B4] overflow-hidden hover:shadow-xl transition-all duration-300 hover-lift">
+                    {/* Image container with hover effect */}
+                    <div className="relative overflow-hidden">
+                      <img
+                        src={p.images?.[0] || '/images/placeholder.png'}
+                        className="w-full h-40 sm:h-48 object-cover transition-opacity duration-500 group-hover:opacity-0"
+                        alt={p.title}
+                      />
+                      <img
+                        src={p.images?.[1] || p.images?.[0] || '/images/placeholder.png'}
+                        className="absolute top-0 left-0 w-full h-40 sm:h-48 object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                        alt={p.title}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
 
-                  {/* Content */}
-                  <div className="p-3 sm:p-4 bg-gradient-to-br from-white to-[#EDD8B4]/30 relative">
-                    <h2 className="font-bold text-base sm:text-lg text-[#442D1C] mb-2 leading-tight serif">
-                      {p.title}
-                    </h2>
-                    <p className="text-[#652810] mb-1 font-medium italic text-xs sm:text-sm">{p.material}</p>
-                    <p className="text-[#8E5022] mb-3 font-medium text-xs sm:text-sm">{p.category?.name}</p>
-                    <div className="flex items-center justify-between">
-                      <p className="text-lg sm:text-xl font-bold text-[#8E5022]">₹{p.price}</p>
-                      {/* Favorite Heart Icon */}
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          toggleWishlist(p);
-                        }}
-                        className="w-10 h-10 bg-white/95 backdrop-blur-sm elegant-rounded-full flex items-center justify-center shadow-lg hover:bg-[#EDD8B4]/30 hover:shadow-xl transition-all duration-300 hover:scale-110 border border-[#EDD8B4]/50 hover:border-[#8E5022]/30"
-                      >
-                        <span className={`text-xl transition-colors duration-300 ${isInWishlist(p) ? 'text-red-600' : 'text-gray-400'} hover:text-red-500`}>
-                          {isInWishlist(p) ? '♥' : '♡'}
-                        </span>
-                      </button>
+                    {/* Content */}
+                    <div className="p-3 sm:p-4 bg-gradient-to-br from-white to-[#EDD8B4]/30 relative">
+                      <h2 className="font-bold text-base sm:text-lg text-[#442D1C] mb-2 leading-tight serif">
+                        {p.title}
+                      </h2>
+                      <p className="text-[#652810] mb-1 font-medium italic text-xs sm:text-sm">{p.material}</p>
+                      <p className="text-[#8E5022] mb-3 font-medium text-xs sm:text-sm">{p.category?.name}</p>
+                      <div className="flex items-center justify-between">
+                        <p className="text-lg sm:text-xl font-bold text-[#8E5022]">₹{p.price}</p>
+                        {/* Favorite Heart Icon */}
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            toggleWishlist(p);
+                          }}
+                          className="w-10 h-10 bg-white/95 backdrop-blur-sm elegant-rounded-full flex items-center justify-center shadow-lg hover:bg-[#EDD8B4]/30 hover:shadow-xl transition-all duration-300 hover:scale-110 border border-[#EDD8B4]/50 hover:border-[#8E5022]/30"
+                        >
+                          <span className={`text-xl transition-colors duration-300 ${isInWishlist(p) ? 'text-red-600' : 'text-gray-400'} hover:text-red-500`}>
+                            {isInWishlist(p) ? '♥' : '♡'}
+                          </span>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+        )}
 
-        {products.length === 0 && (
+        {products.length === 0 && !loading && (
           <div className="text-center py-16">
             <div className="bg-white/90 rounded-2xl p-8 shadow-lg border-2 border-[#EDD8B4]">
               <h3 className="text-[#442D1C] text-2xl font-bold mb-4">No products found</h3>

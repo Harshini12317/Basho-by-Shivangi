@@ -75,8 +75,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     const sort = searchParams.get('sort');
+    const search = searchParams.get('search');
 
     let query: any = { isPublished: true };
+
+    // Add search filter if provided
+    if (search && search.trim()) {
+      query.title = { $regex: search.trim(), $options: 'i' };
+    }
 
     // Add category filter if provided
     if (category && category !== 'all') {
