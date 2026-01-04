@@ -248,7 +248,7 @@ export default function ProductListing() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search products by name..."
-                    className="bg-[#EDD8B4]/30 border border-[#8E5022]/30 rounded-lg pr-10 pl-3 py-2 text-[#442D1C] focus:outline-none focus:ring-2 focus:ring-[#8E5022]/50 focus:border-[#8E5022] transition-all duration-300 flex-1 sm:w-64"
+                    className="bg-[#EDD8B4]/30 border border-[#8E5022]/30 rounded-lg pr-10 pl-3 py-2 text-[#442D1C] focus:outline-none focus:ring-2 focus:ring-[#8E5022]/50 focus:border-[#8E5022] transition-all duration-300 w-full sm:w-64"
                   />
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#442D1C]">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

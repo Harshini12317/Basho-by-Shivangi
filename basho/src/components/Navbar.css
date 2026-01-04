@@ -76,6 +76,13 @@
   opacity: 1;
 }
 
+/* Hide nav-links on mobile, show only in hamburger menu */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+}
+
 /* WORKSHOP DROPDOWN */
 .nav-dropdown {
   position: relative;
@@ -128,6 +135,13 @@
   align-items: center;
   gap: 1rem;
   color: #3a2a1d;
+}
+
+/* Hide social icons on mobile */
+@media (max-width: 768px) {
+  .nav-socials {
+    display: none;
+  }
 }
 
 /* RIGHT ICONS */

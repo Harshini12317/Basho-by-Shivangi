@@ -172,6 +172,25 @@ export default function Navbar() {
           <MdSettings /> Settings
         </Link>
         <hr className="menu-divider" />
+        <Link href="/" className="menu-item">
+          Home
+        </Link>
+        <Link href="/about" className="menu-item">
+          About
+        </Link>
+        <Link href="/gallery" className="menu-item">
+          Gallery
+        </Link>
+        <Link href="/products" className="menu-item">
+          Products
+        </Link>
+        <Link href="/media?tab=Media" className="menu-item">
+          Media
+        </Link>
+        <Link href="/workshop" className="menu-item">
+          Workshop
+        </Link>
+        <hr className="menu-divider" />
         <button className="menu-item logout" onClick={() => {
           // Add logout logic here
           setMenuOpen(false);

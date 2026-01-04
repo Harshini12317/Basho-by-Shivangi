@@ -122,7 +122,7 @@ export default function CustomOrderPage() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
-              className="md:hidden text-[#8E5022] text-3xl rotate-90"
+              className="md:hidden text-[#8E5022] text-3xl"
             >
               ↓
             </motion.div>
@@ -157,7 +157,7 @@ export default function CustomOrderPage() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.8 }}
-              className="md:hidden text-[#8E5022] text-3xl rotate-90"
+              className="md:hidden text-[#8E5022] text-3xl"
             >
               ↓
             </motion.div>
@@ -192,7 +192,7 @@ export default function CustomOrderPage() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 1.1 }}
-              className="md:hidden text-[#8E5022] text-3xl rotate-90"
+              className="md:hidden text-[#8E5022] text-3xl"
             >
               ↓
             </motion.div>
@@ -227,7 +227,7 @@ export default function CustomOrderPage() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 1.4 }}
-              className="md:hidden text-[#8E5022] text-3xl rotate-90"
+              className="md:hidden text-[#8E5022] text-3xl"
             >
               ↓
             </motion.div>
