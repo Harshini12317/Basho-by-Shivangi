@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { useNotification, NotificationContainer } from "@/components/Notification";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 interface Product {
   _id: string;
@@ -30,6 +32,7 @@ export default function ProductListing() {
   const [categories, setCategories] = useState<string[]>([]);
   const fullText = "Our Creations";
   const { data: session } = useSession();
+  const { addNotification, notifications, removeNotification } = useNotification();
 
   // Custom order messages
   const customOrderMessages = [
@@ -197,6 +200,40 @@ export default function ProductListing() {
     }
   };
 
+  const addToCart = async (product: Product) => {
+    if (!session) {
+      addNotification("Please sign in to add items to your cart.", "error");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productSlug: product.slug,
+          qty: 1,
+          price: product.price,
+          weight: 1, // Default weight, you might want to adjust this based on product data
+        }),
+      });
+
+      if (response.ok) {
+        addNotification("Item added to cart successfully!", "success");
+        // Trigger cart update in navbar
+        window.dispatchEvent(new Event('cartUpdated'));
+      } else {
+        const error = await response.json();
+        addNotification(`Failed to add item to cart: ${error.error}`, "error");
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      addNotification("An error occurred while adding the item to cart.", "error");
+    }
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
@@ -316,21 +353,33 @@ export default function ProductListing() {
                       </h2>
                       <p className="text-[#652810] mb-1 font-medium italic text-xs sm:text-sm">{p.material}</p>
                       <p className="text-[#8E5022] mb-3 font-medium text-xs sm:text-sm">{p.category?.name}</p>
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between mb-3">
                         <p className="text-lg sm:text-xl font-bold text-[#8E5022]">₹{p.price}</p>
                         {/* Favorite Heart Icon */}
-                        <button
+                        <div
                           onClick={(e) => {
                             e.preventDefault();
                             toggleWishlist(p);
                           }}
-                          className="w-10 h-10 bg-white/95 backdrop-blur-sm elegant-rounded-full flex items-center justify-center shadow-lg hover:bg-[#EDD8B4]/30 hover:shadow-xl transition-all duration-300 hover:scale-110 border border-[#EDD8B4]/50 hover:border-[#8E5022]/30"
+                          className="cursor-pointer transition-all duration-300 hover:scale-110"
                         >
-                          <span className={`text-xl transition-colors duration-300 ${isInWishlist(p) ? 'text-red-600' : 'text-gray-400'} hover:text-red-500`}>
-                            {isInWishlist(p) ? '♥' : '♡'}
-                          </span>
-                        </button>
+                          {isInWishlist(p) ? (
+                            <FaHeart className="text-red-500 text-xl transition-colors duration-300" />
+                          ) : (
+                            <FaRegHeart className="text-gray-400 text-xl transition-colors duration-300 hover:text-red-400" />
+                          )}
+                        </div>
                       </div>
+                      {/* Add to Cart Button */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          addToCart(p);
+                        }}
+                        className="w-full bg-gradient-to-r from-[#8E5022] to-[#C85428] hover:from-[#652810] hover:to-[#8E5022] text-white py-2 px-4 elegant-rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
+                      >
+                        Add to Cart
+                      </button>
                     </div>
                   </div>
                 </Link>
@@ -363,6 +412,7 @@ export default function ProductListing() {
           </Link>
         </div>
       </div>
+      <NotificationContainer notifications={notifications} removeNotification={removeNotification} />
     </div>
   );
 }

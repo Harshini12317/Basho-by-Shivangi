@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { FiHeart, FiX } from "react-icons/fi";
 import { useSession } from "next-auth/react";
+import { useNotification, NotificationContainer } from "@/components/Notification";
 import "./Wishlist.css";
 
 type WishlistItem = {
@@ -47,6 +48,7 @@ export default function WishlistPage() {
   const router = useRouter();
   const [items, setItems] = useState(initialItems);
   const { data: session, status } = useSession();
+  const { addNotification, notifications, removeNotification } = useNotification();
 
   const removeItem = (id: number) => {
     setItems((prev) => prev.filter((item) => item.id !== id));
@@ -58,7 +60,7 @@ export default function WishlistPage() {
     }
 
     if (!session) {
-      alert("Please sign in to add items to your cart.");
+      addNotification("Please sign in to add items to your cart.", "error");
       return;
     }
 
@@ -80,16 +82,16 @@ export default function WishlistPage() {
       });
 
       if (response.ok) {
-        alert("Item added to cart successfully!");
+        addNotification("Item added to cart successfully!", "success");
         // Trigger cart update in navbar
         window.dispatchEvent(new Event('cartUpdated'));
       } else {
         const error = await response.json();
-        alert(`Failed to add item to cart: ${error.error}`);
+        addNotification(`Failed to add item to cart: ${error.error}`, "error");
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
-      alert("An error occurred while adding the item to cart.");
+      addNotification("An error occurred while adding the item to cart.", "error");
     }
   };
 
@@ -143,6 +145,7 @@ export default function WishlistPage() {
           </div>
         ))}
       </div>
+      <NotificationContainer notifications={notifications} removeNotification={removeNotification} />
     </section>
   );
 }
