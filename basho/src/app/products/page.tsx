@@ -31,6 +31,25 @@ export default function ProductListing() {
   const fullText = "Our Creations";
   const { data: session } = useSession();
 
+  // Custom order messages
+  const customOrderMessages = [
+    "Want this made your way? Place a custom order.",
+    "Like this piece, but want it your way? Go custom.",
+    "Different size, shape, or idea? We make custom pieces.",
+    "Have a design in mind? We'll craft it just for you.",
+    "Your idea, our clay — order a custom piece.",
+    "Love this, but want it personal? Try a custom order.",
+    "Almost perfect? Let's customize it.",
+    "This piece, your rules — custom orders welcome.",
+    "Want your touch on this? Go custom.",
+    "Like this piece, but imagining something different? Request a custom order made just for you.",
+    "Have a size, color, or design in mind? We create custom pottery on request.",
+    "This is just one possibility. Custom orders let you create your own.",
+    "Inspired by this piece? Let us craft a custom version for you."
+  ];
+
+  const [randomMessage, setRandomMessage] = useState<string>("");
+
   useEffect(() => {
     fetchProducts();
     fetchCategories();
@@ -54,6 +73,10 @@ export default function ProductListing() {
       }
     };
     typeWriter();
+
+    // Set random custom order message
+    const randomIndex = Math.floor(Math.random() * customOrderMessages.length);
+    setRandomMessage(customOrderMessages[randomIndex]);
     // Listen for localStorage changes
     const handleStorageChange = () => {
       const updatedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]");
@@ -323,6 +346,22 @@ export default function ProductListing() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Floating Custom Order Element */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <div className="bg-white/95 backdrop-blur-sm elegant-rounded-2xl shadow-xl border-2 border-[#EDD8B4]/60 p-4 max-w-xs animate-pulse hover:animate-none transition-all duration-300 hover:shadow-2xl hover:border-[#8E5022]/40">
+          <p className="text-[#442D1C] text-sm font-medium mb-3 leading-relaxed">
+            {randomMessage}
+          </p>
+          <Link
+            href="/custom-order"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#8E5022] to-[#C85428] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:from-[#652810] hover:to-[#8E5022] hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
+          >
+            <span>Order Custom</span>
+            <span className="text-xs">→</span>
+          </Link>
+        </div>
       </div>
     </div>
   );
