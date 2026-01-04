@@ -7,8 +7,11 @@ export interface ICustomOrder extends Document {
   description: string;
   referenceImages: string[];
   notes: string;
-  status: "requested" | "quoted" | "in-progress" | "completed";
+  status: "requested" | "quoted" | "paid" | "in-progress" | "completed";
   quotedPrice?: number;
+  paymentId?: string;
+  razorpayOrderId?: string;
+  paidAt?: Date;
 }
 
 const CustomOrderSchema = new Schema<ICustomOrder>(
@@ -21,10 +24,13 @@ const CustomOrderSchema = new Schema<ICustomOrder>(
     notes: String,
     status: {
       type: String,
-      enum: ["requested", "quoted", "in-progress", "completed"],
+      enum: ["requested", "quoted", "paid", "in-progress", "completed"],
       default: "requested",
     },
     quotedPrice: Number,
+    paymentId: String,
+    razorpayOrderId: String,
+    paidAt: Date,
   },
   { timestamps: true }
 );

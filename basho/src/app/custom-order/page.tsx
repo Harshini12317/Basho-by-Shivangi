@@ -1,11 +1,13 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function CustomOrderPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [customOrderForm, setCustomOrderForm] = useState({
-    name: "",
-    email: "",
     phone: "",
     description: "",
     notes: "",
@@ -16,9 +18,29 @@ export default function CustomOrderPage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [referenceFiles, setReferenceFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasShownAuthAlert, setHasShownAuthAlert] = useState(false);
+
+  const handleFormFieldInteraction = () => {
+    if (status === "unauthenticated") {
+      // Show alert & redirect only once per page session
+      if (!hasShownAuthAlert) {
+        setHasShownAuthAlert(true);
+        alert("Please log in to request a custom order.");
+        router.push("/auth");
+      }
+      return false;
+    }
+    return true;
+  };
 
   const handleCustomOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!handleFormFieldInteraction()) return;
+    
+    if (!session?.user?.email || !session?.user?.name) {
+      alert("Please log in to submit a custom order.");
+      return;
+    }
     setIsSubmitting(true);
     try {
       // convert selected files to data URLs for server-side Cloudinary upload
@@ -35,8 +57,8 @@ export default function CustomOrderPage() {
         : [];
 
       const payload = {
-        name: customOrderForm.name,
-        email: customOrderForm.email,
+        name: session.user.name,
+        email: session.user.email,
         phone: customOrderForm.phone,
         description: customOrderForm.description,
         notes: customOrderForm.notes,
@@ -54,8 +76,6 @@ export default function CustomOrderPage() {
       if (response.ok) {
         alert("Custom order request submitted! We'll get back to you soon.");
         setCustomOrderForm({
-          name: "",
-          email: "",
           phone: "",
           description: "",
           notes: "",
@@ -76,8 +96,17 @@ export default function CustomOrderPage() {
   return (
     <div className="min-h-screen py-16 grain-texture">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* How Custom Orders Work Flowchart */}
-        <div className="mb-16">
+        {status === "loading" ? (
+          <div className="flex justify-center items-center min-h-[50vh]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8E5022] mx-auto mb-4"></div>
+              <p className="text-[#442D1C] font-semibold">Loading...</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* How Custom Orders Work Flowchart */}
+            <div className="mb-16">
           <motion.h2 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -419,60 +448,54 @@ export default function CustomOrderPage() {
           >
             Request Your Custom Piece
           </motion.h2>
+
+          {/* Authentication Status Display */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 2.8 }}
+            className={`border rounded-lg p-4 mb-6 text-center ${
+              status === "authenticated"
+                ? "bg-[#F9F7F2] border-[#EDD8B4]/50"
+                : "bg-red-50 border-red-200"
+            }`}
+          >
+            {status === "authenticated" ? (
+              <>
+                <p className="text-[#442D1C] font-semibold">
+                  Logged in as: <span className="text-[#8E5022]">{session?.user?.email}</span>
+                </p>
+                <p className="text-sm text-[#652810] mt-1">Your email and name will be used for this custom order request.</p>
+              </>
+            ) : (
+              <>
+                <p className="text-red-600 font-semibold">Login Required</p>
+                <p className="text-sm text-red-500 mt-1">Please log in to submit a custom order request.</p>
+              </>
+            )}
+          </motion.div>
+
           <form onSubmit={handleCustomOrderSubmit} className="space-y-6 sm:space-y-8 relative z-10">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 2.9 }}
-              className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8"
-            >
-              <div className="space-y-2 sm:space-y-3">
-                <label className="text-[#442D1C] font-semibold text-base sm:text-lg serif block">Your Name</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Enter your full name"
-                    value={customOrderForm.name}
-                    onChange={(e) => setCustomOrderForm({ ...customOrderForm, name: e.target.value })}
-                    className="w-full p-3 sm:p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400 text-sm sm:text-base"
-                    required
-                  />
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#8E5022]/5 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                </div>
-              </div>
-              <div className="space-y-2 sm:space-y-3">
-                <label className="text-[#442D1C] font-semibold text-base sm:text-lg serif block">Email Address</label>
-                <div className="relative">
-                  <input
-                    type="email"
-                    placeholder="your.email@example.com"
-                    value={customOrderForm.email}
-                    onChange={(e) => setCustomOrderForm({ ...customOrderForm, email: e.target.value })}
-                    className="w-full p-3 sm:p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400 text-sm sm:text-base"
-                    required
-                  />
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#8E5022]/5 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 3.1 }}
               className="space-y-2 sm:space-y-3"
             >
-              <label className="text-[#442D1C] font-semibold text-base sm:text-lg serif block">Phone Number</label>
-              <div className="relative">
-                <input
-                  type="tel"
-                  placeholder="+91 98765 43210"
-                  value={customOrderForm.phone}
-                  onChange={(e) => setCustomOrderForm({ ...customOrderForm, phone: e.target.value })}
-                  className="w-full p-3 sm:p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400 text-sm sm:text-base"
-                  required
-                />
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#8E5022]/5 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              <div className="space-y-2 sm:space-y-3">
+                <label className="text-[#442D1C] font-semibold text-base sm:text-lg serif block">Phone Number</label>
+                <div className="relative">
+                  <input
+                    type="tel"
+                    placeholder="+91 98765 43210"
+                    value={customOrderForm.phone}
+                    onFocus={() => handleFormFieldInteraction()}
+                    onChange={(e) => setCustomOrderForm({ ...customOrderForm, phone: e.target.value })}
+                    className="w-full p-3 sm:p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400 text-sm sm:text-base"
+                    required
+                  />
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#8E5022]/5 to-transparent opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                </div>
               </div>
             </motion.div>
 
@@ -487,6 +510,7 @@ export default function CustomOrderPage() {
                 <textarea
                   placeholder="Tell us about your dream pottery piece. Include details like size, shape, color preferences, intended use, and any special features..."
                   value={customOrderForm.description}
+                  onFocus={() => handleFormFieldInteraction()}
                   onChange={(e) => setCustomOrderForm({ ...customOrderForm, description: e.target.value })}
                   className="w-full p-3 sm:p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 h-32 sm:h-36 resize-none bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400 text-sm sm:text-base"
                   required
@@ -506,6 +530,7 @@ export default function CustomOrderPage() {
                 <textarea
                   placeholder="Any specific requirements, timeline preferences, or other details..."
                   value={customOrderForm.notes}
+                  onFocus={() => handleFormFieldInteraction()}
                   onChange={(e) => setCustomOrderForm({ ...customOrderForm, notes: e.target.value })}
                   className="w-full p-3 sm:p-4 border-2 border-gray-200 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 h-24 sm:h-28 resize-none bg-white focus:bg-white shadow-sm focus:shadow-md focus:ring-4 focus:ring-[#8E5022]/10 text-gray-800 placeholder-gray-400 text-sm sm:text-base"
                 />
@@ -526,6 +551,7 @@ export default function CustomOrderPage() {
                   type="file"
                   multiple
                   accept="image/*"
+                  onClick={() => handleFormFieldInteraction()}
                   onChange={(e) => {
                     const files = e.target.files;
                     if (files) {
@@ -574,6 +600,7 @@ export default function CustomOrderPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 type="submit"
+                onClick={() => handleFormFieldInteraction()}
                 disabled={isSubmitting}
                 className="inline-flex items-center justify-center gap-2 sm:gap-3 bg-[#8E5022] hover:bg-[#652810] text-white py-3 sm:py-4 px-4 sm:px-6 rounded-lg font-semibold text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-60 w-full sm:w-auto"
               >
@@ -589,6 +616,8 @@ export default function CustomOrderPage() {
             </motion.div>
           </form>
         </motion.div>
+          </>
+        )}
       </div>
     </div>
   );

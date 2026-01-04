@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import CustomOrder from "@/models/CustomOrder";
 import { v2 as cloudinary } from "cloudinary";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -92,8 +94,25 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    // Check authentication
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { name, email, phone, description, referenceImages, notes } = body;
+
+    // Validate that the email matches the session email
+    if (email !== session.user.email) {
+      return NextResponse.json(
+        { error: "Email mismatch with authenticated user" },
+        { status: 400 }
+      );
+    }
 
     // Validate required fields
     if (!name || !email || !phone || !description) {

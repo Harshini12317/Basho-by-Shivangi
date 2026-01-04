@@ -21,6 +21,11 @@ interface Category {
   name: string;
 }
 
+interface ProductFormProps {
+  product?: any;
+  isEditing?: boolean;
+}
+
 export default function ProductForm({ product, isEditing = false }: ProductFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);

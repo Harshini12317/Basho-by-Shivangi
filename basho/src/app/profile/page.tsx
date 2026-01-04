@@ -32,6 +32,7 @@ type ProductOrder = {
   amount: number;
   createdAt: string;
   image?: string;
+  type?: 'product' | 'custom-order';
 };
 
 type WishlistItem = {
@@ -145,10 +146,33 @@ export default function ProfilePage() {
               amount: order.totalAmount,
               createdAt: order.createdAt,
               image: image,
+              type: 'product',
             };
           })
         );
-        setProductOrders(ordersWithImages);
+
+        // Fetch paid custom orders
+        const customOrdersResponse = await fetch("/api/custom-orders");
+        const allCustomOrders = await customOrdersResponse.json();
+        const paidCustomOrders = allCustomOrders
+          .filter((co: any) => co.email?.toLowerCase() === userEmail.toLowerCase() && co.status === 'paid')
+          .map((co: any) => ({
+            id: co._id,
+            title: `Custom Order: ${co.description.substring(0, 50)}${co.description.length > 50 ? '...' : ''}`,
+            slug: '',
+            qty: 1,
+            amount: co.quotedPrice,
+            createdAt: co.paidAt || co.createdAt,
+            image: co.referenceImages?.[0] || '/images/custom-order.png',
+            type: 'custom-order',
+          }));
+
+        // Combine and sort by date
+        const allOrders = [...ordersWithImages, ...paidCustomOrders].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
+        setProductOrders(allOrders);
       })
       .catch(() => setProductOrders([]));
 
@@ -250,6 +274,90 @@ export default function ProfilePage() {
       }
     } catch (err) {
       console.error("Error deleting address", err);
+    }
+  };
+
+  const handleCustomOrderPayment = async (customOrder: any) => {
+    if (!session?.user) {
+      alert("Please sign in to make payment");
+      return;
+    }
+
+    try {
+      // Create Razorpay order
+      const orderResponse = await fetch('/api/payments/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: customOrder.quotedPrice,
+          currency: 'INR',
+          receipt: `custom_order_${customOrder._id}`,
+        }),
+      });
+
+      if (!orderResponse.ok) {
+        throw new Error('Failed to create payment order');
+      }
+
+      const orderData = await orderResponse.json();
+
+      // Initialize Razorpay
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Basho by Shivangi',
+        description: `Payment for Custom Order #${customOrder._id.slice(-8)}`,
+        order_id: orderData.id,
+        handler: async function (response: any) {
+          // Verify payment
+          const verifyResponse = await fetch('/api/payments/verify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              orderDetails: {
+                type: 'custom-order',
+                customOrderId: customOrder._id,
+                totalAmount: customOrder.quotedPrice,
+                customer: {
+                  name: session?.user?.name || customOrder.name,
+                  email: session?.user?.email || customOrder.email,
+                },
+              },
+            }),
+          });
+
+          if (verifyResponse.ok) {
+            // Refresh custom orders
+            const updatedOrders = await fetch("/api/custom-orders").then(res => res.json());
+            const filtered = userEmail ? updatedOrders.filter((d: any) => (d.email || "").toLowerCase() === userEmail.toLowerCase()) : [];
+            setCustomOrders(filtered);
+            alert('Payment successful! Your custom order is now confirmed.');
+          } else {
+            alert('Payment verification failed. Please contact support.');
+          }
+        },
+        prefill: {
+          name: session.user.name || customOrder.name,
+          email: session.user.email || customOrder.email,
+        },
+        theme: {
+          color: '#8E5022',
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('Payment failed. Please try again.');
     }
   };
 
@@ -536,9 +644,9 @@ export default function ProfilePage() {
                 ) : (
                   <div className="space-y-4 mt-6">
                     {productOrders.map((o) => (
-                      <Link key={o.id} href={`/profile/orders/${o.id}`} className="block">
-                        <div className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] to-[#EDD8B4]/20 border-2 border-[#EDD8B4]/40 hover:border-[#8E5022]/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden">
-                          <div className="absolute top-0 right-0 w-16 h-16 bg-[#8E5022]/5 rounded-bl-xl"></div>
+                      o.type === 'custom-order' ? (
+                        <div key={o.id} className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] to-[#EDD8B4]/20 border-2 border-[#EDD8B4]/40 hover:border-[#C85428]/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden">
+                          <div className="absolute top-0 right-0 w-16 h-16 bg-[#C85428]/5 rounded-bl-xl"></div>
                           <div className="flex items-start justify-between mb-4 relative z-10">
                             <div className="flex items-center gap-4 flex-1">
                               {o.image && (
@@ -549,25 +657,56 @@ export default function ProfilePage() {
                                 />
                               )}
                               <div className="flex-1 min-w-0">
-                                <div className="text-xs text-[#8E5022] font-bold mb-2 uppercase tracking-wide">Order #{o.id.slice(-8)}</div>
-                                <div className="font-bold text-[#442D1C] group-hover:text-[#8E5022] transition-colors text-sm leading-tight serif">{o.title}</div>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div className="text-xs text-[#8E5022] font-bold uppercase tracking-wide">Custom Order #{o.id.slice(-8)}</div>
+                                  <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">Custom</span>
+                                </div>
+                                <div className="font-bold text-[#442D1C] text-sm leading-tight serif">{o.title}</div>
                               </div>
                             </div>
-                            <div className="text-[#8E5022] font-bold bg-white px-4 py-2 rounded-xl shadow-lg border-2 border-[#EDD8B4] text-sm ml-3">₹{o.amount}</div>
+                            <div className="text-[#C85428] font-bold bg-white px-4 py-2 rounded-xl shadow-lg border-2 border-[#EDD8B4] text-sm ml-3">₹{o.amount}</div>
                           </div>
                           <div className="flex items-center justify-between relative z-10">
-                            <div className="text-[#652810] text-xs font-semibold bg-[#EDD8B4]/50 px-3 py-1.5 rounded-lg border border-[#EDD8B4]">Qty: {o.qty}</div>
+                            <div className="text-green-700 text-xs font-semibold bg-green-50 px-3 py-1.5 rounded-lg border border-green-200">Payment Completed</div>
                             <div className="text-xs text-[#8E5022] font-medium">
                               {new Date(o.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </div>
                           </div>
-                          <div className="mt-4 text-xs text-[#8E5022] hover:text-[#652810] font-bold flex items-center gap-2 group-hover:gap-3 transition-all duration-300 relative z-10">
-                            <FaSearch className="text-xs" />
-                            View Details
-                            <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
-                          </div>
                         </div>
-                      </Link>
+                      ) : (
+                        <Link key={o.id} href={`/profile/orders/${o.id}`} className="block">
+                          <div className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] to-[#EDD8B4]/20 border-2 border-[#EDD8B4]/40 hover:border-[#8E5022]/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-16 h-16 bg-[#8E5022]/5 rounded-bl-xl"></div>
+                            <div className="flex items-start justify-between mb-4 relative z-10">
+                              <div className="flex items-center gap-4 flex-1">
+                                {o.image && (
+                                  <img
+                                    src={o.image}
+                                    alt={o.title}
+                                    className="w-16 h-16 object-cover rounded-xl border-2 border-[#EDD8B4] flex-shrink-0 shadow-md"
+                                  />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-xs text-[#8E5022] font-bold mb-2 uppercase tracking-wide">Order #{o.id.slice(-8)}</div>
+                                  <div className="font-bold text-[#442D1C] group-hover:text-[#8E5022] transition-colors text-sm leading-tight serif">{o.title}</div>
+                                </div>
+                              </div>
+                              <div className="text-[#8E5022] font-bold bg-white px-4 py-2 rounded-xl shadow-lg border-2 border-[#EDD8B4] text-sm ml-3">₹{o.amount}</div>
+                            </div>
+                            <div className="flex items-center justify-between relative z-10">
+                              <div className="text-[#652810] text-xs font-semibold bg-[#EDD8B4]/50 px-3 py-1.5 rounded-lg border border-[#EDD8B4]">Qty: {o.qty}</div>
+                              <div className="text-xs text-[#8E5022] font-medium">
+                                {new Date(o.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </div>
+                            </div>
+                            <div className="mt-4 text-xs text-[#8E5022] hover:text-[#652810] font-bold flex items-center gap-2 group-hover:gap-3 transition-all duration-300 relative z-10">
+                              <FaSearch className="text-xs" />
+                              View Details
+                              <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
+                            </div>
+                          </div>
+                        </Link>
+                      )
                     ))}
                   </div>
                 )}
@@ -698,14 +837,31 @@ export default function ProfilePage() {
                         <div className="flex items-center justify-between relative z-10">
                           <div className={`text-xs font-bold px-4 py-2 rounded-full uppercase tracking-wide border-2 ${
                             co.status === 'completed' ? 'bg-green-50 text-green-700 border-green-200' : 
-                            co.status === 'pending' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-50 text-slate-600 border-slate-200'
+                            co.status === 'paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                            co.status === 'in-progress' ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                            co.status === 'quoted' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                            co.status === 'requested' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-50 text-slate-600 border-slate-200'
                           }`}>
-                            {co.status}
+                            {co.status === 'requested' ? 'Request Submitted' :
+                             co.status === 'quoted' ? 'Quote Received' :
+                             co.status === 'paid' ? 'Payment Completed' :
+                             co.status === 'in-progress' ? 'In Progress' :
+                             co.status === 'completed' ? 'Completed' : co.status}
                           </div>
                           <div className="text-xs text-[#8E5022] font-medium">
                             {co.createdAt ? new Date(co.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
                           </div>
                         </div>
+                        {co.status === 'quoted' && typeof co.quotedPrice === "number" && (
+                          <div className="mt-4 relative z-10">
+                            <button
+                              onClick={() => handleCustomOrderPayment(co)}
+                              className="w-full bg-gradient-to-r from-[#8E5022] to-[#C85428] hover:from-[#652810] hover:to-[#8E5022] text-white py-3 px-4 elegant-rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                            >
+                              Pay ₹{co.quotedPrice}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -718,7 +874,7 @@ export default function ProfilePage() {
           <div className="bg-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-xl border-2 border-[#EDD8B4]/60 overflow-hidden clay-texture">
             <div
               className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-[#F9F7F2]/50 transition-all duration-300"
-              onClick={() => toggleSection('addresses')}
+              onClick={() => toggleSection('addressBook')}
             >
               <div className="flex items-center gap-4 lg:gap-6">
                 <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 shadow-lg border border-blue-200/50">
@@ -733,7 +889,7 @@ export default function ProfilePage() {
                 <div className="text-sm text-[#8E5022] font-bold bg-[#EDD8B4]/50 px-3 py-1 rounded-full">
                   {addresses.length} {addresses.length === 1 ? 'address' : 'addresses'}
                 </div>
-                {expandedSections.addresses ? (
+                {expandedSections.addressBook ? (
                   <FaChevronUp className="text-[#8E5022] text-xl transition-transform duration-300" />
                 ) : (
                   <FaChevronDown className="text-[#8E5022] text-xl transition-transform duration-300" />
@@ -741,7 +897,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {expandedSections.addresses && (
+            {expandedSections.addressBook && (
               <div className="px-6 lg:px-8 pb-6 lg:pb-8 border-t border-[#EDD8B4]/30">
                 {isEditingAddress ? (
                   <div className="space-y-4 mt-6">

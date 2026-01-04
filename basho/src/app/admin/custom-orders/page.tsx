@@ -9,7 +9,7 @@ interface CustomOrder {
   phone: string;
   description: string;
   referenceImages: string[];
-  status: 'requested' | 'quoted' | 'in-progress' | 'completed';
+  status: 'requested' | 'quoted' | 'paid' | 'in-progress' | 'completed';
   quotedPrice?: number;
   createdAt: string;
   updatedAt: string;
@@ -66,8 +66,9 @@ export default function AdminCustomOrders() {
     switch (status) {
       case 'requested': return 'bg-yellow-100 text-yellow-800';
       case 'quoted': return 'bg-blue-100 text-blue-800';
+      case 'paid': return 'bg-green-100 text-green-800';
       case 'in-progress': return 'bg-purple-100 text-purple-800';
-      case 'completed': return 'bg-green-100 text-green-800';
+      case 'completed': return 'bg-emerald-100 text-emerald-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -75,9 +76,10 @@ export default function AdminCustomOrders() {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'requested': return 'Order requests';
-      case 'quoted': return 'Quoted';
-      case 'in-progress': return 'Payment Success';
-      case 'completed': return 'Mark Complete';
+      case 'quoted': return 'Quoted - Awaiting Payment';
+      case 'paid': return 'Payment Received';
+      case 'in-progress': return 'In Progress';
+      case 'completed': return 'Completed';
       default: return status;
     }
   };
@@ -149,6 +151,16 @@ export default function AdminCustomOrders() {
                   Quoted ({getOrderCount('quoted')})
                 </button>
                 <button
+                  onClick={() => setActiveTab('paid')}
+                  className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                    activeTab === 'paid'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-green-100 text-green-800 hover:bg-green-200'
+                  }`}
+                >
+                  Payment Received ({getOrderCount('paid')})
+                </button>
+                <button
                   onClick={() => setActiveTab('in-progress')}
                   className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                     activeTab === 'in-progress'
@@ -156,7 +168,7 @@ export default function AdminCustomOrders() {
                       : 'bg-purple-100 text-purple-800 hover:bg-purple-200'
                   }`}
                 >
-                  Payment Success ({getOrderCount('in-progress')})
+                  In Progress ({getOrderCount('in-progress')})
                 </button>
                 <button
                   onClick={() => setActiveTab('completed')}
@@ -299,11 +311,15 @@ export default function AdminCustomOrders() {
                   )}
 
                   {selectedOrder.status === 'quoted' && (
+                    <p className="text-sm text-slate-600">Waiting for customer payment...</p>
+                  )}
+
+                  {selectedOrder.status === 'paid' && (
                     <button
                       onClick={() => updateOrderStatus(selectedOrder._id, 'in-progress')}
                       className="w-full px-3 py-2 bg-purple-600 text-white text-sm rounded hover:bg-purple-700"
                     >
-                      Mark Payment Success
+                      Start Work
                     </button>
                   )}
 

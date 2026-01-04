@@ -14,8 +14,7 @@ interface Payment {
     name: string;
     email: string;
   };
-  workshop?: string;
-  type: 'workshop' | 'product';
+  type: 'product' | 'custom-order';
   createdAt: string;
 }
 
@@ -25,44 +24,20 @@ export default function AdminPayments() {
   const [filterStatus, setFilterStatus] = useState('all');
 
   useEffect(() => {
-    // Mock data - in production, fetch from API
-    const mockPayments: Payment[] = [
-      {
-        id: '1',
-        orderId: 'order_RvRrWVn0HhzohI',
-        paymentId: 'pay_RvRrf1Z96Cdjjj',
-        amount: 130,
-        currency: 'INR',
-        status: 'success',
-        customer: {
-          name: 'Harshini J',
-          email: 'harshini12317@gmail.com'
-        },
-        workshop: 'Crimson Flora',
-        type: 'workshop',
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: '2',
-        orderId: 'order_ABC123',
-        paymentId: 'pay_ABC123',
-        amount: 2500,
-        currency: 'INR',
-        status: 'success',
-        customer: {
-          name: 'John Doe',
-          email: 'john@example.com'
-        },
-        type: 'product',
-        createdAt: new Date(Date.now() - 86400000).toISOString()
-      }
-    ];
-
-    setTimeout(() => {
-      setPayments(mockPayments);
-      setLoading(false);
-    }, 1000);
+    fetchPayments();
   }, []);
+
+  const fetchPayments = async () => {
+    try {
+      const response = await fetch('/api/admin/payments');
+      const data = await response.json();
+      setPayments(data);
+    } catch (error) {
+      console.error('Failed to fetch payments:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredPayments = payments.filter(payment =>
     filterStatus === 'all' || payment.status === filterStatus
@@ -220,13 +195,10 @@ export default function AdminPayments() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                        payment.type === 'workshop' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                        payment.type === 'custom-order' ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800'
                       }`}>
-                        {payment.type}
+                        {payment.type === 'custom-order' ? 'Custom Order' : 'Product Order'}
                       </span>
-                      {payment.workshop && (
-                        <span className="ml-2 text-sm text-slate-600">{payment.workshop}</span>
-                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
