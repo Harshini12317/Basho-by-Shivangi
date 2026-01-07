@@ -1,0 +1,268 @@
+.ts-root {
+  max-width: 1400px;
+  margin: 3rem auto;
+  padding: 0 1rem;
+  font-family: var(--font-inter, sans-serif);
+  overflow-x: hidden;
+}
+
+.ts-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.ts-title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-family: var(--font-playfair, serif);
+  color: var(--c-2);
+  margin-bottom: 1rem;
+}
+
+.ts-subtitle {
+  color: var(--text-muted);
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.ts-section-title {
+  font-family: var(--font-playfair, serif);
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  color: var(--c-2);
+  margin-bottom: 3rem;
+  text-align: center;
+  position: relative;
+}
+
+.ts-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 2px;
+  background: var(--c-3);
+}
+
+/* Video Zigzag */
+.ts-zigzag-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;
+}
+
+.ts-zigzag-item {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  width: 100%;
+}
+
+.ts-zigzag-item.reverse {
+  flex-direction: row-reverse;
+}
+
+.ts-video-box {
+  flex: 1.2;
+  width: 100%;
+}
+
+.ts-video-frame {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.ts-video-frame iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ts-video-desc {
+  flex: 0.8;
+  padding: 0 1rem;
+}
+
+.ts-desc-content h4 {
+  font-family: var(--font-playfair, serif);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  color: var(--c-2);
+  margin-bottom: 1rem;
+}
+
+.ts-desc-content p {
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+/* Slider */
+.ts-slider-section {
+  margin: 6rem 0;
+  background: var(--c-5);
+  padding: 4rem 1.5rem;
+  border-radius: 30px;
+}
+
+.ts-slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.ts-slider-main {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-grow: 1;
+}
+
+.ts-slide-image-box {
+  width: clamp(150px, 25vw, 280px);
+  height: clamp(150px, 25vw, 280px);
+  flex-shrink: 0;
+}
+
+.ts-slide-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+.ts-quote-text {
+  font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+  line-height: 1.5;
+  font-family: var(--font-playfair, serif);
+  font-style: italic;
+}
+
+.ts-author-info {
+  margin-top: 1.5rem;
+}
+
+.ts-author-name {
+  font-weight: 700;
+  color: #3d2b1f;
+  font-size: 1.1rem;
+  padding: 0.25rem 0.75rem;
+  background: #f5ebe0;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.ts-rating {
+  display: flex;
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+}
+
+.star-active {
+  color: #ffc107;
+}
+
+.star-inactive {
+  color: #e4e5e9;
+}
+
+/* Form */
+.ts-form-glass {
+  display: flex;
+  background: white;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.06);
+}
+
+.ts-form-side-text {
+  flex: 0.8;
+  background: var(--c-2);
+  color: white;
+  padding: 3rem 2rem;
+}
+
+.ts-form-container {
+  flex: 1.2;
+  padding: 3rem 2rem;
+}
+
+.ts-input-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ts-main-form input,
+.ts-main-form select,
+.ts-main-form textarea {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.08);
+  font-size: 0.95rem;
+}
+
+.ts-upload-area {
+  border: 2px dashed var(--c-3);
+  padding: 1.5rem;
+  text-align: center;
+  border-radius: 12px;
+  cursor: pointer;
+  margin: 1rem 0;
+}
+
+.ts-premium-btn {
+  background: var(--c-2);
+  color: white;
+  width: 100%;
+  padding: 1rem;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .ts-form-glass {
+    flex-direction: column;
+  }
+  .ts-zigzag-item, .ts-zigzag-item.reverse {
+    flex-direction: column;
+    text-align: center;
+    gap: 2rem;
+  }
+  .ts-slider-main {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .ts-nav-btn {
+    display: none;
+  }
+  .ts-video-frame {
+    transform: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .ts-input-group {
+    flex-direction: column;
+  }
+  .ts-title {
+    font-size: 2.2rem;
+  }
+  .ts-form-side-text, .ts-form-container {
+    padding: 2rem 1rem;
+  }
+  .ts-slider-section {
+    padding: 3rem 1rem;
+  }
+}

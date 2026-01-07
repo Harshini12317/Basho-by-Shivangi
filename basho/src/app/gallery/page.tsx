@@ -64,7 +64,7 @@ export default function GalleryPage() {
   }
 
   return (
-    <main className="ms-root">
+    <main className="ms-root pt-24">
       {/* HERO */}
       <header className="ms-hero">
         <h1 className="ms-hero-title">Thoughtfully Crafted Experiences</h1>
@@ -91,7 +91,7 @@ export default function GalleryPage() {
           <button
             key={f}
             className={`filter-box ${filter === f ? "active" : ""}`}
-            onClick={() => setFilter(f as any)}
+            onClick={() => setFilter(f as "All" | Category)}
           >
             {f}
           </button>
