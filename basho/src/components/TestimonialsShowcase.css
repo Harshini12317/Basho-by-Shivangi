@@ -266,3 +266,11 @@
     padding: 3rem 1rem;
   }
 }
+
+.ts-no-testimonials {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  padding: 2rem;
+  font-style: italic;
+}

@@ -5,10 +5,17 @@ import { colors } from '../constants/colors'
 import { FiPlay, FiChevronLeft, FiChevronRight, FiMessageSquare, FiUpload, FiStar, FiCheckCircle } from 'react-icons/fi'
 
 interface Testimonial {
-  who: string;
-  text: string;
+  _id: string;
+  name: string;
+  email: string;
+  message: string;
   rating: number;
   image?: string;
+  videoUrl?: string;
+  testimonialType: 'text' | 'video';
+  isPublished: boolean;
+  featured: boolean;
+  createdAt: string;
 }
 
 interface VideoTestimonial {
@@ -23,44 +30,115 @@ export default function TestimonialsShowcase() {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const textTestimonials: Testimonial[] = [
-    { who: 'Asha K.', text: 'Beautiful craftsmanship — I love my piece! The textures are so unique and bring such a natural feel to my home.', rating: 5, image: '/images/product1.png' },
-    { who: 'Ravi M.', text: 'Great workshop, learned so much in a single day. The instructor was very patient and explained the techniques perfectly.', rating: 5, image: '/images/product2.png' },
-    { who: 'Priya S.', text: 'Friendly team and excellent service. My custom order arrived perfectly packaged and even more beautiful than the photos.', rating: 5, image: '/images/img10.png' },
-    { who: 'Ananya R.', text: 'The custom vase I ordered exceeded all my expectations. Truly a work of art that stands out in my living room.', rating: 5, image: '/images/img12.png' },
-    { who: 'Vikram S.', text: 'Basho captures the soul of pottery. Every piece tells a story of tradition and contemporary elegance.', rating: 5, image: '/images/img13.png' }
-  ];
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: '',
+    rating: 5,
+    image: '',
+    videoUrl: '',
+    testimonialType: 'text' as 'text' | 'video'
+  });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const videoTestimonials: VideoTestimonial[] = [
-    { 
-      who: 'Meera J.', 
-      description: 'The workshop was a meditative experience. I never thought I could create something so beautiful with my own hands. The guidance was exceptional and the environment so peaceful.', 
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ' 
-    },
-    { 
-      who: 'Suresh B.', 
-      description: 'I commissioned a set of dinnerware for my new home. The attention to detail and the warm clay tones have transformed my dining experience. Every meal feels like a celebration now.', 
-      videoUrl: 'https://www.youtube.com/embed/3JZ_D3ELwOQ' 
+  const [textTestimonials, setTextTestimonials] = useState<Testimonial[]>([]);
+  const [videoTestimonials, setVideoTestimonials] = useState<VideoTestimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTestimonials();
+  }, []);
+
+  const fetchTestimonials = async () => {
+    try {
+      const response = await fetch('/api/testimonials');
+      const data = await response.json();
+
+      const textOnes = data.filter((t: Testimonial) => t.testimonialType === 'text');
+      const videoOnes = data.filter((t: Testimonial) => t.testimonialType === 'video').map((t: Testimonial) => ({
+        who: t.name,
+        description: t.message,
+        videoUrl: t.videoUrl || ''
+      }));
+
+      setTextTestimonials(textOnes);
+      setVideoTestimonials(videoOnes);
+      setLoading(false);
+    } catch (error) {
+      console.error('Failed to fetch testimonials:', error);
+      setLoading(false);
     }
-  ];
+  };
 
   const nextSlide = () => setActiveSlide((prev) => (prev + 1) % textTestimonials.length);
   const prevSlide = () => setActiveSlide((prev) => (prev - 1 + textTestimonials.length) % textTestimonials.length);
 
   useEffect(() => {
-    const timer = setInterval(nextSlide, 4000);
-    return () => clearInterval(timer);
-  }, []);
+    if (textTestimonials.length > 0) {
+      const timer = setInterval(nextSlide, 4000);
+      return () => clearInterval(timer);
+    }
+  }, [textTestimonials.length]);
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormSending(true);
-    setTimeout(() => {
+
+    try {
+      let imageUrl = '';
+      let videoUrl = '';
+
+      // For now, we'll skip file upload and just submit the text data
+      // TODO: Implement proper file upload when Cloudinary is configured
+      if (selectedFile) {
+        console.log('File selected but upload not implemented yet:', selectedFile.name);
+        // For now, we'll just submit without the file
+      }
+
+      // Submit review
+      const reviewData = {
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        rating: formData.rating,
+        image: imageUrl || formData.image,
+        videoUrl: videoUrl || formData.videoUrl,
+        testimonialType: selectedFile && selectedFile.type.startsWith('video/') ? 'video' : 'text'
+      };
+
+      const response = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reviewData),
+      });
+
+      if (response.ok) {
+        setFormSubmitted(true);
+        setFormData({
+          name: '',
+          email: '',
+          message: '',
+          rating: 5,
+          image: '',
+          videoUrl: '',
+          testimonialType: 'text'
+        });
+        setSelectedFile(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        setTimeout(() => setFormSubmitted(false), 5000);
+      } else {
+        throw new Error('Failed to submit review');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert('Failed to submit review. Please try again.');
+    } finally {
       setFormSending(false);
-      setFormSubmitted(true);
-      (e.target as HTMLFormElement).reset();
-      setTimeout(() => setFormSubmitted(false), 5000);
-    }, 1500);
+    }
   };
 
   return (
@@ -85,7 +163,7 @@ export default function TestimonialsShowcase() {
       <div className="ts-video-section">
         <h3 className="ts-section-title">In Their Own Words</h3>
         <div className="ts-zigzag-container">
-          {videoTestimonials.map((v, i) => (
+          {videoTestimonials.length > 0 ? videoTestimonials.map((v, i) => (
             <div key={i} className={`ts-zigzag-item ${i % 2 !== 0 ? 'reverse' : ''}`}>
               <div className="ts-video-box">
                 <div className="ts-video-frame">
@@ -100,37 +178,45 @@ export default function TestimonialsShowcase() {
                 </div>
               </div>
             </div>
-          ))}
+          )) : (
+            <p className="ts-no-testimonials">No video testimonials available yet.</p>
+          )}
         </div>
       </div>
 
       <div className="ts-slider-section">
         <h3 className="ts-section-title">Customer Spotlight</h3>
-        <div className="ts-slider-wrapper">
-          <button className="ts-nav-btn ts-prev" onClick={prevSlide}><FiChevronLeft /></button>
-          <div className="ts-slider-main">
-            <div className="ts-slide-image-box">
-              <img src={textTestimonials[activeSlide].image} alt={textTestimonials[activeSlide].who} />
-            </div>
-            <div className="ts-slide-text-box">
-              <div className="ts-rating">
-                {[...Array(5)].map((_, i) => (
-                  <FiStar key={i} className={i < textTestimonials[activeSlide].rating ? 'star-active' : 'star-inactive'} />
-                ))}
+        {textTestimonials.length > 0 ? (
+          <div className="ts-slider-wrapper">
+            <button className="ts-nav-btn ts-prev" onClick={prevSlide}><FiChevronLeft /></button>
+            <div className="ts-slider-main">
+              <div className="ts-slide-image-box">
+                <img src={textTestimonials[activeSlide].image || '/images/img10.png'} alt={textTestimonials[activeSlide].name} />
               </div>
-              <p className="ts-quote-text">&quot;{textTestimonials[activeSlide].text}&quot;</p>
-              <div className="ts-author-info">
-                <span className="ts-author-name"> — {textTestimonials[activeSlide].who}</span>
+              <div className="ts-slide-text-box">
+                <div className="ts-rating">
+                  {[...Array(5)].map((_, i) => (
+                    <FiStar key={i} className={i < textTestimonials[activeSlide].rating ? 'star-active' : 'star-inactive'} />
+                  ))}
+                </div>
+                <p className="ts-quote-text">&quot;{textTestimonials[activeSlide].message}&quot;</p>
+                <div className="ts-author-info">
+                  <span className="ts-author-name"> — {textTestimonials[activeSlide].name}</span>
+                </div>
               </div>
             </div>
+            <button className="ts-nav-btn ts-next" onClick={nextSlide}><FiChevronRight /></button>
           </div>
-          <button className="ts-nav-btn ts-next" onClick={nextSlide}><FiChevronRight /></button>
-        </div>
-        <div className="ts-pagination">
-          {textTestimonials.map((_, i) => (
-            <div key={i} className={`ts-p-dot ${i === activeSlide ? 'active' : ''}`} onClick={() => setActiveSlide(i)} />
-          ))}
-        </div>
+        ) : (
+          <p className="ts-no-testimonials">No testimonials available yet.</p>
+        )}
+        {textTestimonials.length > 1 && (
+          <div className="ts-pagination">
+            {textTestimonials.map((_, i) => (
+              <div key={i} className={`ts-p-dot ${i === activeSlide ? 'active' : ''}`} onClick={() => setActiveSlide(i)} />
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="ts-form-section">
@@ -156,12 +242,28 @@ export default function TestimonialsShowcase() {
             ) : (
               <form className="ts-main-form" onSubmit={handleFormSubmit}>
                 <div className="ts-input-group">
-                  <input type="text" placeholder="Full Name" required />
-                  <input type="email" placeholder="Email Address" required />
+                  <input
+                    type="text"
+                    placeholder="Full Name"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    required
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email Address"
+                    value={formData.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    required
+                  />
                 </div>
                 
                 <div className="ts-input-group">
-                  <select required defaultValue="">
+                  <select
+                    value={formData.rating}
+                    onChange={(e) => setFormData(prev => ({ ...prev, rating: parseInt(e.target.value) }))}
+                    required
+                  >
                     <option value="" disabled>Overall Rating</option>
                     <option value="5">★★★★★ - Amazing</option>
                     <option value="4">★★★★☆ - Great</option>
@@ -171,15 +273,31 @@ export default function TestimonialsShowcase() {
                   </select>
                 </div>
 
-                <textarea placeholder="Tell us your story..." required></textarea>
+                <textarea
+                  placeholder="Tell us your story..."
+                  value={formData.message}
+                  onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                  required
+                ></textarea>
 
                 <div className="ts-upload-area" onClick={() => fileInputRef.current?.click()}>
                   <FiUpload className="ts-upload-icon" />
                   <div className="ts-upload-text">
-                    <span>Click to upload Photo or Video</span>
+                    <span>{selectedFile ? selectedFile.name : 'Click to upload Photo or Video'}</span>
                     <p>Max file size: 50MB</p>
                   </div>
-                  <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*,video/*" multiple />
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    accept="image/*,video/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setSelectedFile(file);
+                      }
+                    }}
+                  />
                 </div>
 
                 <button type="submit" className="ts-premium-btn" disabled={formSending}>

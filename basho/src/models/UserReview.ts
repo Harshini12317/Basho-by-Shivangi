@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface ITestimonial extends Document {
+export interface IUserReview extends Document {
   name: string;
   email: string;
   message: string;
@@ -8,11 +8,13 @@ export interface ITestimonial extends Document {
   image?: string;
   videoUrl?: string;
   testimonialType: 'text' | 'video';
-  isPublished: boolean;
-  featured: boolean;
+  status: 'pending' | 'approved' | 'rejected';
+  submittedAt: Date;
+  reviewedAt?: Date;
+  reviewedBy?: string;
 }
 
-const TestimonialSchema = new Schema<ITestimonial>(
+const UserReviewSchema = new Schema<IUserReview>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true },
@@ -21,11 +23,13 @@ const TestimonialSchema = new Schema<ITestimonial>(
     image: String,
     videoUrl: String,
     testimonialType: { type: String, enum: ['text', 'video'], default: 'text' },
-    isPublished: { type: Boolean, default: false },
-    featured: { type: Boolean, default: false },
+    status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+    submittedAt: { type: Date, default: Date.now },
+    reviewedAt: Date,
+    reviewedBy: String,
   },
   { timestamps: true }
 );
 
-export default mongoose.models.Testimonial ||
-  mongoose.model<ITestimonial>("Testimonial", TestimonialSchema);
+export default mongoose.models.UserReview ||
+  mongoose.model<IUserReview>("UserReview", UserReviewSchema);

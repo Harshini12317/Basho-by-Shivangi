@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { FaComments } from 'react-icons/fa';
+import ChatComponent from '@/components/ChatComponent';
 
 interface CustomOrder {
   _id: string;
@@ -22,9 +24,27 @@ export default function AdminCustomOrders() {
   const [quotePrice, setQuotePrice] = useState('');
   const [activeTab, setActiveTab] = useState<string>('all');
 
+  // Chat state
+  const [chatOpen, setChatOpen] = useState(false);
+  const [selectedCustomOrderForChat, setSelectedCustomOrderForChat] = useState<CustomOrder | null>(null);
+  const [unreadCounts, setUnreadCounts] = useState<{ [key: string]: number }>({});
+
   useEffect(() => {
     fetchOrders();
+    fetchUnreadCounts();
   }, []);
+
+  const fetchUnreadCounts = async () => {
+    try {
+      const response = await fetch('/api/messages/unread');
+      if (response.ok) {
+        const counts = await response.json();
+        setUnreadCounts(counts);
+      }
+    } catch (error) {
+      console.error('Error fetching unread counts:', error);
+    }
+  };
 
   const fetchOrders = async () => {
     try {
@@ -217,8 +237,28 @@ export default function AdminCustomOrders() {
                         </p>
                       )}
                     </div>
-                    <div className="text-right text-xs text-slate-500">
-                      {new Date(order.createdAt).toLocaleDateString()}
+                    <div className="flex flex-col items-end gap-2">
+                      <div className="text-right text-xs text-slate-500">
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedCustomOrderForChat(order);
+                          setChatOpen(true);
+                          // Refresh unread counts after opening chat
+                          setTimeout(fetchUnreadCounts, 1000);
+                        }}
+                        className="relative flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded transition-colors"
+                      >
+                        <FaComments className="text-sm" />
+                        Chat
+                        {unreadCounts[order._id] > 0 && (
+                          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
+                            {unreadCounts[order._id] > 9 ? '9+' : unreadCounts[order._id]}
+                          </span>
+                        )}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -353,6 +393,19 @@ export default function AdminCustomOrders() {
         </div>
       </div>
     </div>
-    </div>
+
+    {/* Chat Component */}
+    {selectedCustomOrderForChat && (
+      <ChatComponent
+        customOrderId={selectedCustomOrderForChat._id}
+        isOpen={chatOpen}
+        onClose={() => {
+          setChatOpen(false);
+          setSelectedCustomOrderForChat(null);
+        }}
+        customerName={selectedCustomOrderForChat.name}
+      />
+    )}
+  </div>
   );
 }

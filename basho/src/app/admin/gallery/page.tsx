@@ -5,13 +5,9 @@ import { IGallery } from '@/models/Gallery';
 
 interface GalleryFormData {
   title: string;
-  description: string;
   image: string;
-  category: "pottery" | "workshops" | "studio" | "events" | "other";
-  tags: string[];
-  isPublished: boolean;
-  featured: boolean;
-  order: number;
+  category: "product" | "workshop" | "studio" | "others";
+  publicId?: string;
 }
 
 export default function GalleryManagement() {
@@ -21,14 +17,12 @@ export default function GalleryManagement() {
   const [editingItem, setEditingItem] = useState<IGallery | null>(null);
   const [formData, setFormData] = useState<GalleryFormData>({
     title: '',
-    description: '',
     image: '',
-    category: 'other',
-    tags: [],
-    isPublished: true,
-    featured: false,
-    order: 0,
+    category: 'others',
+    publicId: '',
   });
+  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     fetchGallery();
@@ -46,9 +40,58 @@ export default function GalleryManagement() {
     }
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  const uploadToCloudinary = async (file: File): Promise<{url: string, publicId: string}> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Upload failed');
+    }
+
+    const data = await response.json();
+    return { url: data.url, publicId: data.publicId };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
+      let imageUrl = formData.image;
+      let publicId = formData.publicId;
+
+      // If editing and no new file selected, keep existing image and publicId
+      if (editingItem && !selectedFile) {
+        imageUrl = editingItem.image;
+        publicId = editingItem.publicId || '';
+      }
+      // If new file selected, upload it
+      else if (selectedFile) {
+        setUploading(true);
+        const uploadResult = await uploadToCloudinary(selectedFile);
+        imageUrl = uploadResult.url;
+        publicId = uploadResult.publicId;
+        setUploading(false);
+      }
+
+      const submitData = {
+        title: formData.title,
+        image: imageUrl,
+        category: formData.category,
+        publicId: publicId,
+      };
+
       const url = editingItem
         ? '/api/admin/gallery'
         : '/api/admin/gallery';
@@ -58,7 +101,7 @@ export default function GalleryManagement() {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(
-          editingItem ? { id: editingItem._id, ...formData } : formData
+          editingItem ? { id: editingItem._id, ...submitData } : submitData
         ),
       });
 
@@ -70,6 +113,7 @@ export default function GalleryManagement() {
       }
     } catch (error) {
       console.error('Failed to save gallery item:', error);
+      setUploading(false);
     }
   };
 
@@ -77,14 +121,11 @@ export default function GalleryManagement() {
     setEditingItem(item);
     setFormData({
       title: item.title,
-      description: item.description || '',
       image: item.image,
       category: item.category,
-      tags: item.tags || [],
-      isPublished: item.isPublished,
-      featured: item.featured,
-      order: item.order,
+      publicId: item.publicId || '',
     });
+    setSelectedFile(null);
     setShowForm(true);
   };
 
@@ -107,22 +148,18 @@ export default function GalleryManagement() {
   const resetForm = () => {
     setFormData({
       title: '',
-      description: '',
       image: '',
-      category: 'other',
-      tags: [],
-      isPublished: true,
-      featured: false,
-      order: 0,
+      category: 'others',
+      publicId: '',
     });
+    setSelectedFile(null);
   };
 
   const categories = [
-    'pottery',
-    'workshops',
+    'product',
+    'workshop',
     'studio',
-    'events',
-    'other'
+    'others'
   ];
 
   if (loading) {
@@ -145,20 +182,20 @@ export default function GalleryManagement() {
           }}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
-          Add Gallery Item
+          Add Gallery Photo
         </button>
       </div>
 
       {showForm && (
         <div className="bg-white p-6 rounded-lg shadow-md border">
           <h2 className="text-xl font-semibold mb-4">
-            {editingItem ? 'Edit Gallery Item' : 'Add New Gallery Item'}
+            {editingItem ? 'Edit Gallery Photo' : 'Add New Gallery Photo'}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Title
+                  Photo Title
                 </label>
                 <input
                   type="text"
@@ -174,102 +211,48 @@ export default function GalleryManagement() {
                 </label>
                 <select
                   value={formData.category}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, category: e.target.value as "pottery" | "workshops" | "studio" | "events" | "other" })}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, category: e.target.value as "product" | "workshop" | "studio" | "others" })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 >
-                  <option value="pottery">Pottery</option>
-                  <option value="workshops">Workshops</option>
+                  <option value="product">Product</option>
+                  <option value="workshop">Workshop</option>
                   <option value="studio">Studio</option>
-                  <option value="events">Events</option>
-                  <option value="other">Other</option>
+                  <option value="others">Others</option>
                 </select>
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Image URL
+                Photo Upload
               </label>
               <input
-                type="url"
-                value={formData.image}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, image: e.target.value })}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
+                required={!editingItem}
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Tags (comma-separated)
-              </label>
-              <input
-                type="text"
-                value={formData.tags.join(', ')}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, tags: e.target.value.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag) })}
-                placeholder="ceramics, pottery, workshop"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Display Order
-                </label>
-                <input
-                  type="number"
-                  value={formData.order}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  min="0"
-                />
-              </div>
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="isPublished"
-                  checked={formData.isPublished}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, isPublished: e.target.checked })}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="isPublished" className="ml-2 text-sm font-medium text-gray-700">
-                  Published
-                </label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="featured"
-                  checked={formData.featured}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, featured: e.target.checked })}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="featured" className="ml-2 text-sm font-medium text-gray-700">
-                  Featured
-                </label>
-              </div>
+              {selectedFile && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Selected: {selectedFile.name}
+                </p>
+              )}
+              {editingItem && !selectedFile && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Current image will be kept if no new file is selected
+                </p>
+              )}
             </div>
 
             <div className="flex gap-4">
               <button
                 type="submit"
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                disabled={uploading}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {editingItem ? 'Update' : 'Create'}
+                {uploading ? 'Uploading...' : (editingItem ? 'Update' : 'Create')}
               </button>
               <button
                 type="button"
@@ -303,29 +286,8 @@ export default function GalleryManagement() {
             <div className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold text-lg text-gray-900">{item.title}</h3>
-                {item.featured && <span className="text-yellow-500">⭐</span>}
               </div>
-              <p className="text-sm text-gray-600 mb-2">{item.category}</p>
-              {item.tags && item.tags.length > 0 && (
-                <div className="text-xs text-gray-500 mb-2">
-                  {item.tags.map((tag, index) => (
-                    <span key={index} className="inline-block bg-gray-100 rounded px-2 py-1 mr-1 mb-1">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-              <p className="text-sm text-gray-700 mb-3 line-clamp-2">{item.description}</p>
-              <div className="flex items-center justify-between">
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  item.isPublished
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {item.isPublished ? 'Published' : 'Draft'}
-                </span>
-                <span className="text-xs text-gray-500">Order: {item.order}</span>
-              </div>
+              <p className="text-sm text-gray-600 mb-2 capitalize">{item.category}</p>
               <div className="flex gap-2 mt-3">
                 <button
                   onClick={() => handleEdit(item)}
@@ -347,7 +309,7 @@ export default function GalleryManagement() {
 
       {gallery.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-gray-500">No gallery items found. Add your first gallery item!</p>
+          <p className="text-gray-500">No gallery photos found. Add your first gallery photo!</p>
         </div>
       )}
     </div>
