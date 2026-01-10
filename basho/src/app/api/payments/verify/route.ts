@@ -73,58 +73,84 @@ export async function POST(request: NextRequest) {
       if (userId) {
         try {
           await connectDB();
-          const order = new Order({
-            userId,
-            items: orderDetails.items,
-            totalAmount: orderDetails.totalAmount,
-            subtotal: orderDetails.subtotal,
-            shippingAmount: orderDetails.shippingAmount,
-            gstAmount: orderDetails.gstAmount,
-            paymentId: razorpay_payment_id,
-            razorpayOrderId: razorpay_order_id,
-            customer: orderDetails.customer,
-            address: orderDetails.address,
-          });
-          await order.save();
-          console.log('Order saved:', order._id);
 
-          // Generate and send PDF invoice if GST is provided and valid
-          const gstNumber = orderDetails.customer.gstNumber;
-          const isGSTValid = gstNumber && validateGST(gstNumber);
+          // Handle different order types
+          if (orderDetails.type === 'custom-order') {
+            // Update custom order status
+            const CustomOrder = (await import('@/models/CustomOrder')).default;
+            await CustomOrder.findByIdAndUpdate(orderDetails.customOrderId, {
+              status: 'paid',
+              paymentId: razorpay_payment_id,
+              razorpayOrderId: razorpay_order_id,
+              paidAt: new Date(),
+            });
+            console.log('Custom order payment verified:', orderDetails.customOrderId);
+          } else {
+            // Handle regular product orders
+            const order = new Order({
+              userId,
+              items: orderDetails.items,
+              totalAmount: orderDetails.totalAmount,
+              subtotal: orderDetails.subtotal,
+              shippingAmount: orderDetails.shippingAmount,
+              gstAmount: orderDetails.gstAmount,
+              paymentId: razorpay_payment_id,
+              razorpayOrderId: razorpay_order_id,
+              customer: orderDetails.customer,
+              address: orderDetails.address,
+            });
+            await order.save();
+            console.log('Order saved:', order._id);
 
-          if (isGSTValid) {
-            try {
-              // Fetch HSN code from static data
-              const staticData = await StaticData.findOne();
-              const hsnCode = staticData?.hsnCode || '';
+            // Generate and send PDF invoice if GST is provided and valid
+            const gstNumber = orderDetails.customer.gstNumber;
+            const isGSTValid = gstNumber && validateGST(gstNumber);
 
-              const pdfBuffer = await generateInvoicePDF({
-                ...order.toObject(),
-                razorpayOrderId: razorpay_order_id,
-                paymentId: razorpay_payment_id,
-                customer: orderDetails.customer,
-                items: orderDetails.items,
-                totalAmount: orderDetails.totalAmount,
-                subtotal: orderDetails.subtotal,
-                shippingAmount: orderDetails.shippingAmount,
-                gstAmount: orderDetails.gstAmount,
-                hsnCode,
-              });
+            if (isGSTValid) {
+              try {
+                // Fetch HSN code from static data
+                const staticData = await StaticData.findOne();
+                const hsnCode = staticData?.hsnCode || '';
 
-              // Send invoice email with PDF attachment
-              await sendPaymentSuccessEmail(
-                orderDetails.customer.email,
-                {
-                  ...orderDetails,
-                  orderId: razorpay_order_id,
-                  amount: orderDetails.totalAmount,
-                  pdfInvoice: pdfBuffer,
-                },
-                razorpay_payment_id
-              );
-            } catch (pdfError) {
-              console.error('Error generating/sending PDF invoice:', pdfError);
-              // Still send regular email if PDF fails
+                const pdfBuffer = await generateInvoicePDF({
+                  ...order.toObject(),
+                  razorpayOrderId: razorpay_order_id,
+                  paymentId: razorpay_payment_id,
+                  customer: orderDetails.customer,
+                  items: orderDetails.items,
+                  totalAmount: orderDetails.totalAmount,
+                  subtotal: orderDetails.subtotal,
+                  shippingAmount: orderDetails.shippingAmount,
+                  gstAmount: orderDetails.gstAmount,
+                  hsnCode,
+                });
+
+                // Send invoice email with PDF attachment
+                await sendPaymentSuccessEmail(
+                  orderDetails.customer.email,
+                  {
+                    ...orderDetails,
+                    orderId: razorpay_order_id,
+                    amount: orderDetails.totalAmount,
+                    pdfInvoice: pdfBuffer,
+                  },
+                  razorpay_payment_id
+                );
+              } catch (pdfError) {
+                console.error('Error generating/sending PDF invoice:', pdfError);
+                // Send regular email if PDF fails
+                await sendPaymentSuccessEmail(
+                  orderDetails.customer.email,
+                  {
+                    ...orderDetails,
+                    orderId: razorpay_order_id,
+                    amount: orderDetails.totalAmount
+                  },
+                  razorpay_payment_id
+                );
+              }
+            } else {
+              // Send regular confirmation email
               await sendPaymentSuccessEmail(
                 orderDetails.customer.email,
                 {
@@ -135,37 +161,9 @@ export async function POST(request: NextRequest) {
                 razorpay_payment_id
               );
             }
-          } else {
-            // Send regular confirmation email
-            await sendPaymentSuccessEmail(
-              orderDetails.customer.email,
-              {
-                ...orderDetails,
-                orderId: razorpay_order_id,
-                amount: orderDetails.totalAmount
-              },
-              razorpay_payment_id
-            );
           }
-        } catch (dbError) {
-          console.error('Error saving order to database:', dbError);
-          // Don't fail payment verification if DB save fails
-        }
-      } else {
-        // Send confirmation emails to customer (no DB save for guest users)
-        try {
-          await sendPaymentSuccessEmail(
-            orderDetails.customer.email,
-            {
-              ...orderDetails,
-              orderId: razorpay_order_id,
-              amount: orderDetails.totalAmount
-            },
-            razorpay_payment_id
-          );
-        } catch (emailError) {
-          console.error('Error sending confirmation emails:', emailError);
-          // Don't fail the payment verification if email fails
+        } catch (error) {
+          console.error('Error saving order:', error);
         }
       }
 

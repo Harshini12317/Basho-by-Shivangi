@@ -4,12 +4,13 @@ import { connectDB } from '@/lib/mongodb';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
 
-    const category = await Category.findById(params.id);
+    const { id } = await params;
+    const category = await Category.findById(id);
 
     if (!category) {
       return NextResponse.json(
@@ -30,11 +31,12 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
 
+    const { id } = await params;
     const body = await request.json();
     const { name } = body;
 
@@ -49,7 +51,7 @@ export async function PUT(
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
     // Check if slug already exists (excluding current category)
-    const existingCategory = await Category.findOne({ slug, _id: { $ne: params.id } });
+    const existingCategory = await Category.findOne({ slug, _id: { $ne: id } });
     if (existingCategory) {
       return NextResponse.json(
         { error: 'Category with this name already exists' },
@@ -58,7 +60,7 @@ export async function PUT(
     }
 
     const category = await Category.findByIdAndUpdate(
-      params.id,
+      id,
       {
         name: name.trim(),
         slug,
@@ -85,14 +87,16 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
 
+    const { id } = await params;
+
     // Check if category is being used by any products
     const Product = (await import('@/models/product')).default;
-    const productsUsingCategory = await Product.countDocuments({ category: params.id });
+    const productsUsingCategory = await Product.countDocuments({ category: id });
 
     if (productsUsingCategory > 0) {
       return NextResponse.json(
@@ -101,7 +105,7 @@ export async function DELETE(
       );
     }
 
-    const category = await Category.findByIdAndDelete(params.id);
+    const category = await Category.findByIdAndDelete(id);
 
     if (!category) {
       return NextResponse.json(

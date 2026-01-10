@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { useNotification, NotificationContainer } from "@/components/Notification";
 
 interface Product {
   _id: string;
@@ -24,6 +25,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false);
   const { data: session, status } = useSession();
+  const { addNotification, notifications, removeNotification } = useNotification();
 
   useEffect(() => {
     params.then((resolvedParams) => {
@@ -106,18 +108,18 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       });
 
       if (response.ok) {
-        alert("Item added to cart successfully!");
+        addNotification("Item added to cart successfully!", "success");
         // Trigger cart update in navbar
         window.dispatchEvent(new Event('cartUpdated'));
         // Optionally redirect to cart/checkout page
         // window.location.href = "/checkout";
       } else {
         const error = await response.json();
-        alert(`Failed to add item to cart: ${error.error}`);
+        addNotification(`Failed to add item to cart: ${error.error}`, "error");
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
-      alert("An error occurred while adding the item to cart.");
+      addNotification("An error occurred while adding the item to cart.", "error");
     }
   };
 
@@ -152,7 +154,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       setFavorites(newFavorites);
       localStorage.setItem("favorites", JSON.stringify(newFavorites));
       setIsInWishlist(!isInWishlist);
-      alert(isInWishlist ? "Removed from wishlist!" : "Added to wishlist!");
       return;
     }
 
@@ -188,8 +189,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         
         // For authenticated users, we don't need to sync with localStorage
         // The wishlist is managed server-side
-        
-        alert(isNowInWishlist ? "Added to wishlist!" : "Removed from wishlist!");
       } else {
         // Revert optimistic update on error
         setIsInWishlist(wasInWishlist);
@@ -320,6 +319,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           </div>
         </div>
       </div>
+      <NotificationContainer notifications={notifications} removeNotification={removeNotification} />
     </div>
   );
 }

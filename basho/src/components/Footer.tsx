@@ -29,6 +29,12 @@ export default function Footer() {
             <a href="#">Craft Process</a>
             <a href="#">Contact</a>
           </div>
+
+          <div>
+            <span>More</span>
+            <a href="/testimonial">Testimonials</a>
+            <a href="/corporate">Corporate</a>
+          </div>
         </div>
 
         {/* RIGHT — NOTE */}

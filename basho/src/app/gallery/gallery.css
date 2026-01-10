@@ -1,236 +1,45 @@
-/* BASE */
 .ms-root {
   max-width: 1400px;
-  margin: auto;
-  padding: 2rem;
-  background: #faf8f5;
+  margin: 3rem auto;
+  padding: 0 1rem;
+  font-family: var(--font-inter, sans-serif);
+  overflow-x: hidden;
 }
 
-.ms-hero-title {
-  font-size: 3rem;
-  font-weight: 500;
-  color: #2d2118;
-  margin-bottom: 2.5rem;
-}
+.ms-hero { text-align: center; margin-bottom: 2rem }
+.ms-hero-title { font-size: clamp(2rem,5vw,3rem); font-family:var(--font-playfair,serif); color:#3d2b1f; margin-bottom:.4rem }
+.ms-hero-sub { color:rgba(61,43,31,0.75); max-width:720px; margin:0 auto; line-height:1.6 }
 
-/* HORIZONTAL SCROLL */
-.ms-horizontal {
-  overflow: hidden;
-  margin-bottom: 3rem;
-  background: linear-gradient(135deg, #f5efe8, #faf7f3);
-  padding: 2rem 0;
-}
+.ms-horizontal { overflow:hidden; margin-bottom:2rem; padding:1rem 0 }
+.ms-horizontal-track { display:flex; gap:1rem; align-items:center }
+.ms-horizontal-track.animate-0 { animation: marquee 28s linear infinite }
+.ms-horizontal-track.animate-1 { animation: marquee 34s linear reverse infinite }
+.ms-horizontal-item { width:280px; height:180px; flex:none; border-radius:12px; overflow:hidden; cursor:pointer }
+.ms-horizontal-item img { width:100%; height:100%; object-fit:cover }
+@keyframes marquee { to { transform: translateX(-50%) } }
 
-.ms-horizontal-track {
-  display: flex;
-  gap: 1.5rem;
-  animation: scroll 35s linear infinite;
-}
+.ms-filters { display:flex; gap:.75rem; justify-content:center; margin:1.5rem 0 }
+.filter-box { padding:.8rem 1.1rem; background:#f5efe8; border:1px solid rgba(61,43,31,0.06); text-transform:uppercase; font-size:.78rem; letter-spacing:.09em; cursor:pointer; border-radius:999px }
+.filter-box.active { background:#3d2b1f; color:#fff }
 
-.ms-horizontal-item {
-  width: 320px;
-  height: 220px;
-  flex: none;
-  border-radius: 16px;
-  overflow: hidden;
-  cursor: pointer;
-}
+.ms-image-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem }
+.ms-image-card { position:relative; aspect-ratio:4/5; border-radius:12px; overflow:hidden; cursor:pointer; background:#fff; transition:transform .25s ease, box-shadow .25s ease }
+.ms-image-card:hover { transform:translateY(-6px); box-shadow:0 24px 48px rgba(0,0,0,0.08) }
+.ms-image-card img { width:100%; height:100%; object-fit:cover }
+.ms-card-caption { position:absolute; bottom:0; left:0; right:0; padding:.75rem .9rem; background:linear-gradient(180deg, transparent, rgba(0,0,0,0.06)); color:#2d2118; display:flex; justify-content:space-between; align-items:center }
+.ms-card-caption strong { font-family:var(--font-playfair,serif); font-size:1rem }
+.ms-card-cat { font-size:.8rem; color:rgba(45,33,24,0.6) }
 
-.ms-horizontal-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+.ms-image-actions { display:none }
+.featured-like { display:none }
 
-@keyframes scroll {
-  to { transform: translateX(-50%); }
-}
+.ms-overlay { position:fixed; inset:0; z-index:999; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; padding:5vh 1rem }
+.ms-overlay-panel { width:min(1100px,96%); background:#fff; border-radius:16px; padding:1rem; box-shadow:0 40px 100px rgba(0,0,0,0.18); position:relative }
+.overlay-content { display:grid; grid-template-columns:1fr 1fr; gap:1rem; align-items:center }
+.ms-overlay-panel img { width:100%; max-height:70vh; object-fit:contain; border-radius:10px }
+.overlay-text h2 { font-size:1.6rem; margin-bottom:.5rem }
+.overlay-text p { color:#555; line-height:1.6; margin-bottom:1rem }
+.close-btn { position:absolute; top:.6rem; right:.6rem; background:none; border:none; font-size:1.1rem; cursor:pointer }
 
-/* FILTERS */
-.ms-filters {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  margin-bottom: 3rem;
-}
-
-.filter-box {
-  padding: 1.1rem;
-  background: #f4efe9;
-  border: 1px solid #d7cfc6;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  letter-spacing: 0.12em;
-  cursor: pointer;
-}
-
-.filter-box.active {
-  background: #2d2118;
-  color: #fff;
-}
-
-/* FEATURED VIEW */
-.ms-featured {
-  margin-bottom: 4rem;
-  padding: 2rem;
-  background: #f4efe9;
-  border-radius: 20px;
-  box-shadow: 0 25px 70px rgba(0,0,0,0.18);
-}
-
-.featured-content {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 2rem;
-}
-
-.ms-featured img {
-  width: 100%;
-  max-height: 65vh;
-  object-fit: contain;
-  border-radius: 16px;
-}
-
-.featured-text h2 {
-  font-size: 1.8rem;
-  margin-bottom: 0.8rem;
-}
-
-.featured-text p {
-  color: #555;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-}
-
-.close-btn {
-  position: absolute;
-  top: 1.2rem;
-  right: 1.2rem;
-  border: none;
-  background: none;
-  font-size: 1.4rem;
-  cursor: pointer;
-}
-
-.featured-like {
-  display: flex;
-  gap: 0.6rem;
-  align-items: center;
-}
-
-/* GRID */
-.ms-image-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.6rem;
-}
-
-.ms-image-card {
-  position: relative;
-  aspect-ratio: 4 / 5;
-  border-radius: 14px;
-  overflow: hidden;
-  cursor: pointer;
-  background: #eae6e1;
-}
-
-.ms-image-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* LIKE ACTIONS */
-.ms-image-actions {
-  position: absolute;
-  bottom: 0.8rem;
-  left: 0.8rem;
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  background: rgba(255,255,255,0.9);
-  padding: 0.4rem 0.6rem;
-  border-radius: 999px;
-}
-
-.like-btn {
-  border: none;
-  background: none;
-  font-size: 1.1rem;
-  cursor: pointer;
-}
-
-.like-btn.liked {
-  color: #e85b6a;
-}
-
-
-/* ===============================
-   FLOATING OVERLAY SHOWCASE
-================================ */
-
-.ms-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 999;
-  pointer-events: auto;
-}
-
-.ms-overlay-panel {
-  position: absolute;
-  top: 8%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(1100px, 92%);
-  background: #f4efe9;
-  border-radius: 22px;
-  padding: 2rem;
-  box-shadow: 0 40px 100px rgba(0,0,0,0.25);
-}
-
-.overlay-content {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 2rem;
-}
-
-.ms-overlay-panel img {
-  width: 100%;
-  max-height: 70vh;
-  object-fit: contain;
-  border-radius: 16px;
-}
-
-.overlay-text h2 {
-  font-size: 1.9rem;
-  margin-bottom: 0.8rem;
-}
-
-.overlay-text p {
-  color: #555;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-}
-
-/* Close button */
-.close-btn {
-  position: absolute;
-  top: 1.2rem;
-  right: 1.2rem;
-  background: none;
-  border: none;
-  font-size: 1.4rem;
-  cursor: pointer;
-}
-
-/* Mobile fallback */
-@media (max-width: 768px) {
-  .overlay-content {
-    grid-template-columns: 1fr;
-  }
-
-  .ms-overlay-panel {
-    top: 5%;
-    padding: 1.5rem;
-  }
-}
+@media (max-width:900px){ .ms-image-grid{grid-template-columns:repeat(2,1fr)} .overlay-content{grid-template-columns:1fr} }
+@media (max-width:480px){ .ms-image-grid{grid-template-columns:1fr} .ms-horizontal-item{width:180px;height:120px} }

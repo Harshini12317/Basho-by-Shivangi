@@ -51,7 +51,7 @@ export async function GET(
     const pdfBuffer = await generateInvoicePDF({ ...order.toObject(), hsnCode });
 
     // Return PDF as downloadable file
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="invoice-${order._id}.pdf"`,

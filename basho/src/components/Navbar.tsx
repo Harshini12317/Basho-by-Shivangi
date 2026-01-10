@@ -121,7 +121,7 @@ export default function Navbar() {
 
     <div className="nav-links right-links">
       <Link href="/products">Products</Link>
-      <Link href="/media?tab=Media">Media</Link>
+      <Link href="/testimonial">Testimonials</Link>
       <Link href="/workshop">Workshop</Link>
     </div>
 
@@ -184,8 +184,8 @@ export default function Navbar() {
         <Link href="/products" className="menu-item">
           Products
         </Link>
-        <Link href="/media?tab=Media" className="menu-item">
-          Media
+        <Link href="/testimonial" className="menu-item">
+          Testimonials
         </Link>
         <Link href="/workshop" className="menu-item">
           Workshop
