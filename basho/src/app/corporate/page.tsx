@@ -222,7 +222,7 @@ export default function CorporatePage() {
                   <div className="corp-step-icon-box">{step.icon}</div>
                   <div className="corp-step-content">
                     <h3>{step.title}</h3>
-                    <p>{step.desc}</p>
+                    {activeStep === i ? <p>{step.desc}</p> : null}
                   </div>
                 </div>
               ))}
@@ -238,6 +238,7 @@ export default function CorporatePage() {
                   <div className="corp-display-text">
                     <span className="step-label">STEP {activeStep + 1}</span>
                     <h4 className="step-title">{steps[activeStep].title}</h4>
+                    <p className="step-desc">{steps[activeStep].desc}</p>
                   </div>
                 </div>
               </div>
