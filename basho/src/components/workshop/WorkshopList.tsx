@@ -45,6 +45,23 @@ interface DBWorkshop {
   seats?: number; // total seats (not necessarily spots left)
 }
 
+type PopupItem = {
+  name: string;
+  isActive: boolean;
+  pages: string[];
+  targetSlug?: string;
+  image?: string;
+  title?: string;
+  description?: string;
+  ctaText?: string;
+  ctaLink?: string;
+  triggerType?: 'page_load' | 'delay' | 'scroll';
+  triggerDelayMs?: number;
+  frequency?: 'once_per_session' | 'once_per_day' | 'always';
+  startAt?: string;
+  endAt?: string;
+};
+
 export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }) {
   // Map incoming DB workshops (if any) to our display shape; otherwise use static content.
   const mapped: StaticWorkshop[] = Array.isArray(workshops) && workshops.length > 0
@@ -101,6 +118,8 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [reg, setReg] = useState({ name: '', email: '' });
   const [regStatus, setRegStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [popup, setPopup] = useState<PopupItem | null>(null);
+  const [showPopup, setShowPopup] = useState(false);
 
   const openModal = (slug: string) => {
     setSelectedSlug(slug);
@@ -136,9 +155,95 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
       setRegStatus('error');
     }
   };
+  const shouldShowByFrequency = (p: PopupItem) => {
+    const key = `popup_${p.name}_seen`;
+    if (p.frequency === 'always') return true;
+    const last = localStorage.getItem(key);
+    if (!last) return true;
+    const lastTime = Number(last);
+    if (p.frequency === 'once_per_session') return false;
+    if (p.frequency === 'once_per_day') {
+      const oneDay = 24 * 60 * 60 * 1000;
+      return Date.now() - lastTime > oneDay;
+    }
+    return true;
+  };
+  const markSeen = (p: PopupItem) => {
+    const key = `popup_${p.name}_seen`;
+    localStorage.setItem(key, String(Date.now()));
+  };
+  const withinSchedule = (p: PopupItem) => {
+    const now = new Date();
+    const startOk = p.startAt ? now >= new Date(p.startAt) : true;
+    const endOk = p.endAt ? now <= new Date(p.endAt) : true;
+    return startOk && endOk;
+  };
+  const evaluatePopups = (list: PopupItem[]) => {
+    const candidates = list.filter(
+      (p) =>
+        p.isActive &&
+        (p.pages || []).includes('workshops') &&
+        !p.targetSlug &&
+        withinSchedule(p)
+    );
+    const first = candidates[0] || null;
+    if (!first) return;
+    if (!shouldShowByFrequency(first)) return;
+    setPopup(first);
+    const showNow = first.triggerType === 'page_load';
+    if (showNow) setShowPopup(true);
+    if (first.triggerType === 'delay') {
+      const ms = first.triggerDelayMs || 0;
+      setTimeout(() => setShowPopup(true), ms);
+    }
+    if (first.triggerType === 'scroll') {
+      const onScroll = () => {
+        const scrolled = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+        if (scrolled >= 40) {
+          setShowPopup(true);
+          window.removeEventListener('scroll', onScroll);
+        }
+      };
+      window.addEventListener('scroll', onScroll);
+    }
+  };
+  React.useEffect(() => {
+    try {
+      const raw = localStorage.getItem('admin_popups') || '[]';
+      const data = JSON.parse(raw);
+      if (Array.isArray(data)) evaluatePopups(data);
+    } catch {}
+  }, []);
 
   return (
     <div className="bg-[#F8F7F2] min-h-screen py-16 px-4 sm:px-8">
+      {popup && showPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
+          <div className="rounded-3xl bg-white shadow-2xl w-[92%] max-w-md overflow-hidden">
+            {popup.image ? <img src={popup.image} alt="" className="w-full h-40 object-cover" /> : null}
+            <div className="p-5">
+              {popup.title ? <div className="text-lg font-semibold text-slate-900">{popup.title}</div> : null}
+              {popup.description ? <p className="mt-2 text-sm text-slate-700">{popup.description}</p> : null}
+              <div className="mt-4 flex items-center gap-3">
+                {popup.ctaText && popup.ctaLink ? (
+                  <a href={popup.ctaLink} className="px-4 py-2 rounded-full bg-[#E76F51] text-white shadow-md hover:bg-[#D35400]">
+                    {popup.ctaText}
+                  </a>
+                ) : null}
+                <button
+                  onClick={() => {
+                    setShowPopup(false);
+                    markSeen(popup);
+                  }}
+                  className="px-4 py-2 rounded-full bg-white ring-1 ring-[#E2C48D] text-slate-900"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="max-w-6xl mx-auto bg-white rounded-[40px] p-8 md:p-16 shadow-sm">
         <div className="-mx-8 md:-mx-16 -mt-8 md:-mt-16 mb-12">
           <div className="overflow-hidden rounded-t-[40px] bg-[#D8A7B1] text-white text-center py-8">

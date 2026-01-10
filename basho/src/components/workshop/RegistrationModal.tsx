@@ -15,7 +15,20 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
   const [members, setMembers] = useState(1);
   const [requests, setRequests] = useState("");
   const [level, setLevel] = useState<"Beginner" | "Advanced">("Beginner");
+  const [timeSlot, setTimeSlot] = useState("");
   const [submitted, setSubmitted] = useState(false);
+
+  const timeSlots = [
+    "10:00 AM - 11:00 AM",
+    "11:00 AM - 12:00 PM",
+    "12:00 PM - 01:00 PM",
+    "01:00 PM - 02:00 PM",
+    "02:00 PM - 03:00 PM",
+    "03:00 PM - 04:00 PM",
+    "04:00 PM - 05:00 PM",
+    "05:00 PM - 06:00 PM",
+    "06:00 PM - 07:00 PM",
+  ];
   const [paymentInitiated, setPaymentInitiated] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
@@ -78,10 +91,13 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
                 orderDetails: {
-                  customer: { name, email },
+                  customer: { name, email, phone },
                   workshop: workshopTitle,
                   date: workshopDate,
+                  timeSlot,
                   members,
+                  requests,
+                  level,
                   totalAmount: totalPrice,
                 },
               }),
@@ -148,10 +164,10 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#C63D3D]/10 hover:bg-[#C63D3D]/20 flex items-center justify-center transition-all duration-200 group"
+            className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-white shadow-md hover:bg-slate-50 flex items-center justify-center transition-all duration-200 group border border-slate-100"
             aria-label="Close modal"
           >
-            <svg className="w-4 h-4 text-[#C63D3D] group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-[#C63D3D] group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -249,6 +265,28 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
               </div>
             </div>
 
+            {/* Time Slot Selection */}
+            <div className="space-y-1">
+              <label className="block text-slate-800 font-medium text-sm uppercase tracking-wide">Select Time Slot</label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {timeSlots.map((slot) => (
+                  <button
+                    key={slot}
+                    type="button"
+                    onClick={() => setTimeSlot(slot)}
+                    className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 border-2 ${
+                      timeSlot === slot
+                        ? "bg-[#C63D3D] text-white border-[#C63D3D]"
+                        : "bg-white/60 text-slate-700 border-transparent hover:border-[#C63D3D]/30"
+                    }`}
+                  >
+                    {slot}
+                  </button>
+                ))}
+              </div>
+              {timeSlot === "" && <p className="text-xs text-[#C63D3D] mt-1">* Please select a time slot</p>}
+            </div>
+
             <div className="space-y-1">
               <label className="block text-slate-800 font-medium text-sm uppercase tracking-wide">Special Requests <span className="text-slate-500 font-normal">(optional)</span></label>
               <div className="relative">
@@ -316,7 +354,7 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <button
                 type="submit"
-                disabled={!razorpayLoaded || paymentInitiated}
+                disabled={!razorpayLoaded || paymentInitiated || !timeSlot}
                 className="flex-1 px-8 py-4 rounded-2xl bg-gradient-to-r from-[#C63D3D] to-[#A22C2C] text-white font-bold text-lg tracking-wide shadow-lg hover:shadow-xl hover:from-[#B33636] hover:to-[#8B2A2A] transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
               >
                 {paymentInitiated ? (

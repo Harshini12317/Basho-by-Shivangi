@@ -33,6 +33,32 @@ export async function POST(request: NextRequest) {
         orderDetails
       });
 
+      // Save workshop registration if applicable
+      if (orderDetails.workshop) {
+        try {
+          await connectDB();
+          const Registration = (await import('@/models/Registration')).default;
+          const registration = new Registration({
+            workshopTitle: orderDetails.workshop,
+            name: orderDetails.customer.name,
+            email: orderDetails.customer.email,
+            phone: orderDetails.customer.phone,
+            members: orderDetails.members,
+            requests: orderDetails.requests,
+            level: orderDetails.level,
+            date: orderDetails.date,
+            timeSlot: orderDetails.timeSlot,
+            paymentId: razorpay_payment_id,
+            orderId: razorpay_order_id,
+            amount: orderDetails.totalAmount,
+          });
+          await registration.save();
+          console.log('Registration saved:', registration._id);
+        } catch (regError) {
+          console.error('Error saving registration:', regError);
+        }
+      }
+
       // Get user session to save order
       const session = await getServerSession(authOptions);
       let userId = null;

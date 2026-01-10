@@ -8,6 +8,8 @@ import SessionProviderWrapper from "@/components/auth/SessionProviderWrapper";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+import PageWrapper from "@/components/common/PageWrapper";
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -49,7 +51,9 @@ export default async function RootLayout({
       >
         <SessionProviderWrapper session={session}>
           <NavbarWrapper />
-          <main className="relative pt-20">{children}</main>
+          <main className="relative pt-20">
+            <PageWrapper>{children}</PageWrapper>
+          </main>
           <Footer />
         </SessionProviderWrapper>
       </body>
