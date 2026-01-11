@@ -75,22 +75,9 @@ export default function ProfilePage() {
   // Chat state
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedCustomOrder, setSelectedCustomOrder] = useState<CustomOrder | null>(null);
-  const [unreadCounts, setUnreadCounts] = useState<{ [key: string]: number }>({});
 
   const userEmail = session?.user?.email || "";
   const userName = session?.user?.name || "";
-
-  const fetchUnreadCounts = async () => {
-    try {
-      const response = await fetch('/api/messages/unread');
-      if (response.ok) {
-        const counts = await response.json();
-        setUnreadCounts(counts);
-      }
-    } catch (error) {
-      console.error('Error fetching unread counts:', error);
-    }
-  };
 
   useEffect(() => {
     if (session?.user?.email) {
@@ -123,8 +110,6 @@ export default function ProfilePage() {
       .then((data: CustomOrder[]) => {
         const filtered = userEmail ? data.filter((d) => (d.email || "").toLowerCase() === userEmail.toLowerCase()) : [];
         setCustomOrders(filtered);
-        // Fetch unread counts after custom orders are loaded
-        fetchUnreadCounts();
       })
       .catch(() => setCustomOrders([]));
 
@@ -873,18 +858,11 @@ export default function ProfilePage() {
                               onClick={() => {
                                 setSelectedCustomOrder(co);
                                 setChatOpen(true);
-                                // Refresh unread counts after opening chat
-                                setTimeout(fetchUnreadCounts, 1000);
                               }}
                               className="relative flex items-center gap-2 px-3 py-2 bg-[#8E5022] hover:bg-[#652810] text-white text-xs font-semibold rounded-lg transition-colors"
                             >
                               <FaComments className="text-sm" />
                               Chat
-                              {unreadCounts[co._id] > 0 && (
-                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
-                                  {unreadCounts[co._id] > 9 ? '9+' : unreadCounts[co._id]}
-                                </span>
-                              )}
                             </button>
                             <div className="text-xs text-[#8E5022] font-medium">
                               {co.createdAt ? new Date(co.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}

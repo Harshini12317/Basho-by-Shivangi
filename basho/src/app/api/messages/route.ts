@@ -43,21 +43,6 @@ export async function GET(request: Request) {
       .sort({ timestamp: 1 })
       .lean();
 
-    // Mark messages as read for the current user
-    const unreadMessageIds = messages
-      .filter(msg => !msg.read && (
-        (isAdmin && msg.senderType === 'customer') ||
-        (!isAdmin && msg.senderType === 'admin')
-      ))
-      .map(msg => msg._id);
-
-    if (unreadMessageIds.length > 0) {
-      await Message.updateMany(
-        { _id: { $in: unreadMessageIds } },
-        { $set: { read: true } }
-      );
-    }
-
     return NextResponse.json(messages);
   } catch (error: any) {
     console.error('Error fetching messages:', error);

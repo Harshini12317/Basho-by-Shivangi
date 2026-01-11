@@ -27,24 +27,10 @@ export default function AdminCustomOrders() {
   // Chat state
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedCustomOrderForChat, setSelectedCustomOrderForChat] = useState<CustomOrder | null>(null);
-  const [unreadCounts, setUnreadCounts] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     fetchOrders();
-    fetchUnreadCounts();
   }, []);
-
-  const fetchUnreadCounts = async () => {
-    try {
-      const response = await fetch('/api/messages/unread');
-      if (response.ok) {
-        const counts = await response.json();
-        setUnreadCounts(counts);
-      }
-    } catch (error) {
-      console.error('Error fetching unread counts:', error);
-    }
-  };
 
   const fetchOrders = async () => {
     try {
@@ -246,18 +232,11 @@ export default function AdminCustomOrders() {
                           e.stopPropagation();
                           setSelectedCustomOrderForChat(order);
                           setChatOpen(true);
-                          // Refresh unread counts after opening chat
-                          setTimeout(fetchUnreadCounts, 1000);
                         }}
                         className="relative flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded transition-colors"
                       >
                         <FaComments className="text-sm" />
                         Chat
-                        {unreadCounts[order._id] > 0 && (
-                          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
-                            {unreadCounts[order._id] > 9 ? '9+' : unreadCounts[order._id]}
-                          </span>
-                        )}
                       </button>
                     </div>
                   </div>

@@ -10,7 +10,6 @@ interface Message {
   senderType: 'customer' | 'admin';
   message: string;
   timestamp: string | Date;
-  read: boolean;
 }
 
 interface ChatComponentProps {

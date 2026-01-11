@@ -6,7 +6,6 @@ export interface IMessage extends Document {
   senderType: 'customer' | 'admin';
   message: string;
   timestamp: Date;
-  read: boolean;
 }
 
 const MessageSchema = new Schema<IMessage>(
@@ -32,10 +31,6 @@ const MessageSchema = new Schema<IMessage>(
     timestamp: {
       type: Date,
       default: Date.now
-    },
-    read: {
-      type: Boolean,
-      default: false
     }
   },
   { timestamps: true }
