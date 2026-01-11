@@ -46,12 +46,12 @@
 .corp-step-item.active .corp-step-content p{ display:block; color:rgba(255,255,255,0.95); margin-top:.4rem }
 
 .display-chart-side{ flex:1; position:sticky; top:110px; z-index:1 }
-.corp-display-card{ background:#fff; padding:2.2rem; border-radius:20px; box-shadow:0 30px 60px rgba(0,0,0,0.06); text-align:center; min-height:320px; display:flex; align-items:center; justify-content:center }
+.corp-display-card{ background:var(--c-2); padding:2.2rem; border-radius:20px; box-shadow:0 30px 60px rgba(0,0,0,0.06); text-align:center; min-height:320px; display:flex; align-items:center; justify-content:center; color:#fff }
 .corp-display-inner{ display:flex; flex-direction:column; align-items:center; gap:.5rem }
-.corp-display-icon{ font-size:3.5rem; color:var(--c-2) }
-.step-label{ display:block; text-transform:uppercase; font-size:0.85rem; letter-spacing:2px; color:rgba(61,43,31,0.6); margin-bottom:.5rem }
-.step-title{ font-family:var(--font-playfair,serif); font-size:1.6rem; color:var(--c-2); margin:0 }
-.step-desc{ margin-top:.75rem; color:var(--text-muted); max-width:40rem; line-height:1.6 }
+.corp-display-icon{ font-size:3.5rem; color:var(--c-5) }
+.step-label{ display:block; text-transform:uppercase; font-size:0.85rem; letter-spacing:2px; color:rgba(255,255,255,0.85); margin-bottom:.5rem }
+.step-title{ font-family:var(--font-playfair,serif); font-size:1.6rem; color:#fff; margin:0 }
+.step-desc{ margin-top:.75rem; color:rgba(255,255,255,0.9); max-width:40rem; line-height:1.6 }
 
 /* Inquiry form */
 .inquiry-section{ padding:4rem 0 }

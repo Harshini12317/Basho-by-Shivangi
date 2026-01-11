@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import './corporate.css'
 import { FiBriefcase, FiPackage, FiTruck, FiGift, FiMapPin, FiMail, FiPhone, FiChevronRight } from 'react-icons/fi'
+import { colors } from '@/constants/colors'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 
@@ -69,6 +70,12 @@ export default function CorporatePage() {
 
   return (
     <div className="corp-root">
+      <style>{`
+        :root{
+          --c-2: ${colors[1].hex};
+          --text-primary: ${colors[0].hex};
+        }
+      `}</style>
       <section className="corp-hero-section">
         <div className="corp-hero-bg"></div>
         <div className="container mx-auto px-6 relative z-10 py-20 md:py-32">
