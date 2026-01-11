@@ -1,6 +1,16 @@
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 export default function AdminDashboard() {
+  const [corpCount, setCorpCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch('/api/admin/corporate-inquiries')
+      .then((r) => r.json())
+      .then((data) => setCorpCount(Array.isArray(data) ? data.length : null))
+      .catch(() => setCorpCount(null));
+  }, []);
+
   const adminSections = [
     {
       title: 'Product Management',
@@ -92,6 +102,17 @@ export default function AdminDashboard() {
       color: 'bg-teal-500',
     },
     {
+      title: 'Corporate Inquiries',
+      description: 'View corporate consultation requests',
+      href: '/admin/corporate-inquiries',
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M3 12h18M3 17h18" />
+        </svg>
+      ),
+      color: 'bg-amber-600',
+    },
+    {
       title: 'Static Data',
       description: 'Manage studio location, contact info, and FAQs',
       href: '/admin/static-data',
@@ -117,13 +138,16 @@ export default function AdminDashboard() {
           <Link
             key={section.href}
             href={section.href}
-            className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow group"
+            className="relative bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow group"
           >
             <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${section.color} text-white mb-4 group-hover:scale-110 transition-transform`}>
               {section.icon}
             </div>
             <h3 className="text-lg font-semibold text-slate-900 mb-2">{section.title}</h3>
             <p className="text-slate-600 text-sm">{section.description}</p>
+            {section.href === '/admin/corporate-inquiries' && corpCount !== null && (
+              <span className="absolute top-3 right-3 inline-flex items-center justify-center px-2 py-1 text-xs font-semibold text-white bg-amber-600 rounded-full">{corpCount}</span>
+            )}
           </Link>
         ))}
       </div>
