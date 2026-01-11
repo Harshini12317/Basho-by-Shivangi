@@ -47,11 +47,6 @@ export default function AdminTestimonials() {
     featured: false,
   });
 
-  useEffect(() => {
-    fetchTestimonials();
-    fetchUserReviews();
-  }, []);
-
   const fetchTestimonials = async () => {
     try {
       const response = await fetch('/api/admin/testimonials');
@@ -73,6 +68,12 @@ export default function AdminTestimonials() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchTestimonials();
+    fetchUserReviews();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -421,7 +422,7 @@ export default function AdminTestimonials() {
                   {renderStars(review.rating)}
                 </div>
 
-                <p className="text-slate-700 mb-4">"{review.message}"</p>
+                <p className="text-slate-700 mb-4">&quot;{review.message}&quot;</p>
 
                 {review.videoUrl && (
                   <div className="mb-4">
@@ -519,7 +520,7 @@ export default function AdminTestimonials() {
               {renderStars(testimonial.rating)}
             </div>
 
-            <p className="text-slate-700 mb-4 line-clamp-3">"{testimonial.message}"</p>
+            <p className="text-slate-700 mb-4 line-clamp-3">&quot;{testimonial.message}&quot;</p>
 
             {testimonial.videoUrl && (
               <div className="mb-4">

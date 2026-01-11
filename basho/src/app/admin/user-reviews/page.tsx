@@ -149,7 +149,7 @@ export default function AdminUserReviews() {
         ].map(({ key, label, count }) => (
           <button
             key={key}
-            onClick={() => setFilter(key as any)}
+            onClick={() => setFilter(key as 'all' | 'pending' | 'approved' | 'rejected')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               filter === key
                 ? 'bg-slate-900 text-white'
@@ -205,7 +205,7 @@ export default function AdminUserReviews() {
               {renderStars(review.rating)}
             </div>
 
-            <p className="text-slate-700 mb-4">"{review.message}"</p>
+            <p className="text-slate-700 mb-4">&quot;{review.message}&quot;</p>
 
             {review.videoUrl && (
               <div className="mb-4">

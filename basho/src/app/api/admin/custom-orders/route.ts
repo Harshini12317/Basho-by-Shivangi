@@ -20,7 +20,7 @@ export async function PUT(request: NextRequest) {
     await connectDB();
     const { id, status, quotedPrice } = await request.json();
 
-    const updateData: any = { status };
+    const updateData: { status: string; quotedPrice?: number } = { status };
     if (quotedPrice !== undefined) {
       updateData.quotedPrice = quotedPrice;
     }

@@ -612,7 +612,7 @@ export default function CustomOrderPage() {
                 ) : null}
                 <span>{isSubmitting ? 'Submitting…' : 'Submit Custom Order Request'}</span>
               </motion.button>
-              <p className="text-gray-500 text-sm mt-4">We'll get back to you within 24-48 hours</p>
+              <p className="text-gray-500 text-sm mt-4">We&apos;ll get back to you within 24-48 hours</p>
             </motion.div>
           </form>
         </motion.div>

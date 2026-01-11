@@ -417,7 +417,7 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
               <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">Birthday Bash: Creative Celebrations</div>
               <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
               <p className="leading-relaxed max-w-md md:max-w-lg">
-                Our Birthday Blast Workshop is the ultimate creative party where guests trade traditional gifts for a hands-on adventure in clay. Under the guidance of our expert instructors, your group will dive into the mess and magic of the pottery wheel, crafting their very own "Earthen Legacy" pieces from scratch.
+                Our Birthday Blast Workshop is the ultimate creative party where guests trade traditional gifts for a hands-on adventure in clay. Under the guidance of our expert instructors, your group will dive into the mess and magic of the pottery wheel, crafting their very own &quot;Earthen Legacy&quot; pieces from scratch.
               </p>
               <div className="flex gap-2 flex-wrap mt-4">
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Group Fun</span>
@@ -437,7 +437,7 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
               <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">Team Building: Hands‑On Harmony</div>
               <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
               <p className="leading-relaxed max-w-md md:max-w-lg">
-                Escape the conventional office setting and immerse your team in a dynamic pottery workshop designed to foster genuine connection and collaborative spirit. Our "Hands‑On Harmony" session encourages communication, problem‑solving, and creative thinking as colleagues learn to shape clay together.
+                Escape the conventional office setting and immerse your team in a dynamic pottery workshop designed to foster genuine connection and collaborative spirit. Our &quot;Hands‑On Harmony&quot; session encourages communication, problem‑solving, and creative thinking as colleagues learn to shape clay together.
               </p>
               <div className="flex gap-2 flex-wrap mt-4">
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Team Bonding</span>
