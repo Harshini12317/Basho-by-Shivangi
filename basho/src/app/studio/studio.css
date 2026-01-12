@@ -1,0 +1,20 @@
+.studio-root{ font-family:var(--font-inter, sans-serif); color:var(--text-primary); }
+.studio-hero{ background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245,238,232,0.6)); padding:2.5rem 0 }
+.studio-title{ font-family:var(--font-playfair, serif); font-size:clamp(1.8rem,5vw,2.8rem); color:var(--c-2); margin:0 0 0.6rem }
+.studio-sub{ color:var(--text-muted); max-width:780px; margin:0 auto }
+
+.studio-content{ max-width:1100px }
+.studio-grid{ display:grid; grid-template-columns: 1fr 360px; gap:2rem; align-items:start }
+.studio-map .map-embed{ position:relative; width:100%; padding-bottom:56.25%; border-radius:16px; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.06); border:1px solid rgba(42,31,23,0.04) }
+.studio-map iframe{ position:absolute; inset:0; width:100%; height:100%; border:0 }
+
+.studio-info .info-card{ background:linear-gradient(180deg, #fff, rgba(237,216,180,0.03)); padding:1.25rem; border-radius:14px; border:1px solid rgba(42,31,23,0.04); box-shadow:0 12px 30px rgba(0,0,0,0.04) }
+.studio-info h2{ margin:0 0 .25rem; font-size:1.25rem; color:var(--c-2) }
+.studio-info .muted{ color:var(--text-muted); margin:0.25rem 0 }
+.studio-address{ font-style:normal; color:var(--text-primary); margin:0.5rem 0 }
+.studio-info .hours{ list-style:none; padding:0; margin:0.25rem 0 }
+.studio-info .hours li{ color:var(--text-primary); margin:0.25rem 0 }
+.studio-cta{ display:inline-block; padding:0.6rem 1rem; background:var(--c-2); color:#fff; border-radius:999px; text-decoration:none; font-weight:700 }
+
+@media (max-width:1024px){ .studio-grid{ grid-template-columns: 1fr 320px } }
+@media (max-width:768px){ .studio-grid{ grid-template-columns: 1fr; } .studio-info{ order:2 } .studio-map{ order:1 } .studio-hero{ padding:1.6rem 0 } }

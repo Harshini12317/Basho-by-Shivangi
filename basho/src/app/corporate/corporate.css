@@ -63,3 +63,36 @@
 /* Responsive tweaks */
 @media(max-width:900px){ .display-chart-side{ position:relative; top:0; width:100%; z-index:0 } .corp-display-card{ min-height:240px } }
 @media(max-width:600px){ .corp-step-item{ padding:.75rem } .corp-display-icon{ font-size:2.6rem } .step-title{ font-size:1.1rem } }
+
+/* Additional responsive refinements */
+@media (max-width:1024px) {
+	.corp-hero-section{ padding:2rem 1rem }
+	.corp-title-3d{ font-size:clamp(1.8rem,6vw,3rem) }
+	.corp-subtitle-premium{ font-size:0.98rem }
+	.corp-expertise-card{ padding:1.6rem }
+	.corp-display-card{ min-height:280px }
+}
+
+@media (max-width:768px) {
+	.corp-hero-section{ padding:1.6rem 0.75rem }
+	.corp-hero-section .corp-btn-glow,
+	.corp-hero-section .corp-btn-outline{ display:block; width:100%; max-width:360px; margin:0.5rem auto }
+	.process-container{ flex-direction:column }
+	.steps-vertical{ width:100% }
+	.display-chart-side{ width:100%; position:relative; top:0 }
+	.corp-display-card{ min-height:220px; padding:1.6rem }
+	.corp-step-icon-box{ width:40px; height:40px }
+	.corp-step-content h3{ font-size:1rem }
+	.corp-step-content p{ font-size:.95rem }
+	.inquiry-glass-card{ padding:1.6rem }
+}
+
+@media (max-width:480px) {
+	.corp-title-3d{ font-size:clamp(1.6rem,8vw,2.4rem) }
+	.corp-subtitle-premium{ font-size:0.95rem; padding:0 0.5rem }
+	.corp-expertise-card{ padding:1rem }
+	.corp-display-icon{ font-size:2.4rem }
+	.corp-step-item{ gap:0.6rem; padding:0.85rem }
+	.corp-step-icon-box{ width:36px; height:36px }
+	.corp-submit-premium{ padding:0.85rem }
+}
