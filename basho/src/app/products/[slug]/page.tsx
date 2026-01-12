@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useNotification, NotificationContainer } from "@/components/Notification";
@@ -37,6 +37,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
     // Load favorites from localStorage
     const savedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFavorites(savedFavorites);
 
     // Listen for localStorage changes
@@ -62,18 +63,37 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     };
   }, [params]);
 
+  const checkWishlistStatus = useCallback(async () => {
+    if (!session || !slug || isUpdatingWishlist) return;
+
+    try {
+      const response = await fetch("/api/wishlist");
+      if (response.ok) {
+        const wishlistData = await response.json();
+        const isInWishlist = wishlistData.items?.some((item: { productSlug: string }) => item.productSlug === slug) || false;
+        setIsInWishlist(isInWishlist);
+        setIsInitialLoad(false);
+      }
+    } catch (error) {
+      console.error("Error checking wishlist status:", error);
+      setIsInitialLoad(false);
+    }
+  }, [session, slug, isUpdatingWishlist]);
+
   useEffect(() => {
     if (product) {
       if (session && isInitialLoad && !isUpdatingWishlist) {
         // For authenticated users, check API only on initial load
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         checkWishlistStatus();
       } else if (!session) {
         // For non-authenticated users, check localStorage
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsInWishlist(favorites.includes(product._id));
         setIsInitialLoad(false);
       }
     }
-  }, [session, product, favorites, isInitialLoad, isUpdatingWishlist]);
+  }, [session, product, favorites, isInitialLoad, isUpdatingWishlist, checkWishlistStatus]);
 
   if (!product) {
     return (
@@ -111,7 +131,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         addNotification("Item added to cart successfully!", "success");
         // Trigger cart update in navbar
         window.dispatchEvent(new Event('cartUpdated'));
-        // Optionally redirect to cart/checkout page
         // window.location.href = "/checkout";
       } else {
         const error = await response.json();
@@ -120,23 +139,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     } catch (error) {
       console.error("Error adding to cart:", error);
       addNotification("An error occurred while adding the item to cart.", "error");
-    }
-  };
-
-  const checkWishlistStatus = async () => {
-    if (!session || !slug || isUpdatingWishlist) return;
-
-    try {
-      const response = await fetch("/api/wishlist");
-      if (response.ok) {
-        const wishlistData = await response.json();
-        const isInWishlist = wishlistData.items?.some((item: any) => item.productSlug === slug) || false;
-        setIsInWishlist(isInWishlist);
-        setIsInitialLoad(false);
-      }
-    } catch (error) {
-      console.error("Error checking wishlist status:", error);
-      setIsInitialLoad(false);
     }
   };
 
@@ -181,7 +183,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
       if (response.ok) {
         const updatedWishlist = await response.json();
-        const isNowInWishlist = updatedWishlist.items?.some((item: any) => item.productSlug === slug) || false;
+        const isNowInWishlist = updatedWishlist.items?.some((item: { productSlug: string }) => item.productSlug === slug) || false;
         
         // Update with the actual server state
         setIsInWishlist(isNowInWishlist);

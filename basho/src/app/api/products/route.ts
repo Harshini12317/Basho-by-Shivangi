@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get('sort');
     const search = searchParams.get('search');
 
-    let query: any = { isPublished: true };
+    const query: any = { isPublished: true };
 
     // Add search filter if provided
     if (search && search.trim()) {

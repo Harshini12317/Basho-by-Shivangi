@@ -81,7 +81,7 @@ export default function CorporatePage() {
         <div className="container mx-auto px-6 relative z-10 py-20 md:py-32">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="corp-title-3d">Corporate Artistry</h1>
-            <p className="corp-subtitle-premium">Handcrafted excellence for your brand's most meaningful connections. Timeless pottery for modern enterprises.</p>
+            <p className="corp-subtitle-premium">Handcrafted excellence for your brand&apos;s most meaningful connections. Timeless pottery for modern enterprises.</p>
             <div className="mt-12 flex flex-wrap justify-center gap-6">
               <button 
                 onClick={() => document.getElementById('inquiry')?.scrollIntoView({ behavior: 'smooth' })}

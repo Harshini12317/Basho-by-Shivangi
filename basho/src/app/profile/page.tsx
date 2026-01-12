@@ -207,7 +207,7 @@ export default function ProfilePage() {
       } else {
         // Add new address
         const newAddress = {
-          _id: require('crypto').randomUUID(),
+          _id: window.crypto.randomUUID(),
           ...addressForm,
           isDefault: addresses.length === 0 // First address is default
         };

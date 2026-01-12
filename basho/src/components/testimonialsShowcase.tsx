@@ -85,8 +85,8 @@ export default function TestimonialsShowcase() {
     setFormSending(true);
 
     try {
-      let imageUrl = '';
-      let videoUrl = '';
+      const imageUrl = '';
+      const videoUrl = '';
 
       // For now, we'll skip file upload and just submit the text data
       // TODO: Implement proper file upload when Cloudinary is configured
