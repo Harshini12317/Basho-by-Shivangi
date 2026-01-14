@@ -45,6 +45,7 @@ const UserSchema = new Schema(
       isDefault: { type: Boolean, default: false },
     }],
     phone: { type: String, default: "" },
+    isAdmin: { type: Boolean, default: false },
   },
   {
     timestamps: true, // adds createdAt & updatedAt

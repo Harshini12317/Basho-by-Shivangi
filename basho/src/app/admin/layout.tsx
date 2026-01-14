@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useSession, signIn, signOut } from 'next-auth/react';
 
 export default function AdminLayout({
   children,
@@ -10,47 +11,39 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: session, status } = useSession();
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Check authentication on client side
-    const checkAuth = () => {
-      const cookies = document.cookie.split(';');
-      const adminAuthCookie = cookies.find(cookie => cookie.trim().startsWith('admin-auth='));
+    // If on the login route, allow rendering while unauthenticated
+    if (pathname === '/admin/login') return;
 
-      if (adminAuthCookie) {
-        const value = adminAuthCookie.split('=')[1].trim();
-        if (value === 'true') {
-          setIsAuthenticated(true);
-        } else {
-          setIsAuthenticated(false);
-        }
-      } else {
-        setIsAuthenticated(false);
-      }
-      setIsLoading(false);
-    };
-
-    checkAuth();
-  }, [pathname]); // Re-check when pathname changes
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated && pathname !== '/admin/login') {
-      router.push('/admin/login');
+    // If not signed in, redirect to site auth page
+    if (status === 'unauthenticated') {
+      router.push('/auth');
+      return;
     }
-  }, [isAuthenticated, isLoading, pathname, router]);
 
-  // Don't apply authentication to the login page
+    // If session exists, ask server whether user is an admin
+    if (status === 'authenticated' && session?.user?.email) {
+      fetch('/api/admin/admins?check=true')
+        .then((r) => r.json())
+        .then((data) => {
+          setIsAdmin(!!data.isAdmin);
+          if (!data.isAdmin) router.push('/');
+        })
+        .catch(() => {
+          setIsAdmin(false);
+          router.push('/');
+        });
+    }
+  }, [pathname, status, session, router]);
+
   if (pathname === '/admin/login') {
-    return (
-      <div className="min-h-screen bg-slate-50">
-        {children}
-      </div>
-    );
+    return <div className="min-h-screen bg-slate-50">{children}</div>;
   }
 
-  if (isLoading) {
+  if (status === 'loading' || isAdmin === null) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
@@ -61,8 +54,8 @@ export default function AdminLayout({
     );
   }
 
-  if (!isAuthenticated) {
-    return null; // This will redirect via useEffect
+  if (!isAdmin) {
+    return null;
   }
 
   return (
@@ -74,14 +67,12 @@ export default function AdminLayout({
               <h1 className="text-xl font-bold text-slate-900">Basho Admin</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <form action="/api/admin/auth" method="DELETE" className="inline">
-                <button
-                  type="submit"
-                  className="text-slate-700 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Logout
-                </button>
-              </form>
+              <button
+                onClick={() => signOut({ callbackUrl: '/' })}
+                className="text-slate-700 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium"
+              >
+                Logout
+              </button>
             </div>
           </div>
         </div>
@@ -89,9 +80,7 @@ export default function AdminLayout({
 
       <div className="flex">
         {/* Main content */}
-        <main className="flex-1 max-w-7xl py-6 px-6 lg:px-8">
-          {children}
-        </main>
+        <main className="flex-1 max-w-7xl py-6 px-6 lg:px-8">{children}</main>
       </div>
     </div>
   );

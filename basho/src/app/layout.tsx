@@ -5,8 +5,6 @@ import "./globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
 import Footer from "@/components/Footer";
 import SessionProviderWrapper from "@/components/auth/SessionProviderWrapper";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 
 import PageWrapper from "@/components/common/PageWrapper";
 
@@ -35,8 +33,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions); // ✅ correct
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -49,7 +45,7 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${playfair.variable} antialiased min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]`}
       >
-        <SessionProviderWrapper session={session}>
+        <SessionProviderWrapper>
           <NavbarWrapper />
           <main className="relative pt-20">
             <PageWrapper>{children}</PageWrapper>
