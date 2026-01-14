@@ -1,6 +1,18 @@
+'use client';
+
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 export default function AdminDashboard() {
+  const [corpCount, setCorpCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch('/api/admin/corporate-inquiries')
+      .then((r) => r.json())
+      .then((data) => setCorpCount(Array.isArray(data) ? data.length : null))
+      .catch(() => setCorpCount(null));
+  }, []);
+
   const adminSections = [
     {
       title: 'Product Management',
@@ -8,7 +20,8 @@ export default function AdminDashboard() {
       href: '/admin/products',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
         </svg>
       ),
       color: 'bg-blue-500',
@@ -19,7 +32,8 @@ export default function AdminDashboard() {
       href: '/admin/custom-orders',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       ),
       color: 'bg-green-500',
@@ -30,19 +44,22 @@ export default function AdminDashboard() {
       href: '/admin/workshop-registrations',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4v10m0 0l-2-2m2 2l2-2m6-6v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6a2 2 0 012-2h8a2 2 0 012 2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4v10m0 0l-2-2m2 2l2-2m6-6v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6a2 2 0 012-2h8a2 2 0 012 2z" />
         </svg>
       ),
       color: 'bg-purple-500',
     },
     {
       title: 'Popup Management',
-      description: 'Create and manage popups for your site',
+      description: 'Create and manage popups',
       href: '/admin/popups',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
         </svg>
       ),
       color: 'bg-purple-600',
@@ -53,7 +70,8 @@ export default function AdminDashboard() {
       href: '/admin/orders',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
         </svg>
       ),
       color: 'bg-orange-500',
@@ -64,7 +82,8 @@ export default function AdminDashboard() {
       href: '/admin/events',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4v10m0 0l-2-2m2 2l2-2m6-6v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6a2 2 0 012-2h8a2 2 0 012 2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4v10m0 0l-2-2m2 2l2-2m6-6v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6a2 2 0 012-2h8a2 2 0 012 2z" />
         </svg>
       ),
       color: 'bg-red-500',
@@ -75,7 +94,8 @@ export default function AdminDashboard() {
       href: '/admin/gallery',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
       ),
       color: 'bg-pink-500',
@@ -86,10 +106,23 @@ export default function AdminDashboard() {
       href: '/admin/testimonials',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
       ),
       color: 'bg-teal-500',
+    },
+    {
+      title: 'Corporate Inquiries',
+      description: 'View corporate consultation requests',
+      href: '/admin/corporate-inquiries',
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M3 7h18M3 12h18M3 17h18" />
+        </svg>
+      ),
+      color: 'bg-amber-600',
     },
     {
       title: 'Static Data',
@@ -97,11 +130,24 @@ export default function AdminDashboard() {
       href: '/admin/static-data',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       ),
       color: 'bg-indigo-500',
+    },
+    {
+      title: 'Custom Order Photos',
+      description: 'Manage photos and descriptions for completed custom orders',
+      href: '/admin/custom-order-photos',
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      ),
+      color: 'bg-emerald-500',
     },
   ];
 
@@ -113,17 +159,39 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+        {/* Admin Management */}
+        <Link
+          href="/admin/admins"
+          className="relative bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow group"
+        >
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-indigo-500 text-white mb-4 group-hover:scale-110 transition-transform">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M5.121 17.804A13.937 13.937 0 0112 15c2.94 0 5.662.86 7.879 2.341M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">Admin Management</h3>
+          <p className="text-slate-600 text-sm">Add or remove admin users who can access this panel.</p>
+        </Link>
+
         {adminSections.map((section) => (
           <Link
             key={section.href}
             href={section.href}
-            className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow group"
+            className="relative bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow group"
           >
             <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${section.color} text-white mb-4 group-hover:scale-110 transition-transform`}>
               {section.icon}
             </div>
             <h3 className="text-lg font-semibold text-slate-900 mb-2">{section.title}</h3>
             <p className="text-slate-600 text-sm">{section.description}</p>
+
+            {section.href === '/admin/corporate-inquiries' && corpCount !== null && (
+              <span className="absolute top-3 right-3 inline-flex items-center justify-center px-2 py-1 text-xs font-semibold text-white bg-amber-600 rounded-full">
+                {corpCount}
+              </span>
+            )}
           </Link>
         ))}
       </div>

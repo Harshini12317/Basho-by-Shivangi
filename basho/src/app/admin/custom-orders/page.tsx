@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { FaComments } from 'react-icons/fa';
+import ChatComponent from '@/components/ChatComponent';
 
 interface CustomOrder {
   _id: string;
@@ -21,6 +23,10 @@ export default function AdminCustomOrders() {
   const [selectedOrder, setSelectedOrder] = useState<CustomOrder | null>(null);
   const [quotePrice, setQuotePrice] = useState('');
   const [activeTab, setActiveTab] = useState<string>('all');
+
+  // Chat state
+  const [chatOpen, setChatOpen] = useState(false);
+  const [selectedCustomOrderForChat, setSelectedCustomOrderForChat] = useState<CustomOrder | null>(null);
 
   useEffect(() => {
     fetchOrders();
@@ -217,8 +223,21 @@ export default function AdminCustomOrders() {
                         </p>
                       )}
                     </div>
-                    <div className="text-right text-xs text-slate-500">
-                      {new Date(order.createdAt).toLocaleDateString()}
+                    <div className="flex flex-col items-end gap-2">
+                      <div className="text-right text-xs text-slate-500">
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedCustomOrderForChat(order);
+                          setChatOpen(true);
+                        }}
+                        className="relative flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded transition-colors"
+                      >
+                        <FaComments className="text-sm" />
+                        Chat
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -353,6 +372,19 @@ export default function AdminCustomOrders() {
         </div>
       </div>
     </div>
-    </div>
+
+    {/* Chat Component */}
+    {selectedCustomOrderForChat && (
+      <ChatComponent
+        customOrderId={selectedCustomOrderForChat._id}
+        isOpen={chatOpen}
+        onClose={() => {
+          setChatOpen(false);
+          setSelectedCustomOrderForChat(null);
+        }}
+        customerName={selectedCustomOrderForChat.name}
+      />
+    )}
+  </div>
   );
 }

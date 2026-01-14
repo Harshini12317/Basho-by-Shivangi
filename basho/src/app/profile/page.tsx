@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
-import { FaShoppingBag, FaPaintBrush, FaCalendarAlt, FaUser, FaBoxOpen, FaMapMarkerAlt, FaPhone, FaPen, FaHeart, FaSearch, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaShoppingBag, FaPaintBrush, FaCalendarAlt, FaUser, FaBoxOpen, FaMapMarkerAlt, FaPhone, FaPen, FaHeart, FaSearch, FaChevronDown, FaChevronUp, FaComments } from "react-icons/fa";
+import ChatComponent from "@/components/ChatComponent";
 
 type CustomOrder = {
   _id: string;
@@ -70,6 +71,10 @@ export default function ProfilePage() {
     phone: ""
   });
   const [isSavingAddress, setIsSavingAddress] = useState(false);
+
+  // Chat state
+  const [chatOpen, setChatOpen] = useState(false);
+  const [selectedCustomOrder, setSelectedCustomOrder] = useState<CustomOrder | null>(null);
 
   const userEmail = session?.user?.email || "";
   const userName = session?.user?.name || "";
@@ -202,7 +207,7 @@ export default function ProfilePage() {
       } else {
         // Add new address
         const newAddress = {
-          _id: require('crypto').randomUUID(),
+          _id: window.crypto.randomUUID(),
           ...addressForm,
           isDefault: addresses.length === 0 // First address is default
         };
@@ -848,8 +853,20 @@ export default function ProfilePage() {
                              co.status === 'in-progress' ? 'In Progress' :
                              co.status === 'completed' ? 'Completed' : co.status}
                           </div>
-                          <div className="text-xs text-[#8E5022] font-medium">
-                            {co.createdAt ? new Date(co.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => {
+                                setSelectedCustomOrder(co);
+                                setChatOpen(true);
+                              }}
+                              className="relative flex items-center gap-2 px-3 py-2 bg-[#8E5022] hover:bg-[#652810] text-white text-xs font-semibold rounded-lg transition-colors"
+                            >
+                              <FaComments className="text-sm" />
+                              Chat
+                            </button>
+                            <div className="text-xs text-[#8E5022] font-medium">
+                              {co.createdAt ? new Date(co.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
+                            </div>
                           </div>
                         </div>
                         {co.status === 'quoted' && typeof co.quotedPrice === "number" && (
@@ -1093,6 +1110,19 @@ export default function ProfilePage() {
 
         </div>
       </div>
+
+      {/* Chat Component */}
+      {selectedCustomOrder && (
+        <ChatComponent
+          customOrderId={selectedCustomOrder._id}
+          isOpen={chatOpen}
+          onClose={() => {
+            setChatOpen(false);
+            setSelectedCustomOrder(null);
+          }}
+          customerName={selectedCustomOrder.name}
+        />
+      )}
     </div>
   );
 }

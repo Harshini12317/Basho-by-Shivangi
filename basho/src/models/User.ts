@@ -1,4 +1,5 @@
 import mongoose, { Schema, model, models } from "mongoose";
+import crypto from "crypto";
 
 const UserSchema = new Schema(
   {
@@ -35,7 +36,7 @@ const UserSchema = new Schema(
     },
     
     addresses: [{
-      _id: { type: String, default: () => require('crypto').randomUUID() },
+      _id: { type: String, default: () => crypto.randomUUID() },
       label: { type: String, default: "Home" },
       street: { type: String, required: true },
       city: { type: String, required: true },
@@ -44,6 +45,7 @@ const UserSchema = new Schema(
       isDefault: { type: Boolean, default: false },
     }],
     phone: { type: String, default: "" },
+    isAdmin: { type: Boolean, default: false },
   },
   {
     timestamps: true, // adds createdAt & updatedAt

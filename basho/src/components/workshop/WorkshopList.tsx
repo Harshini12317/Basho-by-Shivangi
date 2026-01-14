@@ -1,35 +1,25 @@
 "use client";
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaLeaf, FaHandSparkles, FaStar, FaChair, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-interface StaticWorkshop {
+interface Workshop {
+  _id: string;
   slug: string;
-  img: string; // can be filename under /images or full/absolute URL
   title: string;
-  date: string;
-  level: string;
-  price: number;
   description: string;
-  spotsLeft?: number;
+  level: 'Beginner' | 'Intermediate' | 'Advanced';
+  price: number;
+  images: string[];
+  location: string;
+  googleMapLink?: string;
+  whatYouWillLearn: string[];
+  includes: string[];
+  moreInfo?: string;
+  seats: number;
+  createdAt: string;
+  updatedAt: string;
 }
-
-// Fallback static workshops (exactly 6) to match the reference layout
-const staticWorkshops: StaticWorkshop[] = [
-  { slug: 'cobalt-botanical', img: 'img12.png', title: 'Cobalt Botanical', date: 'Jan 25, 2026', level: 'Advanced', price: 95, description: 'Master the art of traditional blue and white pottery.' },
-  { slug: 'rose-garden', img: 'img13.png', title: 'Garden Sculpting', date: 'Jan 29, 2026', level: 'Advanced', price: 65, description: 'Decorate fine ceramic mugs with delicate floral motifs.' },
-  { slug: 'tropical-teal', img: 'img31.png', title: 'Tropical Teal', date: 'Feb 1, 2026', level: 'Advanced', price: 65, description: 'Create stunning platters with vibrant teal glazes.' },
-  { slug: 'sage-minimalist', img: 'img18.png', title: 'Sage Minimalist', date: 'Feb 5, 2026', level: 'Beginner', price: 65, description: 'Focus on the beauty of simplicity and smooth finishes.', spotsLeft: 3 },
-  { slug: 'wildflower-tea', img: 'img9.png', title: 'Wildflower Amber', date: 'Feb 12, 2026', level: 'Intermediate', price: 65, description: 'Design matching tea sets with whimsical patterns.' },
-  { slug: 'matcha-ceremony', img: 'img33.png', title: 'Matcha Ceremony', date: 'Feb 18, 2026', level: 'Advanced', price: 65, description: 'Craft and decorate your own authentic Matcha bowl.' },
-  { slug: 'pastel-parchment', img: 'sculp1.png', title: 'Pastel & Parchment', date: 'Mar 5, 2026', level: 'Intermediate', price: 85, description: 'Step into the world of traditional Indian pottery to explore the relationship between form and nature.' },
-  { slug: 'earthen-legacy', img: 'p3.jpg', title: 'The Earthen Legacy', date: 'Mar 12, 2026', level: 'Beginner', price: 75, description: 'Uncover the tactile joy of hand-molding raw clay into contemporary functional art.' },
-  { slug: 'rustic-light', img: 'p4.jpg', title: 'The Rustic Light', date: 'Mar 15, 2026', level: 'Beginner', price: 70, description: 'Combine the art of pottery with the warmth of candle making in a session focused on texture and light.' },
-  { slug: 'artisan-tableware', img: 'p1.png', title: 'The Artisan Tableware', date: 'Mar 20, 2026', level: 'Advanced', price: 90, description: 'Transform raw clay into sophisticated, deep-form serving ware designed for artistic dining.' },
-  { slug: 'botanical-garden', img: 'img2.png', title: 'Botanical Garden', date: 'Mar 22, 2026', level: 'Intermediate', price: 80, description: 'Elevate your home decor with this stunning decorative tray featuring a lush, whimsical botanical scene.' },
-  { slug: 'heritage-in-hand', img: 'img10.png', title: 'Heritage in Hand', date: 'Mar 28, 2026', level: 'Advanced', price: 95, description: 'Dive into the intersection of two ancient crafts: embossed ceramic textures paired with custom-fitted wooden elements.' },
-  { slug: 'blue-pottery', img: 'img4.png', title: 'Blue Pottery', date: 'Apr 5, 2026', level: 'Advanced', price: 90, description: 'Classic Cobalt Blue Chinoiserie and Indigo pottery with hand-painted botanical motifs on a white ceramic base.' },
-];
 
 const studentImages = ['img13.png', 'img34.png', 'img12.png', 'img31.png', 'img25.png', 'img32.png', 'img5.png', 'img15.png', 'img33.png', 'img27.png', 'img3.png', 'img2.png'];
 
@@ -46,13 +36,11 @@ interface DBWorkshop {
 }
 
 type PopupItem = {
-  _id?: string;
   name: string;
   isActive: boolean;
   pages: string[];
   targetSlug?: string;
   image?: string;
-  images?: string[];
   title?: string;
   description?: string;
   ctaText?: string;
@@ -64,52 +52,48 @@ type PopupItem = {
   endAt?: string;
 };
 
-export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }) {
-  const SHOW_LOCAL_POPUP = false;
-  // Map incoming DB workshops (if any) to our display shape; otherwise use static content.
-  const mapped: StaticWorkshop[] = Array.isArray(workshops) && workshops.length > 0
-    ? workshops.map((w) => {
-        const dateStr = w.date
-          ? typeof w.date === 'string'
-            ? w.date
-            : new Date(w.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-          : 'TBD';
-        const img = w.image || 'img12.png';
-        return {
-          slug: w.slug || 'workshop',
-          img,
-          title: w.title || 'Workshop',
-          date: dateStr,
-          level: w.level || 'Beginner',
-          price: typeof w.price === 'number' ? w.price : 65,
-          description: w.description || 'Join us for an immersive pottery experience.',
-        };
-      })
-    : staticWorkshops;
+export default function WorkshopList({ workshops: initialWorkshops }: { workshops?: DBWorkshop[] }) {
+  const [workshops, setWorkshops] = useState<Workshop[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Normalize titles by slug so listing shows updated names regardless of data source
-  const nameBySlug: Record<string, string> = {
-    'rose-garden': 'Garden Sculpting',
-    'tropical-teal': 'Tropical Teal',
-    'wildflower-tea': 'Wildflower Amber',
-  };
-  const displayList = mapped.map((ws) => ({ ...ws, title: nameBySlug[ws.slug] || ws.title }));
+  useEffect(() => {
+    const fetchWorkshops = async () => {
+      try {
+        const response = await fetch('/api/workshop');
+        if (response.ok) {
+          const data = await response.json();
+          setWorkshops(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch workshops:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorkshops();
+  }, []);
+
+  // Use fetched workshops if available, otherwise use initial props or empty array
+  const workshopData = workshops.length > 0 ? workshops : (initialWorkshops || []);
+
+  // Map workshops to display format
+  const displayList = workshopData.map((w) => ({
+    slug: w.slug,
+    img: w.images?.[0] || '/images/img12.png',
+    title: w.title,
+    date: 'Select Date', // Since users choose their own date
+    level: w.level,
+    price: w.price,
+    description: w.description,
+    spotsLeft: w.seats // Could calculate based on registrations if needed
+  }));
 
   const filenameOf = (src: string) => {
     const s = src || '';
     const base = s.split('/').pop() || s;
     return base;
   };
-
-  const orderImages = ['sculp1.png', 'img12.png', 'p3.jpg', 'p4.jpg', 'img2.png', 'img10.png', 'img33.png', 'p4.jpg', 'img31.png'];
-  const orderedFirst: StaticWorkshop[] = [];
-  for (const imgName of orderImages) {
-    const found = displayList.find((ws) => filenameOf(ws.img) === imgName);
-    if (found) orderedFirst.push(found);
-  }
-  const usedSlugs = new Set(orderedFirst.map((w) => w.slug));
-  const rest = displayList.filter((ws) => !usedSlugs.has(ws.slug));
-  const finalList = [...orderedFirst, ...rest];
 
   const resolveImgSrc = (src: string) => {
     if (!src) return '/images/img12.png';
@@ -120,37 +104,9 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
   const [showModal, setShowModal] = useState(false);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [reg, setReg] = useState({ name: '', email: '' });
-  const [regPhone, setRegPhone] = useState('');
-  const [agreeTos, setAgreeTos] = useState(false);
   const [regStatus, setRegStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [popup, setPopup] = useState<PopupItem | null>(null);
   const [showPopup, setShowPopup] = useState(false);
-  const [popupImgIndex, setPopupImgIndex] = useState(0);
-  React.useEffect(() => {
-    setPopupImgIndex(0);
-  }, [popup, showPopup]);
-  React.useEffect(() => {
-    if (!showPopup || !popup) return;
-    const images = (popup.images && popup.images.length > 0) ? popup.images : (popup.image ? [popup.image] : []);
-    if (images.length <= 1) return;
-  }, [showPopup, popup]);
-  React.useEffect(() => {
-    if (!showPopup || !popup) return;
-    const images = (popup.images && popup.images.length > 0) ? popup.images : (popup.image ? [popup.image] : []);
-    if (images.length <= 1) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
-        setPopupImgIndex((i) => (i - 1 + images.length) % images.length);
-      } else if (e.key === 'ArrowRight') {
-        setPopupImgIndex((i) => (i + 1) % images.length);
-      } else if (e.key === 'Escape') {
-        setShowPopup(false);
-        markSeen(popup);
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [showPopup, popup]);
 
   const openModal = (slug: string) => {
     setSelectedSlug(slug);
@@ -172,13 +128,7 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
       const res = await fetch('/api/workshop/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          workshopSlug: selectedSlug,
-          name: reg.name,
-          email: reg.email,
-          phone: regPhone,
-          agreeTos,
-        }),
+        body: JSON.stringify({ workshopSlug: selectedSlug, name: reg.name, email: reg.email }),
       });
       if (!res.ok) {
         setRegStatus('error');
@@ -193,29 +143,21 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
     }
   };
   const shouldShowByFrequency = (p: PopupItem) => {
-    const idKey = `popup_${p._id || p.name}_seen`;
+    const key = `popup_${p.name}_seen`;
     if (p.frequency === 'always') return true;
-    if (p.frequency === 'once_per_session') {
-      const seen = sessionStorage.getItem(idKey);
-      return !seen;
-    }
+    const last = localStorage.getItem(key);
+    if (!last) return true;
+    const lastTime = Number(last);
+    if (p.frequency === 'once_per_session') return false;
     if (p.frequency === 'once_per_day') {
-      const last = localStorage.getItem(idKey);
-      if (!last) return true;
       const oneDay = 24 * 60 * 60 * 1000;
-      return Date.now() - Number(last) > oneDay;
+      return Date.now() - lastTime > oneDay;
     }
     return true;
   };
   const markSeen = (p: PopupItem) => {
-    const idKey = `popup_${p._id || p.name}_seen`;
-    if (p.frequency === 'once_per_session') {
-      sessionStorage.setItem(idKey, '1');
-    } else if (p.frequency === 'once_per_day') {
-      localStorage.setItem(idKey, String(Date.now()));
-    } else {
-      localStorage.setItem(idKey, String(Date.now()));
-    }
+    const key = `popup_${p.name}_seen`;
+    localStorage.setItem(key, String(Date.now()));
   };
   const withinSchedule = (p: PopupItem) => {
     const now = new Date();
@@ -231,16 +173,17 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
         !p.targetSlug &&
         withinSchedule(p)
     );
-    const showable = candidates.find((p) => shouldShowByFrequency(p)) || null;
-    if (!showable) return;
-    setPopup(showable);
-    const showNow = showable.triggerType === 'page_load';
+    const first = candidates[0] || null;
+    if (!first) return;
+    if (!shouldShowByFrequency(first)) return;
+    setPopup(first);
+    const showNow = first.triggerType === 'page_load';
     if (showNow) setShowPopup(true);
-    if (showable.triggerType === 'delay') {
-      const ms = showable.triggerDelayMs || 0;
+    if (first.triggerType === 'delay') {
+      const ms = first.triggerDelayMs || 0;
       setTimeout(() => setShowPopup(true), ms);
     }
-    if (showable.triggerType === 'scroll') {
+    if (first.triggerType === 'scroll') {
       const onScroll = () => {
         const scrolled = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
         if (scrolled >= 40) {
@@ -252,78 +195,37 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
     }
   };
   React.useEffect(() => {
-    if (!SHOW_LOCAL_POPUP) return;
-    const fetchPopups = async () => {
-      try {
-        const res = await fetch('/api/popups');
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data)) evaluatePopups(data);
-        }
-      } catch {}
-    };
-    fetchPopups();
+    try {
+      const raw = localStorage.getItem('admin_popups') || '[]';
+      const data = JSON.parse(raw);
+      if (Array.isArray(data)) evaluatePopups(data);
+    } catch {}
   }, []);
 
   return (
     <div className="bg-[#F8F7F2] min-h-screen py-16 px-4 sm:px-8">
-      {SHOW_LOCAL_POPUP && popup && showPopup && (
-        <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/70 animate-[overlayfade_.35s_ease]">
-          <div className="relative rounded-[22px] bg-white w-[62vw] max-w-3xl overflow-hidden" style={{ boxShadow: '0 16px 40px rgba(0,0,0,0.25), 0 40px 100px rgba(0,0,0,0.35)', animation: 'popup .35s ease' }}>
-            <button
-              onClick={() => {
-                setShowPopup(false);
-                markSeen(popup);
-              }}
-              className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/85 backdrop-blur-md shadow-lg ring-2 ring-[#E2C48D] flex items-center justify-center text-[#6A2424] transition hover:scale-105 z-20"
-              aria-label="Close"
-            >
-              <span className="text-2xl leading-none transition-transform hover:rotate-90">×</span>
-            </button>
-            {(() => {
-              const images = Array.from(new Set([
-                ...(popup!.image ? [popup!.image] : []),
-                ...((popup!.images && popup!.images.length > 0) ? popup!.images : [])
-              ]));
-              return images.length ? (
-                <div className="group relative w-full h-[46vh] md:h-[58vh] px-6 pt-6">
-                  <div className="relative w-full h-full rounded-xl overflow-hidden ring-1 ring-[#E2C48D]/50 shadow-md bg-white/5">
-                    <img src={images[popupImgIndex]} alt="" className="w-full h-full object-cover transition-transform duration-400 ease-out hover:scale-[1.04] animate-[imgfade_.4s_ease]" />
-                    <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.0) 60%)' }} />
-                  </div>
-                  <div className="absolute bottom-4 right-8 px-2.5 py-1 rounded-full bg-black/40 text-white text-xs backdrop-blur-sm">
-                    {popupImgIndex + 1} / {images.length}
-                  </div>
-                  {images.length > 1 && (
-                    <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4">
-                      <button
-                        onClick={() => setPopupImgIndex((i) => (i - 1 + images.length) % images.length)}
-                        className="pointer-events-auto w-9 h-9 rounded-full bg-white/85 backdrop-blur-md shadow-lg ring-2 ring-[#E2C48D] text-[#6A2424] flex items-center justify-center transition hover:scale-105 hover:bg-white"
-                        aria-label="Previous image"
-                      >
-                        <span className="text-2xl leading-none">‹</span>
-                      </button>
-                      <button
-                        onClick={() => setPopupImgIndex((i) => (i + 1) % images.length)}
-                        className="pointer-events-auto w-9 h-9 rounded-full bg-white/85 backdrop-blur-md shadow-lg ring-2 ring-[#E2C48D] text-[#6A2424] flex items-center justify-center transition hover:scale-105 hover:bg-white"
-                        aria-label="Next image"
-                      >
-                        <span className="text-2xl leading-none">›</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : null;
-            })()}
-            <div className="px-6 pb-6 pt-4 border-t border-slate-200/60 bg-white/95">
+      {popup && showPopup && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
+          <div className="rounded-3xl bg-white shadow-2xl w-[92%] max-w-md overflow-hidden">
+            {popup.image ? <img src={popup.image} alt="" className="w-full h-40 object-cover" /> : null}
+            <div className="p-5">
               {popup.title ? <div className="text-lg font-semibold text-slate-900">{popup.title}</div> : null}
               {popup.description ? <p className="mt-2 text-sm text-slate-700">{popup.description}</p> : null}
               <div className="mt-4 flex items-center gap-3">
                 {popup.ctaText && popup.ctaLink ? (
-                  <a href={popup.ctaLink} className="px-4 py-2 rounded-full bg-[#E76F51] text-white shadow-md hover:bg-[#D35400] transition-transform hover:scale-[1.03]">
+                  <a href={popup.ctaLink} className="px-4 py-2 rounded-full bg-[#E76F51] text-white shadow-md hover:bg-[#D35400]">
                     {popup.ctaText}
                   </a>
                 ) : null}
+                <button
+                  onClick={() => {
+                    setShowPopup(false);
+                    markSeen(popup);
+                  }}
+                  className="px-4 py-2 rounded-full bg-white ring-1 ring-[#E2C48D] text-slate-900"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>
@@ -348,34 +250,54 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
         
         {/* Workshop Grid */}
         <div id="workshops" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24 scroll-mt-24">
-          {finalList.map((ws, idx) => (
-            <Link key={`${ws.slug}-${idx}`} href={`/workshop/${ws.slug}`} className="group cursor-pointer">
-              <div className="bg-[#F9F9F9] rounded-2xl overflow-hidden shadow-sm transition-all hover:shadow-lg">
-                <div className="relative aspect-square">
-                  <img src={resolveImgSrc(ws.img)} alt={ws.title} className="w-full h-full object-cover" />
-                  {/* Removed the level badge completely */}
-                  {typeof ws.spotsLeft === 'number' && (
-                    <div
-                      className={`absolute bottom-3 left-3 bg-[#E74C3C] text-white text-[10px] px-2 py-1 rounded-full ${ws.spotsLeft <= 3 ? 'animate-pulse ring-2 ring-white shadow-md' : ''}`}
-                    >
-                      Only {ws.spotsLeft} spots left
-                    </div>
-                  )}
-                </div>
+          {loading ? (
+            // Loading skeleton
+            Array.from({ length: 6 }).map((_, idx) => (
+              <div key={idx} className="bg-[#F9F9F9] rounded-2xl overflow-hidden shadow-sm animate-pulse">
+                <div className="aspect-square bg-gray-200"></div>
                 <div className="p-5">
-                  <h3 className="text-lg font-bold text-slate-900 mb-1">{ws.title}</h3>
-                  <p className="text-slate-400 text-xs mb-3 line-clamp-1">{ws.description}</p>
-                  <div className="flex items-center gap-2 text-slate-500 text-xs mb-4">
-                    <span>🗓 {ws.date}</span>
-                  </div>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-lg font-bold">₹{ws.price}</span>
-                    <span className="text-slate-400 text-[10px]">per person</span>
-                  </div>
+                  <div className="h-5 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded mb-3"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/3"></div>
                 </div>
               </div>
-            </Link>
-          ))}
+            ))
+          ) : displayList.length > 0 ? (
+            displayList.map((ws, idx) => (
+              <Link key={`${ws.slug}-${idx}`} href={`/workshop/${ws.slug}`} className="group cursor-pointer">
+                <div className="bg-[#F9F9F9] rounded-2xl overflow-hidden shadow-sm transition-all hover:shadow-lg">
+                  <div className="relative aspect-square">
+                    <img src={resolveImgSrc(ws.img)} alt={ws.title} className="w-full h-full object-cover" />
+                    {/* Removed the level badge completely */}
+                    {typeof ws.spotsLeft === 'number' && (
+                      <div
+                        className={`absolute bottom-3 left-3 bg-[#E74C3C] text-white text-[10px] px-2 py-1 rounded-full ${ws.spotsLeft <= 3 ? 'animate-pulse ring-2 ring-white shadow-md' : ''}`}
+                      >
+                        Only {ws.spotsLeft} spots left
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">{ws.title}</h3>
+                    <p className="text-slate-400 text-xs mb-3 line-clamp-1">{ws.description}</p>
+                    <div className="flex items-center gap-2 text-slate-500 text-xs mb-4">
+                      <span>🗓 {ws.date}</span>
+                    </div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-lg font-bold">₹{ws.price}</span>
+                      <span className="text-slate-400 text-[10px]">per person</span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <p className="text-slate-500 text-lg">No workshops available at the moment.</p>
+              <p className="text-slate-400 text-sm mt-2">Check back soon for new pottery workshops!</p>
+            </div>
+          )}
         </div>
 
         <div className="rounded-3xl overflow-hidden mb-16">
@@ -467,12 +389,7 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
                 <p className="mb-8 max-w-sm opacity-90">
                   Host a memorable creative gathering for birthdays, team building, or bridal showers.
                 </p>
-                <Link
-                  href="/contact"
-                  onClick={(e: React.MouseEvent<HTMLAnchorElement>) => e.preventDefault()}
-                  className="inline-block bg-[#E76F51] text-white px-8 py-3 rounded-full shadow-md hover:bg-[#D35400] transition-colors"
-                  aria-disabled="true"
-                >
+                <Link href="/contact" className="inline-block bg-[#E76F51] text-white px-8 py-3 rounded-full shadow-md hover:bg-[#D35400] transition-colors">
                   Book Your Event
                 </Link>
               </div>
@@ -484,8 +401,8 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
               <img src="/images/ev1.png" alt="" className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
             </div>
             <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
-              
-              
+              <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">Date Night: Crafting Memories</div>
+              <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
               <p className="leading-relaxed max-w-md md:max-w-lg">
                 Spend a romantic evening in our serene studio, connecting through the tactile experience of shaping raw earth together on the pottery wheel. It’s a mindful escape for couples.
               </p>
@@ -494,14 +411,7 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Guided</span>
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">All Levels</span>
               </div>
-              <Link
-                href="/contact"
-                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => e.preventDefault()}
-                className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors"
-                aria-disabled="true"
-              >
-                Book Date Night
-              </Link>
+              <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Book Date Night</Link>
               <button onClick={() => openModal('date-night')} className="inline-block mt-3 ml-2 bg-white text-slate-900 px-4 py-2 rounded-full ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">Register Interest</button>
             </div>
           </div>
@@ -511,24 +421,17 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
               <img src="/images/e3.png" alt="" className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
             </div>
             <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
-              
-              
+              <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">Birthday Bash: Creative Celebrations</div>
+              <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
               <p className="leading-relaxed max-w-md md:max-w-lg">
-                Our Birthday Blast Workshop is the ultimate creative party where guests trade traditional gifts for a hands-on adventure in clay. Under the guidance of our expert instructors, your group will dive into the mess and magic of the pottery wheel, crafting their very own "Earthen Legacy" pieces from scratch.
+                Our Birthday Blast Workshop is the ultimate creative party where guests trade traditional gifts for a hands-on adventure in clay. Under the guidance of our expert instructors, your group will dive into the mess and magic of the pottery wheel, crafting their very own &quot;Earthen Legacy&quot; pieces from scratch.
               </p>
               <div className="flex gap-2 flex-wrap mt-4">
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Group Fun</span>
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Instructor‑Led</span>
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">All Ages</span>
               </div>
-              <Link
-                href="/contact"
-                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => e.preventDefault()}
-                className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors"
-                aria-disabled="true"
-              >
-                Plan A Birthday Bash
-              </Link>
+              <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Plan A Birthday Bash</Link>
               <button onClick={() => openModal('birthday-bash')} className="inline-block mt-3 ml-2 bg-white text-slate-900 px-4 py-2 rounded-full ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">Register Interest</button>
             </div>
           </div>
@@ -538,111 +441,60 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
               <img src="/images/e5.png" alt="" className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
             </div>
             <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
-              
-              
+              <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">Team Building: Hands‑On Harmony</div>
+              <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
               <p className="leading-relaxed max-w-md md:max-w-lg">
-                Escape the conventional office setting and immerse your team in a dynamic pottery workshop designed to foster genuine connection and collaborative spirit. Our "Hands‑On Harmony" session encourages communication, problem‑solving, and creative thinking as colleagues learn to shape clay together.
+                Escape the conventional office setting and immerse your team in a dynamic pottery workshop designed to foster genuine connection and collaborative spirit. Our &quot;Hands‑On Harmony&quot; session encourages communication, problem‑solving, and creative thinking as colleagues learn to shape clay together.
               </p>
               <div className="flex gap-2 flex-wrap mt-4">
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Team Bonding</span>
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Communication</span>
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Creative Thinking</span>
               </div>
-              <Link
-                href="/contact"
-                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => e.preventDefault()}
-                className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors"
-                aria-disabled="true"
-              >
-                Book Team Session
-              </Link>
+              <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Book Team Session</Link>
               <button onClick={() => openModal('team-building')} className="inline-block mt-3 ml-2 bg-white text-slate-900 px-4 py-2 rounded-full ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">Register Interest</button>
             </div>
           </div>
 
           {showModal && (
-            <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40">
-              {(() => {
-                const eventBySlug: Record<string, { title: string; image: string; date: string; price: number; tags: string[] }> = {
-                  'date-night': { title: 'Date Night: Crafting Memories', image: '/images/e3.png', date: 'Saturday, May 18th • 7:00 PM – 9:00 PM', price: 95, tags: ['Coupled', 'Guided', 'All Levels'] },
-                  'birthday-bash': { title: 'Birthday Bash: Creative Celebrations', image: '/images/e2.png', date: 'Sunday, May 26th • 10:00 AM – 12:00 PM', price: 85, tags: ['Group', 'Guided', 'All Levels'] },
-                  'team-building': { title: 'Team Building: Studio Sessions', image: '/images/e3.png', date: 'Flexible • Coordinate with Studio', price: 120, tags: ['Corporate', 'Guided', 'All Levels'] },
-                };
-                const info = selectedSlug ? eventBySlug[selectedSlug] || eventBySlug['date-night'] : eventBySlug['date-night'];
-                return (
-                  <div className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden">
-                    <div className="relative">
-                      <button onClick={closeModal} className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white shadow-md ring-1 ring-[#E2C48D] text-[#6A2424] flex items-center justify-center hover:bg-gray-50">✕</button>
-                    </div>
-                    <div className="grid md:grid-cols-2">
-                      <div className="bg-[#FFF5E9] p-5 md:p-6">
-                        <div className="text-sm text-slate-700 mb-2">Workshop Details</div>
-                        <div className="rounded-xl overflow-hidden ring-1 ring-[#E2C48D] bg-white mb-4">
-                          <img src={info.image} alt="" className="w-full h-44 object-cover" />
-                          <div className="p-4">
-                            <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">{info.title}</div>
-                            <div className="text-slate-900 font-bold">{info.title}</div>
-                            <div className="mt-2 text-slate-700 text-sm">{info.date}</div>
-                            <div className="mt-2 flex items-center gap-2">
-                              {info.tags.map((t) => (
-                                <span key={t} className="text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D] px-2 py-1">{t}</span>
-                              ))}
-                            </div>
-                            <div className="mt-3 flex items-center justify-between">
-                              <div className="text-slate-900 font-bold">₹{info.price}/person</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="p-5 md:p-6">
-                        <div className="text-sm text-slate-700 mb-2">Ticket Tier: General Admission</div>
-                        <div className="space-y-3">
-                          <input
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-[#E2C48D]"
-                            placeholder="Full Name"
-                            value={reg.name}
-                            onChange={(e) => setReg((r) => ({ ...r, name: e.target.value }))}
-                          />
-                          <input
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-[#E2C48D]"
-                            placeholder="Email Address"
-                            value={reg.email}
-                            onChange={(e) => setReg((r) => ({ ...r, email: e.target.value }))}
-                          />
-                          <input
-                            className="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-[#E2C48D]"
-                            placeholder="Phone Number"
-                            value={regPhone}
-                            onChange={(e) => setRegPhone(e.target.value)}
-                          />
-                          <label className="flex items-center gap-2 mt-2 text-sm">
-                            <input type="checkbox" checked={agreeTos} onChange={(e) => setAgreeTos(e.target.checked)} />
-                            <span>I agree to Terms & Conditions</span>
-                          </label>
-                          <div className="mt-4 flex items-center gap-3">
-                            <button
-                              onClick={submitRegistration}
-                              disabled={!agreeTos || regStatus === 'loading'}
-                              className="flex-1 px-4 py-2 rounded-full bg-[#E76F51] text-white shadow-md hover:bg-[#D35400] disabled:opacity-50"
-                            >
-                              {regStatus === 'loading' ? 'Submitting...' : 'Secure My Spot'}
-                            </button>
-                            <button onClick={closeModal} className="px-4 py-2 rounded-full bg-white ring-1 ring-[#E2C48D] text-slate-900">
-                              Cancel
-                            </button>
-                          </div>
-                          {regStatus === 'error' && (
-                            <div className="mt-3 text-sm text-red-600">Please fill required fields.</div>
-                          )}
-                          {regStatus === 'success' && (
-                            <div className="mt-3 text-sm text-green-600">Registered! We will contact you soon.</div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
+            <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/30">
+              <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-lg ring-1 ring-[#E2C48D]">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Register Interest</h3>
+                  <button onClick={closeModal} className="text-slate-600 hover:text-slate-900">✕</button>
+                </div>
+                <div className="space-y-3">
+                  <input
+                    className="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-[#E2C48D]"
+                    placeholder="Your Name"
+                    value={reg.name}
+                    onChange={(e) => setReg((r) => ({ ...r, name: e.target.value }))}
+                  />
+                  <input
+                    className="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-[#E2C48D]"
+                    placeholder="Email"
+                    value={reg.email}
+                    onChange={(e) => setReg((r) => ({ ...r, email: e.target.value }))}
+                  />
+                </div>
+                <div className="mt-4 flex items-center gap-3">
+                  <button
+                    onClick={submitRegistration}
+                    className="px-4 py-2 rounded-full bg-[#E76F51] text-white shadow-md hover:bg-[#D35400]"
+                  >
+                    {regStatus === 'loading' ? 'Submitting...' : 'Submit'}
+                  </button>
+                  <button onClick={closeModal} className="px-4 py-2 rounded-full bg-white ring-1 ring-[#E2C48D] text-slate-900">
+                    Cancel
+                  </button>
+                </div>
+                {regStatus === 'error' && (
+                  <div className="mt-3 text-sm text-red-600">Please fill all fields correctly.</div>
+                )}
+                {regStatus === 'success' && (
+                  <div className="mt-3 text-sm text-green-600">Registered! We will contact you soon.</div>
+                )}
+              </div>
             </div>
           )}
         </div>

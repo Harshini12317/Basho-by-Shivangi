@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     console.error('POST /api/admin/products error:', error);
 
     // handle duplicate slug/index errors from MongoDB
-    // @ts-ignore
+    // @ts-expect-error: Handling MongoDB duplicate key error
     if (error && typeof error === 'object' && (error as any).code === 11000) {
       return NextResponse.json(
         { error: 'Product with same slug/title already exists' },
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     }
 
     // try to return a helpful message if available
-    // @ts-ignore
+    // @ts-expect-error: Extracting error message from unknown error object
     const message = error && (error as any).message ? (error as any).message : 'Failed to create product';
     return NextResponse.json(
       { error: message },

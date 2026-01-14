@@ -1,7 +1,8 @@
 "use client"
 import { useEffect, useRef, useState } from 'react'
-import './Corporate.css'
+import './corporate.css'
 import { FiBriefcase, FiPackage, FiTruck, FiGift, FiMapPin, FiMail, FiPhone, FiChevronRight } from 'react-icons/fi'
+import { colors } from '@/constants/colors'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 
@@ -69,12 +70,18 @@ export default function CorporatePage() {
 
   return (
     <div className="corp-root">
+      <style>{`
+        :root{
+          --c-2: ${colors[1].hex};
+          --text-primary: ${colors[0].hex};
+        }
+      `}</style>
       <section className="corp-hero-section">
         <div className="corp-hero-bg"></div>
         <div className="container mx-auto px-6 relative z-10 py-20 md:py-32">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="corp-title-3d">Corporate Artistry</h1>
-            <p className="corp-subtitle-premium">Handcrafted excellence for your brand's most meaningful connections. Timeless pottery for modern enterprises.</p>
+            <p className="corp-subtitle-premium">Handcrafted excellence for your brand&apos;s most meaningful connections. Timeless pottery for modern enterprises.</p>
             <div className="mt-12 flex flex-wrap justify-center gap-6">
               <button 
                 onClick={() => document.getElementById('inquiry')?.scrollIntoView({ behavior: 'smooth' })}
@@ -215,9 +222,13 @@ export default function CorporatePage() {
               {steps.map((step, i) => (
                 <div 
                   key={i} 
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={activeStep === i}
                   className={`corp-step-item ${activeStep === i ? 'active' : ''}`}
                   onMouseEnter={() => setActiveStep(i)}
                   onClick={() => setActiveStep(i)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveStep(i); } }}
                 >
                   <div className="corp-step-icon-box">{step.icon}</div>
                   <div className="corp-step-content">
@@ -251,12 +262,42 @@ export default function CorporatePage() {
         <div className="container mx-auto px-6">
           <div className="inquiry-glass-card">
             <h2 className="section-title-premium text-center mb-10">Start a Consultation</h2>
-            <form className="grid grid-cols-1 md:grid-cols-2 gap-8" onSubmit={(e) => e.preventDefault()}>
+            <form id="corp-inquiry-form" className="grid grid-cols-1 md:grid-cols-2 gap-8" onSubmit={async (e) => {
+              e.preventDefault();
+              const form = e.currentTarget as HTMLFormElement;
+              const companyName = (form.querySelector('input[placeholder="Company Name"]') as HTMLInputElement)?.value || '';
+              const email = (form.querySelector('input[placeholder="Professional Email"]') as HTMLInputElement)?.value || '';
+              const phone = (form.querySelector('input[placeholder="Phone (optional)"]') as HTMLInputElement)?.value || '';
+              const message = (form.querySelector('textarea') as HTMLTextAreaElement)?.value || '';
+
+              try {
+                const res = await fetch('/api/corporate-inquiry', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ companyName, email, phone, message })
+                });
+                const json = await res.json();
+                if (json.ok) {
+                  console.log('Inquiry response', json);
+                  alert('Inquiry sent — we will contact you soon.');
+                  form.reset();
+                } else {
+                  console.error('Inquiry error', json);
+                  alert('Failed to send inquiry: ' + (json.error || 'unknown error'));
+                }
+              } catch (err) {
+                console.error(err);
+                alert('Failed to send inquiry.');
+              }
+            }}>
               <div className="input-field-premium">
                 <input type="text" placeholder="Company Name" required />
               </div>
               <div className="input-field-premium">
                 <input type="email" placeholder="Professional Email" required />
+              </div>
+              <div className="input-field-premium">
+                <input type="tel" placeholder="Phone (optional)" />
               </div>
               <div className="input-field-premium md:col-span-2">
                 <textarea placeholder="Tell us about your event or project..." rows={5} required></textarea>

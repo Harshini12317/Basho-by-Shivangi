@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import Gallery from '@/models/Gallery';
+import cloudinary from '@/lib/cloudinary';
 
 export async function GET() {
   try {
     await connectDB();
-    const gallery = await Gallery.find({}).sort({ order: 1, createdAt: -1 });
+    const gallery = await Gallery.find({}).sort({ createdAt: -1 });
     return NextResponse.json(gallery);
   } catch (error) {
     return NextResponse.json(
@@ -70,7 +71,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const galleryItem = await Gallery.findByIdAndDelete(id);
+    const galleryItem = await Gallery.findById(id);
 
     if (!galleryItem) {
       return NextResponse.json(
@@ -78,6 +79,19 @@ export async function DELETE(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    // Delete from Cloudinary if publicId exists
+    if (galleryItem.publicId) {
+      try {
+        await cloudinary.uploader.destroy(galleryItem.publicId);
+      } catch (cloudinaryError) {
+        console.error('Failed to delete image from Cloudinary:', cloudinaryError);
+        // Don't fail the whole operation if Cloudinary deletion fails
+      }
+    }
+
+    // Delete from database
+    await Gallery.findByIdAndDelete(id);
 
     return NextResponse.json({ message: 'Gallery item deleted successfully' });
   } catch (error) {

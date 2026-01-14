@@ -18,13 +18,39 @@ const WorkshopSchema = new Schema(
       required: true,
     },
 
-    date: {
-      type: Date,
+    level: {
+      type: String,
+      enum: ['None', 'Beginner', 'Intermediate', 'Advanced'],
+      default: 'None',
+    },
+
+    location: {
+      type: String,
+      required: true,
+    },
+
+    googleMapLink: {
+      type: String,
       required: true,
     },
 
     price: {
       type: Number,
+      required: true,
+    },
+
+    whatYouWillLearn: {
+      type: String,
+      required: true,
+    },
+
+    includes: {
+      type: String,
+      required: true,
+    },
+
+    moreInfo: {
+      type: String,
       required: true,
     },
 

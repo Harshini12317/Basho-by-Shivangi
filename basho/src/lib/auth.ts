@@ -71,15 +71,24 @@ export const authOptions: NextAuthOptions = {
 
       await connectDB();
 
-      const existingUser = await User.findOne({ email: user.email }).lean();
+      const existingUser = await User.findOne({ email: user.email });
 
+      // If user doesn't exist, create. Also mark the specific owner as admin.
       if (!existingUser) {
+        const isAdmin = user.email === "harshini12317@gmail.com";
         await User.create({
           name: user.name,
           email: user.email,
           isVerified: true,
           provider: "google",
+          isAdmin,
         });
+      } else {
+        // If existing user is the owner, ensure they are admin
+        if (user.email === "harshini12317@gmail.com" && !existingUser.isAdmin) {
+          existingUser.isAdmin = true;
+          await existingUser.save();
+        }
       }
 
       return true;
