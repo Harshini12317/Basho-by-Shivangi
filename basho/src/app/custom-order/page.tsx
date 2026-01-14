@@ -19,6 +19,23 @@ export default function CustomOrderPage() {
   const [referenceFiles, setReferenceFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasShownAuthAlert, setHasShownAuthAlert] = useState(false);
+  const [customOrderPhotos, setCustomOrderPhotos] = useState<any[]>([]);
+  const [photosLoading, setPhotosLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch custom order photos
+    fetch('/api/custom-order-photos')
+      .then((r) => r.json())
+      .then((data) => {
+        setCustomOrderPhotos(data);
+      })
+      .catch((error) => {
+        console.error('Failed to fetch custom order photos:', error);
+      })
+      .finally(() => {
+        setPhotosLoading(false);
+      });
+  }, []);
 
   const handleFormFieldInteraction = () => {
     if (status === "unauthenticated") {
@@ -296,63 +313,73 @@ export default function CustomOrderPage() {
             transition={{ duration: 0.8, delay: 1.9 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
-            {/* Mock custom orders data - in real app, fetch from API */}
-            {[
-              {
-                id: 1,
-                name: "Wedding Vase",
-                description: "Custom floral vase for wedding ceremony with intricate hand-painted details and gold accents",
-                images: [
-                  "/images/product1.png",
-                  "/images/product2.png"
-                ]
-              },
-              {
-                id: 2,
-                name: "Coffee Mug Set",
-                description: "Personalized mugs for office team with custom logos and ergonomic design",
-                images: [
-                  "/images/product1.png",
-                  "/images/product2.png"
-                ]
-              },
-              {
-                id: 3,
-                name: "Dinnerware Set",
-                description: "Complete dinner set for family of 4 with modern minimalist design",
-                images: [
-                  "/images/product1.png",
-                  "/images/product2.png"
-                ]
-              }
-            ].map((order, orderIndex) => (
-              <motion.div 
-                key={order.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 2 + orderIndex * 0.1 }}
-                whileHover={{ y: -5 }}
-                className="card-soft elegant-rounded-2xl p-6 border border-[#8E5022]/20 hover:shadow-lg transition-shadow cursor-pointer"
-              >
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                  {order.images.map((image, index) => (
-                    <motion.img
-                      key={index}
-                      src={image}
-                      whileHover={{ scale: 1.05 }}
-                      onClick={() => {
-                        setSelectedOrder(order);
-                        setSelectedImageIndex(index);
-                      }}
-                      className="w-full h-32 md:h-40 object-cover elegant-rounded-lg border-2 border-white cursor-pointer"
-                      alt={`${order.name} - ${index + 1}`}
-                    />
-                  ))}
-                </div>
-                <h3 className="font-semibold text-[#442D1C] mb-2 text-lg serif">{order.name}</h3>
-                <p className="text-[#652810] text-sm">{order.description}</p>
-              </motion.div>
-            ))}
+            {photosLoading ? (
+              // Loading skeleton
+              Array.from({ length: 3 }).map((_, index) => (
+                <motion.div 
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 2 + index * 0.1 }}
+                  className="card-soft elegant-rounded-2xl p-6 border border-[#8E5022]/20"
+                >
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    {Array.from({ length: 2 }).map((_, imgIndex) => (
+                      <div key={imgIndex} className="w-full h-32 md:h-40 bg-gray-200 animate-pulse elegant-rounded-lg"></div>
+                    ))}
+                  </div>
+                  <div className="h-6 bg-gray-200 animate-pulse mb-2"></div>
+                  <div className="h-4 bg-gray-200 animate-pulse"></div>
+                </motion.div>
+              ))
+            ) : customOrderPhotos.length > 0 ? (
+              customOrderPhotos.map((photo, orderIndex) => (
+                <motion.div 
+                  key={photo._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 2 + orderIndex * 0.1 }}
+                  whileHover={{ y: -5 }}
+                  className="card-soft elegant-rounded-2xl p-6 border border-[#8E5022]/20 hover:shadow-lg transition-shadow cursor-pointer"
+                >
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    {photo.images.slice(0, 2).map((image: string, index: number) => (
+                      <div key={index} className="relative">
+                        <motion.img
+                          src={image}
+                          whileHover={{ scale: 1.05 }}
+                          onClick={() => {
+                            setSelectedOrder(photo);
+                            setSelectedImageIndex(index);
+                          }}
+                          className="w-full h-32 md:h-40 object-cover elegant-rounded-lg border-2 border-white cursor-pointer"
+                          alt={`${photo.title} - ${index + 1}`}
+                        />
+                        {index === 1 && photo.images.length > 2 && (
+                          <div 
+                            className="absolute inset-0 bg-black/60 flex items-center justify-center elegant-rounded-lg cursor-pointer"
+                            onClick={() => {
+                              setSelectedOrder(photo);
+                              setSelectedImageIndex(0);
+                            }}
+                          >
+                            <span className="text-white font-semibold text-lg">
+                              +{photo.images.length - 2} more
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <h3 className="font-semibold text-[#442D1C] mb-2 text-lg serif">{photo.title}</h3>
+                  <p className="text-[#652810] text-sm">{photo.description}</p>
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-[#652810] text-lg">No custom order photos available yet.</p>
+              </div>
+            )}
           </motion.div>
         </div>
 
@@ -375,7 +402,7 @@ export default function CustomOrderPage() {
               <div className="relative">
                 <img
                   src={selectedOrder.images[selectedImageIndex]}
-                  alt={selectedOrder.name}
+                  alt={selectedOrder.title}
                   className="w-full h-auto max-h-[60vh] object-contain"
                 />
                 
