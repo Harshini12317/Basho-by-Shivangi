@@ -1,539 +1,528 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 
 interface Workshop {
-  id: string;
-  slug: string;
+  _id: string;
   title: string;
+  slug: string;
   description: string;
-  level: 'Beginner' | 'Intermediate' | 'Advanced' | 'None';
-  locationName: string;
-  locationLink: string;
+  level: 'None' | 'Beginner' | 'Intermediate' | 'Advanced';
+  location: string;
+  googleMapLink: string;
   price: number;
-  learn: string[];
-  includes: string[];
-  prerequisites: string;
-  instructor: string;
-  bring: string[];
+  whatYouWillLearn: string;
+  includes: string;
+  moreInfo: string;
   image: string;
-  duration: string;
-  timings: string;
-  mode: string;
+  images: string[];
   seats: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function WorkshopManagement() {
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingWorkshop, setEditingWorkshop] = useState<Workshop | null>(null);
-  const [formData, setFormData] = useState<Partial<Workshop>>({
+  const [loading, setLoading] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  // Form state
+  const [formData, setFormData] = useState({
     title: '',
     description: '',
-    level: 'Beginner',
-    locationName: '',
-    locationLink: '',
+    level: 'None' as 'None' | 'Beginner' | 'Intermediate' | 'Advanced',
+    location: '',
+    googleMapLink: '',
     price: 0,
-    learn: [''],
-    includes: [''],
-    prerequisites: '',
-    instructor: '',
-    bring: [''],
-    image: '',
-    duration: '1 Day',
-    timings: '10:00 AM - 1:00 PM',
-    mode: 'Offline — in-studio session',
-    seats: 20,
+    whatYouWillLearn: '',
+    includes: '',
+    moreInfo: '',
+    images: [] as File[],
+    imageUrls: [] as string[],
   });
+  const [uploading, setUploading] = useState(false);
 
-  // Load workshops from localStorage or use dummy data
   useEffect(() => {
-    const savedWorkshops = localStorage.getItem('admin-workshops');
-    if (savedWorkshops) {
-      setWorkshops(JSON.parse(savedWorkshops));
-    } else {
-      // Dummy data
-      const dummyWorkshops: Workshop[] = [
-        {
-          id: '1',
-          slug: 'cobalt-botanical',
-          title: 'Cobalt Botanical',
-          description: 'Master the art of traditional blue and white pottery with brushwork and layering.',
-          level: 'Advanced',
-          locationName: 'Basho Pottery Studio, New Delhi',
-          locationLink: 'https://maps.google.com/?q=Basho+Pottery+Studio+New+Delhi',
-          price: 95,
-          learn: [
-            'Cobalt oxide brush painting basics',
-            'Layering glazes for depth',
-            'Kiln safety and firing schedules'
-          ],
-          includes: [
-            'All materials & tools provided',
-            'Firing and glazing included',
-            'Take home one finished piece'
-          ],
-          prerequisites: 'Basic pottery knowledge recommended',
-          instructor: 'Shivangi (Lead Instructor)',
-          bring: ['Comfortable clothing', 'Water bottle'],
-          image: '/images/img4.png',
-          duration: '1 Day',
-          timings: '10:00 AM - 1:00 PM',
-          mode: 'Offline — in-studio session',
-          seats: 20,
-        },
-        {
-          id: '2',
-          slug: 'rose-garden',
-          title: 'Crimson Flora',
-          description: 'Decorate fine ceramic mugs with delicate floral motifs and soft gradients.',
-          level: 'Advanced',
-          locationName: 'Basho Pottery Studio, New Delhi',
-          locationLink: 'https://maps.google.com/?q=Basho+Pottery+Studio+New+Delhi',
-          price: 65,
-          learn: [
-            'Underglaze illustration techniques',
-            'Gradient shading and transfers',
-            'Finishing and sealing'
-          ],
-          includes: [
-            'Studio tools & materials',
-            'One mug per participant',
-            'Snacks & beverages'
-          ],
-          prerequisites: 'Basic pottery knowledge recommended',
-          instructor: 'Shivangi (Lead Instructor)',
-          bring: ['Comfortable clothing', 'Water bottle'],
-          image: '/images/img13.png',
-          duration: '1 Day',
-          timings: '10:00 AM - 1:00 PM',
-          mode: 'Offline — in-studio session',
-          seats: 20,
-        },
-      ];
-      setWorkshops(dummyWorkshops);
-      localStorage.setItem('admin-workshops', JSON.stringify(dummyWorkshops));
-    }
+    fetchWorkshops();
   }, []);
 
-  // Save workshops to localStorage whenever they change
-  useEffect(() => {
-    if (workshops.length > 0) {
-      localStorage.setItem('admin-workshops', JSON.stringify(workshops));
+  const fetchWorkshops = async () => {
+    try {
+      const response = await fetch('/api/admin/workshops');
+      const data = await response.json();
+      setWorkshops(data);
+    } catch (error) {
+      console.error('Failed to fetch workshops:', error);
+    } finally {
+      setLoading(false);
     }
-  }, [workshops]);
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      const fileArray = Array.from(files);
+      setFormData(prev => ({
+        ...prev,
+        images: fileArray,
+        imageUrls: fileArray.map(file => URL.createObjectURL(file))
+      }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (editingWorkshop) {
-      // Update existing workshop
-      setWorkshops(prev => prev.map(w =>
-        w.id === editingWorkshop.id
-          ? { ...formData, id: w.id, slug: generateSlug(formData.title || '') } as Workshop
-          : w
-      ));
-    } else {
-      // Add new workshop
-      const newWorkshop: Workshop = {
-        ...formData,
-        id: Date.now().toString(), // eslint-disable-line react-hooks/purity
-        slug: generateSlug(formData.title || ''),
-      } as Workshop;
-      setWorkshops(prev => [...prev, newWorkshop]);
+    if (!formData.title.trim() || !formData.description.trim() || !formData.location.trim() ||
+        !formData.googleMapLink.trim() || !formData.whatYouWillLearn.trim() ||
+        !formData.includes.trim() || !formData.moreInfo.trim() || formData.images.length === 0) {
+      alert('Please fill all fields and upload at least one image');
+      return;
     }
 
-    setIsModalOpen(false);
-    setEditingWorkshop(null);
-    resetForm();
-  };
+    setUploading(true);
+    try {
+      // Convert images to base64 for upload
+      const imagePromises = formData.images.map(file => {
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      });
 
-  const generateSlug = (title: string) => {
-    return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-  };
+      const imageDataUrls = await Promise.all(imagePromises);
 
-  const resetForm = () => {
-    setFormData({
-      title: '',
-      description: '',
-      level: 'Beginner',
-      locationName: '',
-      locationLink: '',
-      price: 0,
-      learn: [''],
-      includes: [''],
-      prerequisites: '',
-      instructor: '',
-      bring: [''],
-      image: '',
-      duration: '1 Day',
-      timings: '10:00 AM - 1:00 PM',
-      mode: 'Offline — in-studio session',
-      seats: 20,
-    });
+      const payload = {
+        title: formData.title,
+        description: formData.description,
+        level: formData.level,
+        location: formData.location,
+        googleMapLink: formData.googleMapLink,
+        price: formData.price,
+        whatYouWillLearn: formData.whatYouWillLearn,
+        includes: formData.includes,
+        moreInfo: formData.moreInfo,
+        images: imageDataUrls,
+      };
+
+      const response = await fetch('/api/admin/workshops', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        setFormData({
+          title: '',
+          description: '',
+          level: 'None',
+          location: '',
+          googleMapLink: '',
+          price: 0,
+          whatYouWillLearn: '',
+          includes: '',
+          moreInfo: '',
+          images: [],
+          imageUrls: []
+        });
+        setShowAddForm(false);
+        fetchWorkshops();
+      } else {
+        alert('Failed to add workshop');
+      }
+    } catch (error) {
+      console.error('Error uploading:', error);
+      alert('Error uploading workshop');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleEdit = (workshop: Workshop) => {
-    setEditingWorkshop(workshop);
-    setFormData(workshop);
-    setIsModalOpen(true);
+    setFormData({
+      title: workshop.title,
+      description: workshop.description,
+      level: workshop.level,
+      location: workshop.location,
+      googleMapLink: workshop.googleMapLink,
+      price: workshop.price,
+      whatYouWillLearn: workshop.whatYouWillLearn,
+      includes: workshop.includes,
+      moreInfo: workshop.moreInfo,
+      images: [],
+      imageUrls: workshop.images,
+    });
+    setSelectedWorkshop(workshop);
+    setShowAddForm(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this workshop?')) {
-      setWorkshops(prev => prev.filter(w => w.id !== id));
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedWorkshop) return;
+
+    setUploading(true);
+    try {
+      let imageDataUrls: string[] = [];
+      if (formData.images.length > 0) {
+        // Convert new images to base64
+        const imagePromises = formData.images.map(file => {
+          return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+        });
+        imageDataUrls = await Promise.all(imagePromises);
+      }
+
+      const payload = {
+        id: selectedWorkshop._id,
+        title: formData.title,
+        description: formData.description,
+        level: formData.level,
+        location: formData.location,
+        googleMapLink: formData.googleMapLink,
+        price: formData.price,
+        whatYouWillLearn: formData.whatYouWillLearn,
+        includes: formData.includes,
+        moreInfo: formData.moreInfo,
+        ...(imageDataUrls.length > 0 && { images: imageDataUrls }),
+      };
+
+      const response = await fetch('/api/admin/workshops', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        setFormData({
+          title: '',
+          description: '',
+          level: 'None',
+          location: '',
+          googleMapLink: '',
+          price: 0,
+          whatYouWillLearn: '',
+          includes: '',
+          moreInfo: '',
+          images: [],
+          imageUrls: []
+        });
+        setShowAddForm(false);
+        setSelectedWorkshop(null);
+        fetchWorkshops();
+      } else {
+        alert('Failed to update workshop');
+      }
+    } catch (error) {
+      console.error('Error updating:', error);
+      alert('Error updating workshop');
+    } finally {
+      setUploading(false);
     }
   };
 
-  const handleAdd = () => {
-    setEditingWorkshop(null);
-    resetForm();
-    setIsModalOpen(true);
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this workshop?')) return;
+
+    try {
+      const response = await fetch(`/api/admin/workshops?id=${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        fetchWorkshops();
+      } else {
+        alert('Failed to delete workshop');
+      }
+    } catch (error) {
+      console.error('Error deleting:', error);
+      alert('Error deleting workshop');
+    }
   };
 
-  const updateArrayField = (field: 'learn' | 'includes' | 'bring', index: number, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: prev[field]?.map((item, i) => i === index ? value : item) || []
-    }));
-  };
-
-  const addArrayItem = (field: 'learn' | 'includes' | 'bring') => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: [...(prev[field] || []), '']
-    }));
-  };
-
-  const removeArrayItem = (field: 'learn' | 'includes' | 'bring', index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: prev[field]?.filter((_, i) => i !== index) || []
-    }));
-  };
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8E5022]"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="px-4 py-6 sm:px-0">
-      <div className="mb-8 flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Workshop Management</h1>
-          <p className="mt-2 text-slate-600">Add, edit, and delete workshops</p>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Workshop Management</h1>
+          <button
+            onClick={() => {
+              setSelectedWorkshop(null);
+              setFormData({
+                title: '',
+                description: '',
+                level: 'None',
+                location: '',
+                googleMapLink: '',
+                price: 0,
+                whatYouWillLearn: '',
+                includes: '',
+                moreInfo: '',
+                images: [],
+                imageUrls: []
+              });
+              setShowAddForm(true);
+            }}
+            className="bg-[#8E5022] text-white px-4 py-2 rounded-lg hover:bg-[#7a4520] transition-colors"
+          >
+            Add Workshop
+          </button>
         </div>
-        <button
-          onClick={handleAdd}
-          className="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition-colors flex items-center gap-2"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          Add Workshop
-        </button>
-      </div>
 
-      {/* Workshops Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-200">
-          <h2 className="text-lg font-semibold text-slate-900">Workshops ({workshops.length})</h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-slate-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Title</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Level</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Price</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Seats</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-slate-200">
-              {workshops.map((workshop) => (
-                <tr key={workshop.id} className="hover:bg-slate-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-slate-900">{workshop.title}</div>
-                    <div className="text-sm text-slate-500">{workshop.slug}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      workshop.level === 'Beginner' ? 'bg-green-100 text-green-800' :
-                      workshop.level === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' :
-                      workshop.level === 'Advanced' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {workshop.level}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                    ₹{workshop.price}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                    {workshop.seats}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+        {/* Workshops Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {workshops.length > 0 ? (
+            workshops.map((workshop) => (
+              <div key={workshop._id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="relative">
+                  <img
+                    src={workshop.images?.[0] || workshop.image || '/images/img12.png'}
+                    alt={workshop.title}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="absolute top-2 right-2 bg-[#8E5022] text-white px-2 py-1 rounded text-sm">
+                    {workshop.level}
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{workshop.title}</h3>
+                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">{workshop.description}</p>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[#8E5022] font-bold">₹{workshop.price}</span>
+                    <span className="text-gray-500 text-sm">{workshop.seats} seats</span>
+                  </div>
+                  <div className="flex space-x-2">
                     <button
                       onClick={() => handleEdit(workshop)}
-                      className="text-cyan-600 hover:text-cyan-900 mr-4"
+                      className="flex-1 bg-blue-500 text-white px-3 py-2 rounded text-sm hover:bg-blue-600 transition-colors"
                     >
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(workshop.id)}
-                      className="text-red-600 hover:text-red-900"
+                      onClick={() => handleDelete(workshop._id)}
+                      className="flex-1 bg-red-500 text-white px-3 py-2 rounded text-sm hover:bg-red-600 transition-colors"
                     >
                       Delete
                     </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-slate-900">
-                {editingWorkshop ? 'Edit Workshop' : 'Add Workshop'}
-              </h2>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <div className="max-w-md mx-auto">
+                <div className="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No workshops yet</h3>
+                <p className="text-gray-500 mb-6">Get started by creating your first workshop. Click the "Add Workshop" button above to begin.</p>
+                <button
+                  onClick={() => {
+                    setSelectedWorkshop(null);
+                    setFormData({
+                      title: '',
+                      description: '',
+                      level: 'None',
+                      location: '',
+                      googleMapLink: '',
+                      price: 0,
+                      whatYouWillLearn: '',
+                      includes: '',
+                      moreInfo: '',
+                      images: [],
+                      imageUrls: []
+                    });
+                    setShowAddForm(true);
+                  }}
+                  className="bg-[#8E5022] text-white px-6 py-3 rounded-lg hover:bg-[#7a4520] transition-colors inline-flex items-center"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Add Your First Workshop
+                </button>
+              </div>
             </div>
-
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Title</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.title || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Level</label>
-                  <select
-                    value={formData.level || 'Beginner'}
-                    onChange={(e) => setFormData(prev => ({ ...prev, level: e.target.value }))}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  >
-                    <option value="None">None</option>
-                    <option value="Beginner">Beginner</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Advanced">Advanced</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Location Name</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.locationName || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, locationName: e.target.value }))}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Location Link</label>
-                  <input
-                    type="url"
-                    required
-                    value={formData.locationLink || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, locationLink: e.target.value }))}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Price per Person (₹)</label>
-                  <input
-                    type="number"
-                    required
-                    min="0"
-                    value={formData.price || 0}
-                    onChange={(e) => setFormData(prev => ({ ...prev, price: parseInt(e.target.value) || 0 }))}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Seats</label>
-                  <input
-                    type="number"
-                    required
-                    min="1"
-                    value={formData.seats || 20}
-                    onChange={(e) => setFormData(prev => ({ ...prev, seats: parseInt(e.target.value) || 20 }))}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Instructor</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.instructor || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, instructor: e.target.value }))}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Image URL</label>
-                  <input
-                    type="url"
-                    required
-                    value={formData.image || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Description</label>
-                <textarea
-                  required
-                  rows={3}
-                  value={formData.description || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Prerequisites</label>
-                <input
-                  type="text"
-                  value={formData.prerequisites || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, prerequisites: e.target.value }))}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                />
-              </div>
-
-              {/* What you will learn */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">What you will learn</label>
-                {(formData.learn || []).map((item, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={item}
-                      onChange={(e) => updateArrayField('learn', index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                      placeholder="Enter learning objective"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem('learn', index)}
-                      className="px-3 py-2 text-red-600 hover:text-red-800"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => addArrayItem('learn')}
-                  className="px-4 py-2 text-cyan-600 hover:text-cyan-800 border border-cyan-600 rounded-md hover:bg-cyan-50"
-                >
-                  Add Learning Objective
-                </button>
-              </div>
-
-              {/* Includes */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Includes</label>
-                {(formData.includes || []).map((item, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={item}
-                      onChange={(e) => updateArrayField('includes', index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                      placeholder="What is included"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem('includes', index)}
-                      className="px-3 py-2 text-red-600 hover:text-red-800"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => addArrayItem('includes')}
-                  className="px-4 py-2 text-cyan-600 hover:text-cyan-800 border border-cyan-600 rounded-md hover:bg-cyan-50"
-                >
-                  Add Include Item
-                </button>
-              </div>
-
-              {/* What to bring */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">What to bring</label>
-                {(formData.bring || []).map((item, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={item}
-                      onChange={(e) => updateArrayField('bring', index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                      placeholder="What participants should bring"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem('bring', index)}
-                      className="px-3 py-2 text-red-600 hover:text-red-800"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => addArrayItem('bring')}
-                  className="px-4 py-2 text-cyan-600 hover:text-cyan-800 border border-cyan-600 rounded-md hover:bg-cyan-50"
-                >
-                  Add Item to Bring
-                </button>
-              </div>
-
-              <div className="flex justify-end gap-4 pt-6 border-t border-slate-200">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-slate-700 bg-slate-100 rounded-md hover:bg-slate-200 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition-colors"
-                >
-                  {editingWorkshop ? 'Update Workshop' : 'Add Workshop'}
-                </button>
-              </div>
-            </form>
-          </div>
+          )}
         </div>
-      )}
+
+        {/* Add/Edit Form Modal */}
+        {showAddForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  {selectedWorkshop ? 'Edit Workshop' : 'Add New Workshop'}
+                </h2>
+
+                <form onSubmit={selectedWorkshop ? handleUpdate : handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                    <input
+                      type="text"
+                      value={formData.title}
+                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8E5022]"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea
+                      value={formData.description}
+                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8E5022]"
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Level</label>
+                      <select
+                        value={formData.level}
+                        onChange={(e) => setFormData(prev => ({ ...prev, level: e.target.value as any }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8E5022]"
+                      >
+                        <option value="None">None</option>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+                      <input
+                        type="number"
+                        value={formData.price}
+                        onChange={(e) => setFormData(prev => ({ ...prev, price: parseInt(e.target.value) || 0 }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8E5022]"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <input
+                      type="text"
+                      value={formData.location}
+                      onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8E5022]"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Google Map Link</label>
+                    <input
+                      type="url"
+                      value={formData.googleMapLink}
+                      onChange={(e) => setFormData(prev => ({ ...prev, googleMapLink: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8E5022]"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">What You Will Learn</label>
+                    <textarea
+                      value={formData.whatYouWillLearn}
+                      onChange={(e) => setFormData(prev => ({ ...prev, whatYouWillLearn: e.target.value }))}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8E5022]"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Includes</label>
+                    <textarea
+                      value={formData.includes}
+                      onChange={(e) => setFormData(prev => ({ ...prev, includes: e.target.value }))}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8E5022]"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">More Info</label>
+                    <textarea
+                      value={formData.moreInfo}
+                      onChange={(e) => setFormData(prev => ({ ...prev, moreInfo: e.target.value }))}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8E5022]"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Images</label>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8E5022]"
+                      required={!selectedWorkshop}
+                    />
+                    {formData.imageUrls.length > 0 && (
+                      <div className="mt-2 grid grid-cols-3 gap-2">
+                        {formData.imageUrls.map((url, index) => (
+                          <img key={index} src={url} alt={`Preview ${index + 1}`} className="w-full h-20 object-cover rounded" />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex space-x-4 pt-4">
+                    <button
+                      type="submit"
+                      disabled={uploading}
+                      className="flex-1 bg-[#8E5022] text-white px-4 py-2 rounded-lg hover:bg-[#7a4520] transition-colors disabled:opacity-50"
+                    >
+                      {uploading ? 'Saving...' : (selectedWorkshop ? 'Update Workshop' : 'Add Workshop')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowAddForm(false);
+                        setSelectedWorkshop(null);
+                      }}
+                      className="flex-1 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

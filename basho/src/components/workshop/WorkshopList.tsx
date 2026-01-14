@@ -1,35 +1,25 @@
 "use client";
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaLeaf, FaHandSparkles, FaStar, FaChair, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-interface StaticWorkshop {
+interface Workshop {
+  _id: string;
   slug: string;
-  img: string; // can be filename under /images or full/absolute URL
   title: string;
-  date: string;
-  level: string;
-  price: number;
   description: string;
-  spotsLeft?: number;
+  level: 'Beginner' | 'Intermediate' | 'Advanced';
+  price: number;
+  images: string[];
+  location: string;
+  googleMapLink?: string;
+  whatYouWillLearn: string[];
+  includes: string[];
+  moreInfo?: string;
+  seats: number;
+  createdAt: string;
+  updatedAt: string;
 }
-
-// Fallback static workshops (exactly 6) to match the reference layout
-const staticWorkshops: StaticWorkshop[] = [
-  { slug: 'cobalt-botanical', img: 'img12.png', title: 'Cobalt Botanical', date: 'Jan 25, 2026', level: 'Advanced', price: 95, description: 'Master the art of traditional blue and white pottery.' },
-  { slug: 'rose-garden', img: 'img13.png', title: 'Garden Sculpting', date: 'Jan 29, 2026', level: 'Advanced', price: 65, description: 'Decorate fine ceramic mugs with delicate floral motifs.' },
-  { slug: 'tropical-teal', img: 'img31.png', title: 'Tropical Teal', date: 'Feb 1, 2026', level: 'Advanced', price: 65, description: 'Create stunning platters with vibrant teal glazes.' },
-  { slug: 'sage-minimalist', img: 'img18.png', title: 'Sage Minimalist', date: 'Feb 5, 2026', level: 'Beginner', price: 65, description: 'Focus on the beauty of simplicity and smooth finishes.', spotsLeft: 3 },
-  { slug: 'wildflower-tea', img: 'img9.png', title: 'Wildflower Amber', date: 'Feb 12, 2026', level: 'Intermediate', price: 65, description: 'Design matching tea sets with whimsical patterns.' },
-  { slug: 'matcha-ceremony', img: 'img33.png', title: 'Matcha Ceremony', date: 'Feb 18, 2026', level: 'Advanced', price: 65, description: 'Craft and decorate your own authentic Matcha bowl.' },
-  { slug: 'pastel-parchment', img: 'sculp1.png', title: 'Pastel & Parchment', date: 'Mar 5, 2026', level: 'Intermediate', price: 85, description: 'Step into the world of traditional Indian pottery to explore the relationship between form and nature.' },
-  { slug: 'earthen-legacy', img: 'p3.jpg', title: 'The Earthen Legacy', date: 'Mar 12, 2026', level: 'Beginner', price: 75, description: 'Uncover the tactile joy of hand-molding raw clay into contemporary functional art.' },
-  { slug: 'rustic-light', img: 'p4.jpg', title: 'The Rustic Light', date: 'Mar 15, 2026', level: 'Beginner', price: 70, description: 'Combine the art of pottery with the warmth of candle making in a session focused on texture and light.' },
-  { slug: 'artisan-tableware', img: 'p1.png', title: 'The Artisan Tableware', date: 'Mar 20, 2026', level: 'Advanced', price: 90, description: 'Transform raw clay into sophisticated, deep-form serving ware designed for artistic dining.' },
-  { slug: 'botanical-garden', img: 'img2.png', title: 'Botanical Garden', date: 'Mar 22, 2026', level: 'Intermediate', price: 80, description: 'Elevate your home decor with this stunning decorative tray featuring a lush, whimsical botanical scene.' },
-  { slug: 'heritage-in-hand', img: 'img10.png', title: 'Heritage in Hand', date: 'Mar 28, 2026', level: 'Advanced', price: 95, description: 'Dive into the intersection of two ancient crafts: embossed ceramic textures paired with custom-fitted wooden elements.' },
-  { slug: 'blue-pottery', img: 'img4.png', title: 'Blue Pottery', date: 'Apr 5, 2026', level: 'Advanced', price: 90, description: 'Classic Cobalt Blue Chinoiserie and Indigo pottery with hand-painted botanical motifs on a white ceramic base.' },
-];
 
 const studentImages = ['img13.png', 'img34.png', 'img12.png', 'img31.png', 'img25.png', 'img32.png', 'img5.png', 'img15.png', 'img33.png', 'img27.png', 'img3.png', 'img2.png'];
 
@@ -62,51 +52,48 @@ type PopupItem = {
   endAt?: string;
 };
 
-export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }) {
-  // Map incoming DB workshops (if any) to our display shape; otherwise use static content.
-  const mapped: StaticWorkshop[] = Array.isArray(workshops) && workshops.length > 0
-    ? workshops.map((w) => {
-        const dateStr = w.date
-          ? typeof w.date === 'string'
-            ? w.date
-            : new Date(w.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-          : 'TBD';
-        const img = w.image || 'img12.png';
-        return {
-          slug: w.slug || 'workshop',
-          img,
-          title: w.title || 'Workshop',
-          date: dateStr,
-          level: w.level || 'Beginner',
-          price: typeof w.price === 'number' ? w.price : 65,
-          description: w.description || 'Join us for an immersive pottery experience.',
-        };
-      })
-    : staticWorkshops;
+export default function WorkshopList({ workshops: initialWorkshops }: { workshops?: DBWorkshop[] }) {
+  const [workshops, setWorkshops] = useState<Workshop[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Normalize titles by slug so listing shows updated names regardless of data source
-  const nameBySlug: Record<string, string> = {
-    'rose-garden': 'Garden Sculpting',
-    'tropical-teal': 'Tropical Teal',
-    'wildflower-tea': 'Wildflower Amber',
-  };
-  const displayList = mapped.map((ws) => ({ ...ws, title: nameBySlug[ws.slug] || ws.title }));
+  useEffect(() => {
+    const fetchWorkshops = async () => {
+      try {
+        const response = await fetch('/api/workshop');
+        if (response.ok) {
+          const data = await response.json();
+          setWorkshops(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch workshops:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorkshops();
+  }, []);
+
+  // Use fetched workshops if available, otherwise use initial props or empty array
+  const workshopData = workshops.length > 0 ? workshops : (initialWorkshops || []);
+
+  // Map workshops to display format
+  const displayList = workshopData.map((w) => ({
+    slug: w.slug,
+    img: w.images?.[0] || '/images/img12.png',
+    title: w.title,
+    date: 'Select Date', // Since users choose their own date
+    level: w.level,
+    price: w.price,
+    description: w.description,
+    spotsLeft: w.seats // Could calculate based on registrations if needed
+  }));
 
   const filenameOf = (src: string) => {
     const s = src || '';
     const base = s.split('/').pop() || s;
     return base;
   };
-
-  const orderImages = ['sculp1.png', 'img12.png', 'p3.jpg', 'p4.jpg', 'img2.png', 'img10.png', 'img33.png', 'p4.jpg', 'img31.png'];
-  const orderedFirst: StaticWorkshop[] = [];
-  for (const imgName of orderImages) {
-    const found = displayList.find((ws) => filenameOf(ws.img) === imgName);
-    if (found) orderedFirst.push(found);
-  }
-  const usedSlugs = new Set(orderedFirst.map((w) => w.slug));
-  const rest = displayList.filter((ws) => !usedSlugs.has(ws.slug));
-  const finalList = [...orderedFirst, ...rest];
 
   const resolveImgSrc = (src: string) => {
     if (!src) return '/images/img12.png';
@@ -263,34 +250,54 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
         
         {/* Workshop Grid */}
         <div id="workshops" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24 scroll-mt-24">
-          {finalList.map((ws, idx) => (
-            <Link key={`${ws.slug}-${idx}`} href={`/workshop/${ws.slug}`} className="group cursor-pointer">
-              <div className="bg-[#F9F9F9] rounded-2xl overflow-hidden shadow-sm transition-all hover:shadow-lg">
-                <div className="relative aspect-square">
-                  <img src={resolveImgSrc(ws.img)} alt={ws.title} className="w-full h-full object-cover" />
-                  {/* Removed the level badge completely */}
-                  {typeof ws.spotsLeft === 'number' && (
-                    <div
-                      className={`absolute bottom-3 left-3 bg-[#E74C3C] text-white text-[10px] px-2 py-1 rounded-full ${ws.spotsLeft <= 3 ? 'animate-pulse ring-2 ring-white shadow-md' : ''}`}
-                    >
-                      Only {ws.spotsLeft} spots left
-                    </div>
-                  )}
-                </div>
+          {loading ? (
+            // Loading skeleton
+            Array.from({ length: 6 }).map((_, idx) => (
+              <div key={idx} className="bg-[#F9F9F9] rounded-2xl overflow-hidden shadow-sm animate-pulse">
+                <div className="aspect-square bg-gray-200"></div>
                 <div className="p-5">
-                  <h3 className="text-lg font-bold text-slate-900 mb-1">{ws.title}</h3>
-                  <p className="text-slate-400 text-xs mb-3 line-clamp-1">{ws.description}</p>
-                  <div className="flex items-center gap-2 text-slate-500 text-xs mb-4">
-                    <span>🗓 {ws.date}</span>
-                  </div>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-lg font-bold">₹{ws.price}</span>
-                    <span className="text-slate-400 text-[10px]">per person</span>
-                  </div>
+                  <div className="h-5 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded mb-3"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/3"></div>
                 </div>
               </div>
-            </Link>
-          ))}
+            ))
+          ) : displayList.length > 0 ? (
+            displayList.map((ws, idx) => (
+              <Link key={`${ws.slug}-${idx}`} href={`/workshop/${ws.slug}`} className="group cursor-pointer">
+                <div className="bg-[#F9F9F9] rounded-2xl overflow-hidden shadow-sm transition-all hover:shadow-lg">
+                  <div className="relative aspect-square">
+                    <img src={resolveImgSrc(ws.img)} alt={ws.title} className="w-full h-full object-cover" />
+                    {/* Removed the level badge completely */}
+                    {typeof ws.spotsLeft === 'number' && (
+                      <div
+                        className={`absolute bottom-3 left-3 bg-[#E74C3C] text-white text-[10px] px-2 py-1 rounded-full ${ws.spotsLeft <= 3 ? 'animate-pulse ring-2 ring-white shadow-md' : ''}`}
+                      >
+                        Only {ws.spotsLeft} spots left
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">{ws.title}</h3>
+                    <p className="text-slate-400 text-xs mb-3 line-clamp-1">{ws.description}</p>
+                    <div className="flex items-center gap-2 text-slate-500 text-xs mb-4">
+                      <span>🗓 {ws.date}</span>
+                    </div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-lg font-bold">₹{ws.price}</span>
+                      <span className="text-slate-400 text-[10px]">per person</span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <p className="text-slate-500 text-lg">No workshops available at the moment.</p>
+              <p className="text-slate-400 text-sm mt-2">Check back soon for new pottery workshops!</p>
+            </div>
+          )}
         </div>
 
         <div className="rounded-3xl overflow-hidden mb-16">

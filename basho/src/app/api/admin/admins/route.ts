@@ -37,16 +37,21 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  // Add admin by email (protected)
-  const auth = await requireAdminSession();
-  if (!auth.ok) return NextResponse.json({ message: 'Forbidden' }, { status: auth.status });
+  // Allow creating first admin without authentication
+  await connectDB();
+  const existingAdmins = await User.countDocuments({ isAdmin: true });
+
+  if (existingAdmins > 0) {
+    // If admins exist, require admin authentication
+    const auth = await requireAdminSession();
+    if (!auth.ok) return NextResponse.json({ message: 'Forbidden' }, { status: auth.status });
+  }
 
   try {
     const body = await request.json();
     const { email } = body;
     if (!email) return NextResponse.json({ message: 'Email required' }, { status: 400 });
 
-    await connectDB();
     let user = await User.findOne({ email: email.toLowerCase().trim() });
     if (!user) {
       // create a placeholder user with random password
