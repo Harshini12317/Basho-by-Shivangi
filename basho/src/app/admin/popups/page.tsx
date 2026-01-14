@@ -9,7 +9,10 @@ type Popup = {
   pages: string[];
   targetSlug?: string;
   image?: string;
+  images?: string[];
   title?: string;
+  subtitle?: string;
+  tags?: string[];
   description?: string;
   ctaText?: string;
   ctaLink?: string;
@@ -20,7 +23,7 @@ type Popup = {
   endAt?: string;
 };
 
-const pageOptions = ['homepage', 'workshops', 'events'];
+const pageOptions = ['homepage', 'workshops'];
 
 export default function AdminPopupsPage() {
   const [items, setItems] = useState<Popup[]>([]);
@@ -30,7 +33,10 @@ export default function AdminPopupsPage() {
     pages: [],
     targetSlug: '',
     image: '',
+    images: [],
     title: '',
+    subtitle: '',
+    tags: [],
     description: '',
     ctaText: '',
     ctaLink: '',
@@ -42,6 +48,13 @@ export default function AdminPopupsPage() {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingMore, setUploadingMore] = useState(false);
+  const [previewIdx, setPreviewIdx] = useState(0);
+  const [zoomOpen, setZoomOpen] = useState(false);
+  const [zoomSrc, setZoomSrc] = useState<string | null>(null);
+  useEffect(() => {
+    setPreviewIdx(0);
+  }, [form.image, form.images]);
 
   useEffect(() => {
     fetchPopups();
@@ -81,6 +94,46 @@ export default function AdminPopupsPage() {
     }
   };
 
+  const handleUploadAdditional = async (files: FileList) => {
+    if (!files || files.length === 0) return;
+    setUploadingMore(true);
+    const urls: string[] = [];
+    try {
+      for (const file of Array.from(files)) {
+        const fd = new FormData();
+        fd.append('file', file);
+        const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (res.ok && data?.url) {
+          urls.push(data.url);
+        }
+      }
+      if (urls.length) {
+        setForm((f) => ({ ...f, images: [...(f.images || []), ...urls] }));
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+    } finally {
+      setUploadingMore(false);
+    }
+  };
+
+  const removeAdditionalImage = (idx: number) => {
+    setForm((f) => {
+      const arr = [...(f.images || [])];
+      arr.splice(idx, 1);
+      return { ...f, images: arr };
+    });
+  };
+  const useAdditionalAsMain = (idx: number) => {
+    setForm((f) => {
+      const arr = [...(f.images || [])];
+      const chosen = arr[idx];
+      arr.splice(idx, 1);
+      return { ...f, image: chosen, images: arr };
+    });
+  };
+
   const savePopup = async () => {
     if (!form.name || form.pages.length === 0) return;
     setIsSaving(true);
@@ -105,7 +158,10 @@ export default function AdminPopupsPage() {
           pages: [],
           targetSlug: '',
           image: '',
+          images: [],
           title: '',
+          subtitle: '',
+          tags: [],
           description: '',
           ctaText: '',
           ctaLink: '',
@@ -148,6 +204,21 @@ export default function AdminPopupsPage() {
     } catch (error) {
       console.error('Error deleting popup:', error);
     }
+  };
+  const resetSeen = (p: Popup) => {
+    try {
+      const keyById = p._id ? `popup_${p._id}_seen` : null;
+      const keyByName = p.name ? `popup_${p.name}_seen` : null;
+      if (keyById) {
+        sessionStorage.removeItem(keyById);
+        localStorage.removeItem(keyById);
+      }
+      if (keyByName) {
+        sessionStorage.removeItem(keyByName);
+        localStorage.removeItem(keyByName);
+      }
+      alert('Popup view history reset. Reload the site page to see it again.');
+    } catch {}
   };
 
   return (
@@ -207,13 +278,78 @@ export default function AdminPopupsPage() {
             
             {/* Image Upload Builder Card */}
             <div className="border rounded-2xl p-4 space-y-4 bg-gradient-to-br from-gray-50 to-white">
-              <div className="aspect-video rounded-xl bg-gray-100 flex items-center justify-center border">
-                {form.image ? (
-                  <img src={form.image} alt="preview" className="w-full h-full object-cover rounded-lg" />
+              {(() => {
+                const imgs = Array.from(new Set([
+                  ...(form.image ? [form.image] : []),
+                  ...((form.images && form.images.length > 0) ? form.images : [])
+                ]));
+                return imgs.length ? (
+                  <div className="relative">
+                    <div className="aspect-video rounded-xl bg-white overflow-hidden border shadow-sm flex items-center justify-center">
+                      <img
+                        src={imgs[previewIdx]}
+                        alt="preview"
+                        className="max-h-full max-w-full object-contain"
+                        onClick={() => { setZoomSrc(imgs[previewIdx]); setZoomOpen(true); }}
+                        style={{ cursor: 'zoom-in' }}
+                      />
+                    </div>
+                    {imgs.length > 1 && (
+                      <>
+                        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex items-center justify-between px-2">
+                          <button
+                            type="button"
+                            onClick={() => setPreviewIdx((i) => (i - 1 + imgs.length) % imgs.length)}
+                            className="pointer-events-auto w-8 h-8 rounded-full bg-white shadow-sm ring-1 ring-gray-300 text-gray-700 flex items-center justify-center hover:bg-gray-50 transition"
+                            aria-label="Prev"
+                          >
+                            <span className="text-lg leading-none">‹</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPreviewIdx((i) => (i + 1) % imgs.length)}
+                            className="pointer-events-auto w-8 h-8 rounded-full bg-white shadow-sm ring-1 ring-gray-300 text-gray-700 flex items-center justify-center hover:bg-gray-50 transition"
+                            aria-label="Next"
+                          >
+                            <span className="text-lg leading-none">›</span>
+                          </button>
+                        </div>
+                        <div className="mt-2 flex items-center justify-center gap-1">
+                          {imgs.map((_, i) => (
+                            <button
+                              key={`dot-${i}`}
+                              type="button"
+                              onClick={() => setPreviewIdx(i)}
+                              className={`w-2 h-2 rounded-full ${i === previewIdx ? 'bg-orange-500' : 'bg-gray-300'}`}
+                              aria-label={`Go to image ${i + 1}`}
+                            />
+                          ))}
+                        </div>
+                        <div className="mt-3">
+                          <div className="text-xs font-medium uppercase tracking-wide text-gray-500 mb-2">Additional images</div>
+                          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                          {imgs.map((src, i) => (
+                            <button
+                              type="button"
+                              key={`${src}-${i}`}
+                              onClick={() => setPreviewIdx(i)}
+                              className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border ${i === previewIdx ? 'ring-2 ring-orange-400' : 'border-gray-200'}`}
+                              aria-label="Preview thumbnail"
+                            >
+                              <img src={src} alt="thumb" className="w-full h-full object-cover rounded-md shadow-sm" />
+                            </button>
+                          ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 ) : (
-                  <div className="text-gray-400 text-sm">Image preview</div>
-                )}
-              </div>
+                  <div className="aspect-video rounded-xl bg-gray-100 flex items-center justify-center border">
+                    <div className="text-gray-400 text-sm">Image preview</div>
+                  </div>
+                );
+              })()}
               <div className="flex gap-2">
                 <input
                   className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition placeholder:text-gray-400 outline-none"
@@ -231,6 +367,43 @@ export default function AdminPopupsPage() {
                   {uploading ? 'Uploading...' : 'Upload'}
                 </label>
               </div>
+              <div className="space-y-2">
+                <label className="text-xs font-medium uppercase tracking-wide text-gray-500">Additional images (Cloudinary or URLs)</label>
+                <div className="flex items-center gap-2">
+                  <label className="px-4 py-2 rounded-lg border border-orange-400 text-orange-500 hover:bg-orange-50 transition text-sm font-medium cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => e.target.files && handleUploadAdditional(e.target.files)}
+                    />
+                    {uploadingMore ? 'Uploading...' : 'Upload more'}
+                  </label>
+                  <span className="text-xs text-gray-400">You can also paste URLs below</span>
+                </div>
+                <textarea
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition placeholder:text-gray-400 outline-none min-h-[100px] resize-y"
+                  placeholder="https://.../img1.jpg\nhttps://.../img2.jpg"
+                  value={(form.images || []).join('\n')}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      images: e.target.value
+                        .split(/(?:\r?\n|\\n|,)+/g)
+                        .map(s => s.trim())
+                        .filter(Boolean)
+                    })
+                  }
+                />
+                {(form.images || []).length > 0 && (
+                  <div className="grid grid-cols-3 gap-2">
+                    {form.images!.slice(0,3).map((src, i) => (
+                      <img key={i} src={src} alt="preview" className="w-full h-20 object-cover rounded-lg border shadow-sm" />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
@@ -240,6 +413,15 @@ export default function AdminPopupsPage() {
                   className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition placeholder:text-gray-400 outline-none"
                   value={form.title || ''}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wide text-gray-500">Subtitle</label>
+                <input
+                  className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition placeholder:text-gray-400 outline-none"
+                  value={form.subtitle || ''}
+                  onChange={(e) => setForm({ ...form, subtitle: e.target.value })}
+                  placeholder="Short subtitle or category"
                 />
               </div>
               <div>
@@ -260,6 +442,33 @@ export default function AdminPopupsPage() {
                 value={form.description || ''}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
               />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium uppercase tracking-wide text-gray-500">Tags</label>
+              <input
+                className="mt-1 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:bg-white focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition placeholder:text-gray-400 outline-none"
+                value={(form.tags || []).join(', ')}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    tags: e.target.value
+                      .split(',')
+                      .map(s => s.trim())
+                      .filter(Boolean)
+                  })
+                }
+                placeholder="Art, Workshop, Handmade"
+              />
+              {(form.tags || []).length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {form.tags!.map((t, i) => (
+                    <span key={`${t}-${i}`} className="px-2 py-1 rounded-full bg-orange-50 text-orange-700 text-xs border border-orange-200">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div>
@@ -374,9 +583,87 @@ export default function AdminPopupsPage() {
             <div className="rounded-xl border bg-gray-50 p-4">
               {/* Mock Popup Preview */}
               <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm mx-auto">
-                {form.image && (
-                  <img src={form.image} alt="preview" className="w-full h-32 object-cover rounded-lg mb-4" />
-                )}
+                {/* Header */}
+                <div className="mb-3">
+                  <h4 className="text-xl font-bold text-gray-900 leading-tight">{form.title || 'Your Popup Title'}</h4>
+                  {form.subtitle && <p className="text-sm text-gray-600">{form.subtitle}</p>}
+                  {(form.tags || []).length > 0 && (
+                    <div className="mt-1 text-xs text-gray-500">
+                      {(form.tags || []).join(' • ')}
+                    </div>
+                  )}
+                </div>
+                {(() => {
+                  const imgs = Array.from(new Set([
+                    ...(form.image ? [form.image] : []),
+                    ...((form.images && form.images.length > 0) ? form.images : [])
+                  ]));
+                return imgs.length ? (
+                  <div className="relative w-full h-32 mb-4 overflow-hidden rounded-lg border shadow-sm bg-white flex items-center justify-center">
+                    <img
+                      src={imgs[previewIdx]}
+                      alt="preview"
+                      className="max-h-full max-w-full object-contain"
+                      onClick={() => { setZoomSrc(imgs[previewIdx]); setZoomOpen(true); }}
+                      style={{ cursor: 'zoom-in' }}
+                    />
+                    {imgs.length > 1 && (
+                      <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex items-center justify-between px-2">
+                        <button
+                          type="button"
+                          onClick={() => setPreviewIdx((i) => (i - 1 + imgs.length) % imgs.length)}
+                          className="pointer-events-auto w-8 h-8 rounded-full bg-white shadow-sm ring-1 ring-gray-300 text-gray-700 flex items-center justify-center hover:bg-gray-50 transition"
+                          aria-label="Prev"
+                        >
+                          <span className="text-lg leading-none">‹</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPreviewIdx((i) => (i + 1) % imgs.length)}
+                          className="pointer-events-auto w-8 h-8 rounded-full bg-white shadow-sm ring-1 ring-gray-300 text-gray-700 flex items-center justify-center hover:bg-gray-50 transition"
+                          aria-label="Next"
+                        >
+                          <span className="text-lg leading-none">›</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : null;
+                })()}
+                {(() => {
+                  const imgs = Array.from(new Set([
+                    ...(form.image ? [form.image] : []),
+                    ...((form.images && form.images.length > 0) ? form.images : [])
+                  ]));
+                  return imgs.length > 1 ? (
+                    <>
+                      <div className="mb-2 flex items-center justify-center gap-1">
+                        {imgs.map((_, i) => (
+                          <button
+                            key={`live-dot-${i}`}
+                            type="button"
+                            onClick={() => setPreviewIdx(i)}
+                            className={`w-2 h-2 rounded-full ${i === previewIdx ? 'bg-orange-500' : 'bg-gray-300'}`}
+                            aria-label={`Go to image ${i + 1}`}
+                          />
+                        ))}
+                      </div>
+                      <div className="mb-4 flex items-center gap-2 overflow-x-auto pb-1">
+                        {imgs.map((src, i) => (
+                          <button
+                            type="button"
+                            key={`live-thumb-${src}-${i}`}
+                            onClick={() => setPreviewIdx(i)}
+                            className={`flex-shrink-0 w-14 h-14 rounded-md overflow-hidden border ${i === previewIdx ? 'ring-2 ring-orange-400' : 'border-gray-200'}`}
+                            aria-label="Preview thumbnail"
+                          >
+                            <img src={src} alt="thumb" className="w-full h-full object-cover rounded-md shadow-sm" />
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  ) : null;
+                })()}
                 <h4 className="text-lg font-semibold text-gray-900 mb-2 break-words">
                   {form.title || 'Your Popup Title'}
                 </h4>
@@ -452,6 +739,12 @@ export default function AdminPopupsPage() {
                         {x.isActive ? 'Disable' : 'Enable'}
                       </button>
                       <button
+                        onClick={() => resetSeen(x)}
+                        className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs font-medium transition"
+                      >
+                        Reset Seen
+                      </button>
+                      <button
                         onClick={() => x._id && remove(x._id)}
                         className="px-3 py-1 rounded-full bg-red-100 text-red-700 hover:bg-red-200 text-xs font-medium transition"
                       >
@@ -465,6 +758,14 @@ export default function AdminPopupsPage() {
           </table>
         </div>
       </div>
+      {/* Zoom Overlay */}
+      {zoomOpen && zoomSrc && (
+        <div className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-4" onClick={() => setZoomOpen(false)}>
+          <div className="max-w-5xl max-h-[85vh] bg-white rounded-xl shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <img src={zoomSrc} alt="Zoomed" className="w-full h-full object-contain" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

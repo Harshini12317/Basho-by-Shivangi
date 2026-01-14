@@ -14,7 +14,8 @@ export default function PageWrapper({ children }: { children: React.ReactNode })
   if (pathname.startsWith('/workshop')) {
     currentPage = 'workshops';
   } else if (pathname.startsWith('/events')) {
-    currentPage = 'events';
+    // Do not show popups on events pages
+    return <>{children}</>;
   }
 
   return (

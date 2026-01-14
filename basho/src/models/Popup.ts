@@ -6,10 +6,13 @@ export interface IPopup extends Document {
   pages: string[];
   targetSlug?: string;
   image?: string;
+  subtitle?: string;
+  tags?: string[];
   title?: string;
   description?: string;
   ctaText?: string;
   ctaLink?: string;
+  images?: string[];
   triggerType: 'page_load' | 'delay' | 'scroll';
   triggerDelayMs?: number;
   frequency: 'once_per_session' | 'once_per_day' | 'always';
@@ -26,10 +29,13 @@ const PopupSchema = new Schema<IPopup>(
     pages: [{ type: String }],
     targetSlug: { type: String },
     image: { type: String },
+    subtitle: { type: String },
+    tags: [String],
     title: { type: String },
     description: { type: String },
     ctaText: { type: String },
     ctaLink: { type: String },
+    images: [{ type: String }],
     triggerType: {
       type: String,
       enum: ['page_load', 'delay', 'scroll'],

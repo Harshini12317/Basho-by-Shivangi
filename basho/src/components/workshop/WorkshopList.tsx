@@ -46,11 +46,13 @@ interface DBWorkshop {
 }
 
 type PopupItem = {
+  _id?: string;
   name: string;
   isActive: boolean;
   pages: string[];
   targetSlug?: string;
   image?: string;
+  images?: string[];
   title?: string;
   description?: string;
   ctaText?: string;
@@ -63,6 +65,7 @@ type PopupItem = {
 };
 
 export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }) {
+  const SHOW_LOCAL_POPUP = false;
   // Map incoming DB workshops (if any) to our display shape; otherwise use static content.
   const mapped: StaticWorkshop[] = Array.isArray(workshops) && workshops.length > 0
     ? workshops.map((w) => {
@@ -117,9 +120,37 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
   const [showModal, setShowModal] = useState(false);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [reg, setReg] = useState({ name: '', email: '' });
+  const [regPhone, setRegPhone] = useState('');
+  const [agreeTos, setAgreeTos] = useState(false);
   const [regStatus, setRegStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [popup, setPopup] = useState<PopupItem | null>(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [popupImgIndex, setPopupImgIndex] = useState(0);
+  React.useEffect(() => {
+    setPopupImgIndex(0);
+  }, [popup, showPopup]);
+  React.useEffect(() => {
+    if (!showPopup || !popup) return;
+    const images = (popup.images && popup.images.length > 0) ? popup.images : (popup.image ? [popup.image] : []);
+    if (images.length <= 1) return;
+  }, [showPopup, popup]);
+  React.useEffect(() => {
+    if (!showPopup || !popup) return;
+    const images = (popup.images && popup.images.length > 0) ? popup.images : (popup.image ? [popup.image] : []);
+    if (images.length <= 1) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        setPopupImgIndex((i) => (i - 1 + images.length) % images.length);
+      } else if (e.key === 'ArrowRight') {
+        setPopupImgIndex((i) => (i + 1) % images.length);
+      } else if (e.key === 'Escape') {
+        setShowPopup(false);
+        markSeen(popup);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [showPopup, popup]);
 
   const openModal = (slug: string) => {
     setSelectedSlug(slug);
@@ -141,7 +172,13 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
       const res = await fetch('/api/workshop/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ workshopSlug: selectedSlug, name: reg.name, email: reg.email }),
+        body: JSON.stringify({
+          workshopSlug: selectedSlug,
+          name: reg.name,
+          email: reg.email,
+          phone: regPhone,
+          agreeTos,
+        }),
       });
       if (!res.ok) {
         setRegStatus('error');
@@ -156,21 +193,29 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
     }
   };
   const shouldShowByFrequency = (p: PopupItem) => {
-    const key = `popup_${p.name}_seen`;
+    const idKey = `popup_${p._id || p.name}_seen`;
     if (p.frequency === 'always') return true;
-    const last = localStorage.getItem(key);
-    if (!last) return true;
-    const lastTime = Number(last);
-    if (p.frequency === 'once_per_session') return false;
+    if (p.frequency === 'once_per_session') {
+      const seen = sessionStorage.getItem(idKey);
+      return !seen;
+    }
     if (p.frequency === 'once_per_day') {
+      const last = localStorage.getItem(idKey);
+      if (!last) return true;
       const oneDay = 24 * 60 * 60 * 1000;
-      return Date.now() - lastTime > oneDay;
+      return Date.now() - Number(last) > oneDay;
     }
     return true;
   };
   const markSeen = (p: PopupItem) => {
-    const key = `popup_${p.name}_seen`;
-    localStorage.setItem(key, String(Date.now()));
+    const idKey = `popup_${p._id || p.name}_seen`;
+    if (p.frequency === 'once_per_session') {
+      sessionStorage.setItem(idKey, '1');
+    } else if (p.frequency === 'once_per_day') {
+      localStorage.setItem(idKey, String(Date.now()));
+    } else {
+      localStorage.setItem(idKey, String(Date.now()));
+    }
   };
   const withinSchedule = (p: PopupItem) => {
     const now = new Date();
@@ -186,17 +231,16 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
         !p.targetSlug &&
         withinSchedule(p)
     );
-    const first = candidates[0] || null;
-    if (!first) return;
-    if (!shouldShowByFrequency(first)) return;
-    setPopup(first);
-    const showNow = first.triggerType === 'page_load';
+    const showable = candidates.find((p) => shouldShowByFrequency(p)) || null;
+    if (!showable) return;
+    setPopup(showable);
+    const showNow = showable.triggerType === 'page_load';
     if (showNow) setShowPopup(true);
-    if (first.triggerType === 'delay') {
-      const ms = first.triggerDelayMs || 0;
+    if (showable.triggerType === 'delay') {
+      const ms = showable.triggerDelayMs || 0;
       setTimeout(() => setShowPopup(true), ms);
     }
-    if (first.triggerType === 'scroll') {
+    if (showable.triggerType === 'scroll') {
       const onScroll = () => {
         const scrolled = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
         if (scrolled >= 40) {
@@ -208,37 +252,78 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
     }
   };
   React.useEffect(() => {
-    try {
-      const raw = localStorage.getItem('admin_popups') || '[]';
-      const data = JSON.parse(raw);
-      if (Array.isArray(data)) evaluatePopups(data);
-    } catch {}
+    if (!SHOW_LOCAL_POPUP) return;
+    const fetchPopups = async () => {
+      try {
+        const res = await fetch('/api/popups');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) evaluatePopups(data);
+        }
+      } catch {}
+    };
+    fetchPopups();
   }, []);
 
   return (
     <div className="bg-[#F8F7F2] min-h-screen py-16 px-4 sm:px-8">
-      {popup && showPopup && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
-          <div className="rounded-3xl bg-white shadow-2xl w-[92%] max-w-md overflow-hidden">
-            {popup.image ? <img src={popup.image} alt="" className="w-full h-40 object-cover" /> : null}
-            <div className="p-5">
+      {SHOW_LOCAL_POPUP && popup && showPopup && (
+        <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/70 animate-[overlayfade_.35s_ease]">
+          <div className="relative rounded-[22px] bg-white w-[62vw] max-w-3xl overflow-hidden" style={{ boxShadow: '0 16px 40px rgba(0,0,0,0.25), 0 40px 100px rgba(0,0,0,0.35)', animation: 'popup .35s ease' }}>
+            <button
+              onClick={() => {
+                setShowPopup(false);
+                markSeen(popup);
+              }}
+              className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/85 backdrop-blur-md shadow-lg ring-2 ring-[#E2C48D] flex items-center justify-center text-[#6A2424] transition hover:scale-105 z-20"
+              aria-label="Close"
+            >
+              <span className="text-2xl leading-none transition-transform hover:rotate-90">×</span>
+            </button>
+            {(() => {
+              const images = Array.from(new Set([
+                ...(popup!.image ? [popup!.image] : []),
+                ...((popup!.images && popup!.images.length > 0) ? popup!.images : [])
+              ]));
+              return images.length ? (
+                <div className="group relative w-full h-[46vh] md:h-[58vh] px-6 pt-6">
+                  <div className="relative w-full h-full rounded-xl overflow-hidden ring-1 ring-[#E2C48D]/50 shadow-md bg-white/5">
+                    <img src={images[popupImgIndex]} alt="" className="w-full h-full object-cover transition-transform duration-400 ease-out hover:scale-[1.04] animate-[imgfade_.4s_ease]" />
+                    <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.0) 60%)' }} />
+                  </div>
+                  <div className="absolute bottom-4 right-8 px-2.5 py-1 rounded-full bg-black/40 text-white text-xs backdrop-blur-sm">
+                    {popupImgIndex + 1} / {images.length}
+                  </div>
+                  {images.length > 1 && (
+                    <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4">
+                      <button
+                        onClick={() => setPopupImgIndex((i) => (i - 1 + images.length) % images.length)}
+                        className="pointer-events-auto w-9 h-9 rounded-full bg-white/85 backdrop-blur-md shadow-lg ring-2 ring-[#E2C48D] text-[#6A2424] flex items-center justify-center transition hover:scale-105 hover:bg-white"
+                        aria-label="Previous image"
+                      >
+                        <span className="text-2xl leading-none">‹</span>
+                      </button>
+                      <button
+                        onClick={() => setPopupImgIndex((i) => (i + 1) % images.length)}
+                        className="pointer-events-auto w-9 h-9 rounded-full bg-white/85 backdrop-blur-md shadow-lg ring-2 ring-[#E2C48D] text-[#6A2424] flex items-center justify-center transition hover:scale-105 hover:bg-white"
+                        aria-label="Next image"
+                      >
+                        <span className="text-2xl leading-none">›</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : null;
+            })()}
+            <div className="px-6 pb-6 pt-4 border-t border-slate-200/60 bg-white/95">
               {popup.title ? <div className="text-lg font-semibold text-slate-900">{popup.title}</div> : null}
               {popup.description ? <p className="mt-2 text-sm text-slate-700">{popup.description}</p> : null}
               <div className="mt-4 flex items-center gap-3">
                 {popup.ctaText && popup.ctaLink ? (
-                  <a href={popup.ctaLink} className="px-4 py-2 rounded-full bg-[#E76F51] text-white shadow-md hover:bg-[#D35400]">
+                  <a href={popup.ctaLink} className="px-4 py-2 rounded-full bg-[#E76F51] text-white shadow-md hover:bg-[#D35400] transition-transform hover:scale-[1.03]">
                     {popup.ctaText}
                   </a>
                 ) : null}
-                <button
-                  onClick={() => {
-                    setShowPopup(false);
-                    markSeen(popup);
-                  }}
-                  className="px-4 py-2 rounded-full bg-white ring-1 ring-[#E2C48D] text-slate-900"
-                >
-                  Close
-                </button>
               </div>
             </div>
           </div>
@@ -382,7 +467,12 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
                 <p className="mb-8 max-w-sm opacity-90">
                   Host a memorable creative gathering for birthdays, team building, or bridal showers.
                 </p>
-                <Link href="/contact" className="inline-block bg-[#E76F51] text-white px-8 py-3 rounded-full shadow-md hover:bg-[#D35400] transition-colors">
+                <Link
+                  href="/contact"
+                  onClick={(e: React.MouseEvent<HTMLAnchorElement>) => e.preventDefault()}
+                  className="inline-block bg-[#E76F51] text-white px-8 py-3 rounded-full shadow-md hover:bg-[#D35400] transition-colors"
+                  aria-disabled="true"
+                >
                   Book Your Event
                 </Link>
               </div>
@@ -394,8 +484,8 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
               <img src="/images/ev1.png" alt="" className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
             </div>
             <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
-              <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">Date Night: Crafting Memories</div>
-              <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
+              
+              
               <p className="leading-relaxed max-w-md md:max-w-lg">
                 Spend a romantic evening in our serene studio, connecting through the tactile experience of shaping raw earth together on the pottery wheel. It’s a mindful escape for couples.
               </p>
@@ -404,7 +494,14 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Guided</span>
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">All Levels</span>
               </div>
-              <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Book Date Night</Link>
+              <Link
+                href="/contact"
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => e.preventDefault()}
+                className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors"
+                aria-disabled="true"
+              >
+                Book Date Night
+              </Link>
               <button onClick={() => openModal('date-night')} className="inline-block mt-3 ml-2 bg-white text-slate-900 px-4 py-2 rounded-full ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">Register Interest</button>
             </div>
           </div>
@@ -414,8 +511,8 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
               <img src="/images/e3.png" alt="" className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
             </div>
             <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
-              <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">Birthday Bash: Creative Celebrations</div>
-              <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
+              
+              
               <p className="leading-relaxed max-w-md md:max-w-lg">
                 Our Birthday Blast Workshop is the ultimate creative party where guests trade traditional gifts for a hands-on adventure in clay. Under the guidance of our expert instructors, your group will dive into the mess and magic of the pottery wheel, crafting their very own "Earthen Legacy" pieces from scratch.
               </p>
@@ -424,7 +521,14 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Instructor‑Led</span>
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">All Ages</span>
               </div>
-              <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Plan A Birthday Bash</Link>
+              <Link
+                href="/contact"
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => e.preventDefault()}
+                className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors"
+                aria-disabled="true"
+              >
+                Plan A Birthday Bash
+              </Link>
               <button onClick={() => openModal('birthday-bash')} className="inline-block mt-3 ml-2 bg-white text-slate-900 px-4 py-2 rounded-full ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">Register Interest</button>
             </div>
           </div>
@@ -434,8 +538,8 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
               <img src="/images/e5.png" alt="" className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
             </div>
             <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
-              <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">Team Building: Hands‑On Harmony</div>
-              <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
+              
+              
               <p className="leading-relaxed max-w-md md:max-w-lg">
                 Escape the conventional office setting and immerse your team in a dynamic pottery workshop designed to foster genuine connection and collaborative spirit. Our "Hands‑On Harmony" session encourages communication, problem‑solving, and creative thinking as colleagues learn to shape clay together.
               </p>
@@ -444,50 +548,101 @@ export default function WorkshopList({ workshops }: { workshops?: DBWorkshop[] }
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Communication</span>
                 <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Creative Thinking</span>
               </div>
-              <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Book Team Session</Link>
+              <Link
+                href="/contact"
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => e.preventDefault()}
+                className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors"
+                aria-disabled="true"
+              >
+                Book Team Session
+              </Link>
               <button onClick={() => openModal('team-building')} className="inline-block mt-3 ml-2 bg-white text-slate-900 px-4 py-2 rounded-full ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">Register Interest</button>
             </div>
           </div>
 
           {showModal && (
-            <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/30">
-              <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-lg ring-1 ring-[#E2C48D]">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-slate-900">Register Interest</h3>
-                  <button onClick={closeModal} className="text-slate-600 hover:text-slate-900">✕</button>
-                </div>
-                <div className="space-y-3">
-                  <input
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-[#E2C48D]"
-                    placeholder="Your Name"
-                    value={reg.name}
-                    onChange={(e) => setReg((r) => ({ ...r, name: e.target.value }))}
-                  />
-                  <input
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-[#E2C48D]"
-                    placeholder="Email"
-                    value={reg.email}
-                    onChange={(e) => setReg((r) => ({ ...r, email: e.target.value }))}
-                  />
-                </div>
-                <div className="mt-4 flex items-center gap-3">
-                  <button
-                    onClick={submitRegistration}
-                    className="px-4 py-2 rounded-full bg-[#E76F51] text-white shadow-md hover:bg-[#D35400]"
-                  >
-                    {regStatus === 'loading' ? 'Submitting...' : 'Submit'}
-                  </button>
-                  <button onClick={closeModal} className="px-4 py-2 rounded-full bg-white ring-1 ring-[#E2C48D] text-slate-900">
-                    Cancel
-                  </button>
-                </div>
-                {regStatus === 'error' && (
-                  <div className="mt-3 text-sm text-red-600">Please fill all fields correctly.</div>
-                )}
-                {regStatus === 'success' && (
-                  <div className="mt-3 text-sm text-green-600">Registered! We will contact you soon.</div>
-                )}
-              </div>
+            <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/40">
+              {(() => {
+                const eventBySlug: Record<string, { title: string; image: string; date: string; price: number; tags: string[] }> = {
+                  'date-night': { title: 'Date Night: Crafting Memories', image: '/images/e3.png', date: 'Saturday, May 18th • 7:00 PM – 9:00 PM', price: 95, tags: ['Coupled', 'Guided', 'All Levels'] },
+                  'birthday-bash': { title: 'Birthday Bash: Creative Celebrations', image: '/images/e2.png', date: 'Sunday, May 26th • 10:00 AM – 12:00 PM', price: 85, tags: ['Group', 'Guided', 'All Levels'] },
+                  'team-building': { title: 'Team Building: Studio Sessions', image: '/images/e3.png', date: 'Flexible • Coordinate with Studio', price: 120, tags: ['Corporate', 'Guided', 'All Levels'] },
+                };
+                const info = selectedSlug ? eventBySlug[selectedSlug] || eventBySlug['date-night'] : eventBySlug['date-night'];
+                return (
+                  <div className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden">
+                    <div className="relative">
+                      <button onClick={closeModal} className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white shadow-md ring-1 ring-[#E2C48D] text-[#6A2424] flex items-center justify-center hover:bg-gray-50">✕</button>
+                    </div>
+                    <div className="grid md:grid-cols-2">
+                      <div className="bg-[#FFF5E9] p-5 md:p-6">
+                        <div className="text-sm text-slate-700 mb-2">Workshop Details</div>
+                        <div className="rounded-xl overflow-hidden ring-1 ring-[#E2C48D] bg-white mb-4">
+                          <img src={info.image} alt="" className="w-full h-44 object-cover" />
+                          <div className="p-4">
+                            <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">{info.title}</div>
+                            <div className="text-slate-900 font-bold">{info.title}</div>
+                            <div className="mt-2 text-slate-700 text-sm">{info.date}</div>
+                            <div className="mt-2 flex items-center gap-2">
+                              {info.tags.map((t) => (
+                                <span key={t} className="text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D] px-2 py-1">{t}</span>
+                              ))}
+                            </div>
+                            <div className="mt-3 flex items-center justify-between">
+                              <div className="text-slate-900 font-bold">₹{info.price}/person</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-5 md:p-6">
+                        <div className="text-sm text-slate-700 mb-2">Ticket Tier: General Admission</div>
+                        <div className="space-y-3">
+                          <input
+                            className="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-[#E2C48D]"
+                            placeholder="Full Name"
+                            value={reg.name}
+                            onChange={(e) => setReg((r) => ({ ...r, name: e.target.value }))}
+                          />
+                          <input
+                            className="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-[#E2C48D]"
+                            placeholder="Email Address"
+                            value={reg.email}
+                            onChange={(e) => setReg((r) => ({ ...r, email: e.target.value }))}
+                          />
+                          <input
+                            className="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-[#E2C48D]"
+                            placeholder="Phone Number"
+                            value={regPhone}
+                            onChange={(e) => setRegPhone(e.target.value)}
+                          />
+                          <label className="flex items-center gap-2 mt-2 text-sm">
+                            <input type="checkbox" checked={agreeTos} onChange={(e) => setAgreeTos(e.target.checked)} />
+                            <span>I agree to Terms & Conditions</span>
+                          </label>
+                          <div className="mt-4 flex items-center gap-3">
+                            <button
+                              onClick={submitRegistration}
+                              disabled={!agreeTos || regStatus === 'loading'}
+                              className="flex-1 px-4 py-2 rounded-full bg-[#E76F51] text-white shadow-md hover:bg-[#D35400] disabled:opacity-50"
+                            >
+                              {regStatus === 'loading' ? 'Submitting...' : 'Secure My Spot'}
+                            </button>
+                            <button onClick={closeModal} className="px-4 py-2 rounded-full bg-white ring-1 ring-[#E2C48D] text-slate-900">
+                              Cancel
+                            </button>
+                          </div>
+                          {regStatus === 'error' && (
+                            <div className="mt-3 text-sm text-red-600">Please fill required fields.</div>
+                          )}
+                          {regStatus === 'success' && (
+                            <div className="mt-3 text-sm text-green-600">Registered! We will contact you soon.</div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
         </div>

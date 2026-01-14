@@ -158,13 +158,13 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
   };
 
   return (
-    <div className="fixed inset-0 bg-black/35 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/35 z-[9999] flex items-center justify-center p-4 overflow-y-auto">
       <div className="relative w-full max-w-2xl rounded-[24px] overflow-hidden max-h-[90vh] overflow-y-auto">
         <div className="relative bg-gradient-to-br from-[#F8F7F2] via-[#F5EBDD] to-[#F0E6D2] p-8 md:p-12 border-2 border-[#EAD9C6] shadow-2xl rounded-[32px] backdrop-blur-sm">
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-white shadow-md hover:bg-slate-50 flex items-center justify-center transition-all duration-200 group border border-slate-100"
+            className="absolute top-4 right-4 z-[10001] pointer-events-auto w-10 h-10 rounded-full bg-white shadow-md hover:bg-slate-50 flex items-center justify-center transition-all duration-200 group border border-slate-100"
             aria-label="Close modal"
           >
             <svg className="w-6 h-6 text-[#C63D3D] group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -391,7 +391,7 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
 
       {/* Success Popup */}
       {showSuccessPopup && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/50 z-[10000] flex items-center justify-center p-4">
           <div className="relative w-full max-w-md">
             <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-8 rounded-3xl border-4 border-green-200 shadow-2xl">
               {/* Close button */}
