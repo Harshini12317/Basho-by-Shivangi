@@ -37,12 +37,27 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* RIGHT — NOTE */}
-        <div className="footer-note">
-          <p>
-            Made with patience,<br />
-            inspired by earth.
-          </p>
+        {/* RIGHT — STUDIO & CONTACT */}
+        <div className="footer-studio">
+          <div className="studio-info">
+            <h4>Visit Our Studio</h4>
+            <p className="studio-address">311, Silent Zone, Gavier,<br />Dumas Road, Surat-395007</p>
+            <p className="studio-phone">
+              <a href="tel:+919879575601">+91 9879575601</a>
+            </p>
+          </div>
+
+          <div className="studio-socials">
+            <span>Follow Us</span>
+            <a href="https://www.instagram.com/bashobyyshivangi?igsh=NnBhMzh3NTVwbzA4" target="_blank" rel="noopener noreferrer" className="social-link instagram">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <circle cx="17.5" cy="6.5" r="1.5"></circle>
+              </svg>
+              Instagram
+            </a>
+          </div>
         </div>
 
       </div>

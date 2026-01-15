@@ -71,13 +71,77 @@
 }
 
 /* ===============================
-   NOTE
+   NOTE / STUDIO
 ================================ */
 .footer-note {
   font-family: serif;
   font-size: 1.1rem;
   line-height: 1.6;
   color: var(--text-primary);
+}
+
+.footer-studio {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.studio-info h4 {
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.studio-address {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.studio-phone a {
+  text-decoration: none;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  transition: opacity 0.3s ease;
+}
+
+.studio-phone a:hover {
+  opacity: 0.6;
+}
+
+.studio-socials {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.studio-socials span {
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  transition: opacity 0.3s ease;
+  width: fit-content;
+}
+
+.social-link:hover {
+  opacity: 0.6;
+}
+
+.social-link svg {
+  flex-shrink: 0;
 }
 
 /* ===============================

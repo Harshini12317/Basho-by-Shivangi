@@ -35,7 +35,7 @@ export default function StudioPage() {
             <div className="info-card">
               <h2>Our Location</h2>
               <p className="muted">Basho Pottery Studio</p>
-              <address className="studio-address">21.1299866, 72.7239895<br/>Surat, India</address>
+              <address className="studio-address">311, Silent Zone, Gavier,<br/>Dumas Road, Surat-395007</address>
 
               <h3 className="mt-6">Opening Hours</h3>
               <ul className="hours">
@@ -45,8 +45,8 @@ export default function StudioPage() {
               </ul>
 
               <h3 className="mt-6">Contact</h3>
-              <p className="muted">Phone: +91 99999 99999</p>
-              <p className="muted">Email: hello@basho.studio</p>
+              <p className="muted"><a href="tel:+919879575601" className="contact-link">Phone: +91 9879575601</a></p>
+              <p className="muted"><a href="https://www.instagram.com/bashobyyshivangi?igsh=NnBhMzh3NTVwbzA4" target="_blank" rel="noopener noreferrer" className="contact-link">Instagram: @bashobyyshivangi</a></p>
 
               <div className="mt-6">
                 <a className="studio-cta" href="https://maps.google.com/maps?q=21.1299866%2C72.7239895&z=17&hl=en" target="_blank" rel="noreferrer">Open in Google Maps</a>

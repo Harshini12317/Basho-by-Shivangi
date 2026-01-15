@@ -3,8 +3,8 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { FiSearch, FiShoppingBag, FiMenu, FiX } from "react-icons/fi";
-import { FaTwitter, FaInstagram, FaPinterestP } from "react-icons/fa";
+import { FiSearch, FiShoppingBag, FiMenu, FiX, FiPhone } from "react-icons/fi";
+import { FaInstagram } from "react-icons/fa";
 import { MdAccountCircle, MdHistory, MdFavoriteBorder, MdSettings, MdLogout } from "react-icons/md";
 import { useSession } from "next-auth/react";
 import "./Navbar.css";
@@ -94,14 +94,11 @@ export default function Navbar() {
 
   {/* LEFT ICONS */}
  <div className="nav-socials">
-  <a href="https://twitter.com" aria-label="Twitter">
-    <FaTwitter />
-  </a>
-  <a href="https://instagram.com" aria-label="Instagram">
+  <a href="https://www.instagram.com/bashobyyshivangi?igsh=NnBhMzh3NTVwbzA4" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
     <FaInstagram />
   </a>
-  <a href="https://pinterest.com" aria-label="Pinterest">
-    <FaPinterestP />
+  <a href="tel:+919879575601" aria-label="Call Us">
+    <FiPhone />
   </a>
 </div>
 
