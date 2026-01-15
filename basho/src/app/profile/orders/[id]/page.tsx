@@ -10,7 +10,7 @@ interface Order {
   items: Array<{
     productSlug: string;
     qty: number;
-    price: number;
+    price: number ;
     weight: number;
   }>;
   totalAmount: number;
