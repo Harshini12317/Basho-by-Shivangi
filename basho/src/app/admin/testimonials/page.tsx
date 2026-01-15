@@ -75,6 +75,20 @@ export default function AdminTestimonials() {
     fetchUserReviews();
   }, []);
 
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      email: '',
+      message: '',
+      rating: 5,
+      image: '',
+      videoUrl: '',
+      testimonialType: 'text' as 'text' | 'video',
+      isPublished: false,
+      featured: false,
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
