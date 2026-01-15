@@ -241,25 +241,25 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
           </div>
         </div>
       )}
-      <div className="max-w-6xl mx-auto bg-white rounded-[40px] p-8 md:p-16 shadow-sm">
-        <div className="-mx-8 md:-mx-16 -mt-8 md:-mt-16 mb-12">
-          <div className="overflow-hidden rounded-t-[40px] bg-[#D8A7B1] text-white text-center py-8">
-            <h2 className="text-3xl md:text-4xl font-semibold">Pottery Workshop</h2>
+      <div className="max-w-6xl mx-auto bg-white rounded-2xl sm:rounded-3xl lg:rounded-[40px] p-4 sm:p-8 md:p-12 lg:p-16 shadow-sm">
+        <div className="-mx-4 sm:-mx-8 md:-mx-12 lg:-mx-16 -mt-4 sm:-mt-8 md:-mt-12 lg:-mt-16 mb-8 sm:mb-12">
+          <div className="overflow-hidden rounded-t-2xl sm:rounded-t-3xl lg:rounded-t-[40px] bg-[#D8A7B1] text-white text-center py-6 sm:py-8">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold px-4">Pottery Workshop</h2>
           </div>
         </div>
 
-        <div className="sticky top-0 z-20 -mx-8 md:-mx-16 bg-white/80 backdrop-blur border-b border-[#EDD8B4]">
-          <div className="max-w-6xl mx-auto px-8 md:px-16">
-            <div className="flex items-center gap-3 py-3">
-              <a href="#workshops" className="px-4 py-2 rounded-full bg-[#FFF8F2] ring-1 ring-[#E2C48D] text-slate-900 hover:bg-white">Workshops</a>
-              <a href="#events" className="px-4 py-2 rounded-full bg-[#FFF8F2] ring-1 ring-[#E2C48D] text-slate-900 hover:bg-white">Events</a>
+        <div className="sticky top-0 z-20 -mx-4 sm:-mx-8 md:-mx-12 lg:-mx-16 bg-white/80 backdrop-blur border-b border-[#EDD8B4]">
+          <div className="max-w-6xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16">
+            <div className="flex items-center gap-2 sm:gap-3 py-2 sm:py-3">
+              <a href="#workshops" className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-full bg-[#FFF8F2] ring-1 ring-[#E2C48D] text-slate-900 hover:bg-white transition-colors">Workshops</a>
+              <a href="#events" className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-full bg-[#FFF8F2] ring-1 ring-[#E2C48D] text-slate-900 hover:bg-white transition-colors">Events</a>
             </div>
           </div>
         </div>
         
         
         {/* Workshop Grid */}
-        <div id="workshops" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24 scroll-mt-24">
+        <div id="workshops" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-24 scroll-mt-24">
           {loading ? (
             // Loading skeleton
             Array.from({ length: 6 }).map((_, idx) => (
@@ -288,14 +288,14 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
                       </div>
                     )}
                   </div>
-                  <div className="p-5">
-                    <h3 className="text-lg font-bold text-slate-900 mb-1">{ws.title}</h3>
+                  <div className="p-4 sm:p-5">
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-1 line-clamp-2">{ws.title}</h3>
                     <p className="text-slate-400 text-xs mb-3 line-clamp-1">{ws.description}</p>
-                    <div className="flex items-center gap-2 text-slate-500 text-xs mb-4">
+                    <div className="flex items-center gap-2 text-slate-500 text-xs mb-3 sm:mb-4">
                       <span>🗓 {ws.date}</span>
                     </div>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-lg font-bold">₹{ws.price}</span>
+                      <span className="text-base sm:text-lg font-bold">₹{ws.price}</span>
                       <span className="text-slate-400 text-[10px]">per person</span>
                     </div>
                   </div>

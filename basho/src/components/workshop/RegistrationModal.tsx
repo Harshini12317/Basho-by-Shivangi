@@ -15,7 +15,6 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
   const [selectedDate, setSelectedDate] = useState("");
   const [members, setMembers] = useState(1);
   const [requests, setRequests] = useState("");
-  const [level, setLevel] = useState<"Beginner" | "Advanced">("Beginner");
   const [timeSlot, setTimeSlot] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -99,7 +98,6 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
                   timeSlot,
                   members,
                   requests,
-                  level,
                   totalAmount: totalPrice,
                 },
               }),
@@ -150,7 +148,6 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
       phone ? `Phone: ${phone}` : undefined,
       `Number of Members: ${members}`,
       requests ? `Special Requests: ${requests}` : undefined,
-      `Experience Level: ${level}`,
       `Total Paid: ₹${totalPrice}`,
     ].filter(Boolean).join("\n");
     const details = encodeURIComponent(detailLines);
@@ -252,7 +249,7 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
                 <input
                   type="date"
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full bg-white/80 backdrop-blur-sm rounded-xl shadow-sm px-4 py-3 border-2 border-transparent border-b-4 border-b-[#C63D3D] focus:border-[#C63D3D] focus:ring-4 focus:ring-[#C63D3D]/10 outline-none text-slate-900 placeholder-slate-400 transition-all duration-200"
+                  className="w-full bg-white/80 backdrop-blur-sm rounded-xl shadow-sm px-4 py-3 border-2 border-slate-200 hover:border-[#C63D3D]/50 focus:border-[#C63D3D] focus:ring-4 focus:ring-[#C63D3D]/10 outline-none text-slate-900 placeholder-slate-400 transition-all duration-300 ease-out"
                   value={selectedDate}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedDate(e.target.value)}
                   required
@@ -272,15 +269,22 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
                   type="number"
                   min="1"
                   max="10"
-                  className="w-full bg-white/80 backdrop-blur-sm rounded-xl shadow-sm px-4 py-3 border-2 border-transparent border-b-4 border-b-[#C63D3D] focus:border-[#C63D3D] focus:ring-4 focus:ring-[#C63D3D]/10 outline-none text-slate-900 placeholder-slate-400 transition-all duration-200"
-                  placeholder="1"
-                  value={members}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMembers(parseInt(e.target.value) || 1)}
+                  className="w-full bg-white/80 backdrop-blur-sm rounded-xl shadow-sm px-4 py-3 border-2 border-slate-200 hover:border-[#C63D3D]/50 focus:border-[#C63D3D] focus:ring-4 focus:ring-[#C63D3D]/10 outline-none text-slate-900 placeholder-slate-400 transition-all duration-300 ease-out"
+                  value={members || ''}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const val = e.target.value;
+                    if (val === '') {
+                      setMembers(0);
+                    } else {
+                      const num = parseInt(val);
+                      if (!isNaN(num) && num >= 1 && num <= 10) setMembers(num);
+                    }
+                  }}
                   required
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                   <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 5a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
               </div>
@@ -326,34 +330,6 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
               </div>
             </div>
 
-            {/* Experience Level */}
-            <div className="space-y-3">
-              <label className="block text-slate-800 font-medium text-sm uppercase tracking-wide">Experience Level</label>
-              <div className="flex items-center gap-8">
-                <label className="group relative flex items-center gap-3 cursor-pointer p-3 rounded-xl bg-white/60 backdrop-blur-sm border-2 border-transparent hover:border-[#C63D3D]/30 transition-all duration-200">
-                  <input
-                    type="radio"
-                    name="exp"
-                    className="w-4 h-4 text-[#C63D3D] border-2 border-slate-300 focus:ring-[#C63D3D] focus:ring-offset-0"
-                    checked={level === "Beginner"}
-                    onChange={() => setLevel("Beginner")}
-                  />
-                  <span className="text-slate-800 font-medium">Beginner</span>
-                  <div className="absolute inset-0 rounded-xl bg-[#C63D3D]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-                </label>
-                <label className="group relative flex items-center gap-3 cursor-pointer p-3 rounded-xl bg-white/60 backdrop-blur-sm border-2 border-transparent hover:border-[#C63D3D]/30 transition-all duration-200">
-                  <input
-                    type="radio"
-                    name="exp"
-                    className="w-4 h-4 text-[#C63D3D] border-2 border-slate-300 focus:ring-[#C63D3D] focus:ring-offset-0"
-                    checked={level === "Advanced"}
-                    onChange={() => setLevel("Advanced")}
-                  />
-                  <span className="text-slate-800 font-medium">Advanced</span>
-                  <div className="absolute inset-0 rounded-xl bg-[#C63D3D]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-                </label>
-              </div>
-            </div>
 
             {/* Price Display */}
             <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/50 shadow-sm">

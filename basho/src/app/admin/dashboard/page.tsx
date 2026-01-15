@@ -51,6 +51,18 @@ export default function AdminDashboard() {
       color: 'bg-purple-500',
     },
     {
+      title: 'Workshops',
+      description: 'Add, edit, and remove workshops',
+      href: '/admin/workshops',
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M12 6.253v13m0-13C6.5 6.253 2 10.753 2 16.5c0 5.747 4.5 10.247 10 10.247s10-4.5 10-10.247c0-5.747-4.5-10.247-10-10.247z" />
+        </svg>
+      ),
+      color: 'bg-cyan-500',
+    },
+    {
       title: 'Popup Management',
       description: 'Create and manage popups',
       href: '/admin/popups',

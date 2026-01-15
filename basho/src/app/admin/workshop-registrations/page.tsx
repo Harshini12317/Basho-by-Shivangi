@@ -5,8 +5,17 @@ import { useState, useEffect } from 'react';
 interface WorkshopRegistration {
   _id: string;
   workshopSlug: string;
+  workshopTitle: string;
   name: string;
   email: string;
+  phone?: string;
+  members: number;
+  requests?: string;
+  level?: string;
+  date?: string;
+  timeSlot?: string;
+  amount?: number;
+  paymentId?: string;
   createdAt: string;
 }
 
@@ -14,6 +23,7 @@ export default function AdminWorkshopRegistrations() {
   const [registrations, setRegistrations] = useState<WorkshopRegistration[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchRegistrations();
@@ -34,15 +44,16 @@ export default function AdminWorkshopRegistrations() {
   const filteredRegistrations = registrations.filter(registration =>
     registration.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     registration.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    registration.workshopSlug.toLowerCase().includes(searchTerm.toLowerCase())
+    registration.workshopTitle.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Group registrations by workshop
   const groupedByWorkshop = filteredRegistrations.reduce((acc, reg) => {
-    if (!acc[reg.workshopSlug]) {
-      acc[reg.workshopSlug] = [];
+    const workshopTitle = reg.workshopTitle || 'Unknown Workshop';
+    if (!acc[workshopTitle]) {
+      acc[workshopTitle] = [];
     }
-    acc[reg.workshopSlug].push(reg);
+    acc[workshopTitle].push(reg);
     return acc;
   }, {} as Record<string, WorkshopRegistration[]>);
 
@@ -76,11 +87,11 @@ export default function AdminWorkshopRegistrations() {
 
       {/* Registrations by Workshop */}
       <div className="space-y-6">
-        {Object.entries(groupedByWorkshop).map(([workshopSlug, regs]) => (
-          <div key={workshopSlug} className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+        {Object.entries(groupedByWorkshop).map(([workshopTitle, regs]) => (
+          <div key={workshopTitle} className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-200 bg-slate-50">
-              <h2 className="text-lg font-semibold text-slate-900 capitalize">
-                {workshopSlug.replace(/-/g, ' ')}
+              <h2 className="text-lg font-semibold text-slate-900">
+                {workshopTitle}
               </h2>
               <p className="text-sm text-slate-600">{regs.length} registration{regs.length !== 1 ? 's' : ''}</p>
             </div>
@@ -96,7 +107,28 @@ export default function AdminWorkshopRegistrations() {
                       Email
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                      Registration Date
+                      Phone
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Members
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Preferred Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Time Slot
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Level
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Amount
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Reg Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Details
                     </th>
                   </tr>
                 </thead>
@@ -110,6 +142,49 @@ export default function AdminWorkshopRegistrations() {
                         <div className="text-sm text-slate-900">{registration.email}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-slate-700">{registration.phone || '—'}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-slate-700">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                            {registration.members} {registration.members === 1 ? 'member' : 'members'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-slate-700">
+                          {registration.date 
+                            ? new Date(registration.date).toLocaleDateString('en-IN', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric'
+                              })
+                            : '—'
+                          }
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-slate-700">{registration.timeSlot || '—'}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-slate-700">
+                          {registration.level ? (
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                              registration.level === 'Beginner' 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-purple-100 text-purple-800'
+                            }`}>
+                              {registration.level}
+                            </span>
+                          ) : '—'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-slate-900">
+                          {registration.amount ? `₹${registration.amount}` : '—'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-slate-500">
                           {new Date(registration.createdAt).toLocaleDateString('en-IN', {
                             day: 'numeric',
@@ -120,11 +195,97 @@ export default function AdminWorkshopRegistrations() {
                           })}
                         </div>
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <button
+                          onClick={() => setExpandedId(expandedId === registration._id ? null : registration._id)}
+                          className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                        >
+                          {expandedId === registration._id ? 'Hide' : 'View'}
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+
+            {/* Expanded Details */}
+            {regs.map((registration) => 
+              expandedId === registration._id && (
+                <div key={`details-${registration._id}`} className="bg-slate-50 border-t border-slate-200 p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Left Column */}
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase">Full Name</label>
+                        <p className="text-sm text-slate-900 mt-1">{registration.name}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase">Email Address</label>
+                        <p className="text-sm text-slate-900 mt-1">{registration.email}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase">Phone Number</label>
+                        <p className="text-sm text-slate-900 mt-1">{registration.phone || 'Not provided'}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase">Number of Members</label>
+                        <p className="text-sm text-slate-900 mt-1">{registration.members}</p>
+                      </div>
+                    </div>
+
+                    {/* Right Column */}
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase">Preferred Date</label>
+                        <p className="text-sm text-slate-900 mt-1">
+                          {registration.date 
+                            ? new Date(registration.date).toLocaleDateString('en-IN', {
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
+                              })
+                            : 'Not specified'
+                          }
+                        </p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase">Time Slot</label>
+                        <p className="text-sm text-slate-900 mt-1">{registration.timeSlot || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase">Experience Level</label>
+                        <p className="text-sm text-slate-900 mt-1">{registration.level || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase">Registration Amount</label>
+                        <p className="text-sm text-slate-900 font-semibold mt-1">
+                          {registration.amount ? `₹${registration.amount.toLocaleString('en-IN')}` : 'Not specified'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Special Requests */}
+                  {registration.requests && (
+                    <div className="mt-6 pt-6 border-t border-slate-200">
+                      <label className="text-xs font-semibold text-slate-500 uppercase">Special Requests</label>
+                      <p className="text-sm text-slate-900 mt-2 bg-white p-3 rounded border border-slate-200">
+                        {registration.requests}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Payment Info */}
+                  {registration.paymentId && (
+                    <div className="mt-6 pt-6 border-t border-slate-200">
+                      <label className="text-xs font-semibold text-slate-500 uppercase">Payment ID</label>
+                      <p className="text-sm text-slate-700 mt-1 font-mono bg-white p-2 rounded">{registration.paymentId}</p>
+                    </div>
+                  )}
+                </div>
+              )
+            )}
           </div>
         ))}
 

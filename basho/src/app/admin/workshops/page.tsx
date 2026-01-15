@@ -70,6 +70,14 @@ export default function WorkshopManagement() {
     }
   };
 
+  const handleRemoveImage = (indexToRemove: number) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, index) => index !== indexToRemove),
+      imageUrls: prev.imageUrls.filter((_, index) => index !== indexToRemove)
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title.trim() || !formData.description.trim() || !formData.location.trim() ||
@@ -366,7 +374,7 @@ export default function WorkshopManagement() {
 
         {/* Add/Edit Form Modal */}
         {showAddForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
             <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">
@@ -479,20 +487,48 @@ export default function WorkshopManagement() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Images</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Images (Upload multiple images)</label>
+                    <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                      <p className="text-sm text-blue-700">
+                        {formData.imageUrls.length > 0 
+                          ? `${formData.imageUrls.length} image(s) selected` 
+                          : 'No images selected. Upload at least one image.'}
+                      </p>
+                    </div>
                     <input
                       type="file"
                       multiple
                       accept="image/*"
                       onChange={handleImageUpload}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8E5022]"
-                      required={!selectedWorkshop}
+                      required={!selectedWorkshop && formData.imageUrls.length === 0}
                     />
                     {formData.imageUrls.length > 0 && (
-                      <div className="mt-2 grid grid-cols-3 gap-2">
-                        {formData.imageUrls.map((url, index) => (
-                          <img key={index} src={url} alt={`Preview ${index + 1}`} className="w-full h-20 object-cover rounded" />
-                        ))}
+                      <div className="mt-4">
+                        <p className="text-sm font-medium text-gray-700 mb-3">Image Previews:</p>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                          {formData.imageUrls.map((url, index) => (
+                            <div key={index} className="relative group">
+                              <img 
+                                src={url} 
+                                alt={`Preview ${index + 1}`} 
+                                className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
+                              />
+                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all rounded-lg flex items-center justify-center">
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveImage(index)}
+                                  className="hidden group-hover:block bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                              <span className="absolute top-1 right-1 bg-gray-900 text-white px-2 py-1 rounded text-xs">
+                                {index + 1}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>

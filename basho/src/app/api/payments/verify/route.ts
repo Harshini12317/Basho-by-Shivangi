@@ -54,8 +54,36 @@ export async function POST(request: NextRequest) {
           });
           await registration.save();
           console.log('Registration saved:', registration._id);
+
+          // Send success email for workshop registration
+          try {
+            await sendPaymentSuccessEmail(
+              orderDetails.customer.email,
+              {
+                orderId: razorpay_order_id,
+                amount: orderDetails.totalAmount,
+                items: [{
+                  name: orderDetails.workshop,
+                  price: orderDetails.totalAmount,
+                  qty: orderDetails.members,
+                }],
+              },
+              razorpay_payment_id
+            );
+          } catch (emailError) {
+            console.error('Error sending email:', emailError);
+          }
+
+          return NextResponse.json(
+            { success: true, message: 'Workshop registration completed successfully' },
+            { status: 200 }
+          );
         } catch (regError) {
           console.error('Error saving registration:', regError);
+          return NextResponse.json(
+            { success: false, error: 'Failed to save workshop registration' },
+            { status: 500 }
+          );
         }
       }
 
