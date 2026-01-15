@@ -1,22 +1,49 @@
-import nodemailer from "nodemailer";
+import nodemailer, { SendMailOptions } from "nodemailer";
+
+/* ---------------- Types ---------------- */
+
+interface OrderItem {
+  productSlug?: string;
+  name?: string;
+  price: number;
+  qty: number;
+}
+
+interface CustomerDetails {
+  name?: string;
+  phone?: string;
+  gstNumber?: string;
+}
+
+interface OrderDetails {
+  orderId?: string;
+  amount?: number;
+  items?: OrderItem[];
+  customer?: CustomerDetails;
+  pdfInvoice?: Buffer | string;
+}
+
+/* ---------------- Transporter ---------------- */
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
 });
 
+/* ---------------- Email Sender ---------------- */
+
 export const sendPaymentSuccessEmail = async (
   customerEmail: string,
-  orderDetails: any,
+  orderDetails: OrderDetails,
   paymentId: string
 ) => {
-  const customerMailOptions: any = {
+  const customerMailOptions: SendMailOptions = {
     from: process.env.EMAIL_USER,
     to: customerEmail,
-    subject: 'Payment Successful - Order Confirmed',
+    subject: "Payment Successful - Order Confirmed",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #333;">Payment Successful!</h2>
@@ -26,14 +53,24 @@ export const sendPaymentSuccessEmail = async (
         <div style="background-color: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 5px;">
           <h3>Order Details:</h3>
           <p><strong>Payment ID:</strong> ${paymentId}</p>
-          <p><strong>Order ID:</strong> ${orderDetails.orderId || 'N/A'}</p>
-          <p><strong>Amount:</strong> ₹${orderDetails.amount || 'N/A'}</p>
-          ${orderDetails.items ? `
+          <p><strong>Order ID:</strong> ${orderDetails.orderId || "N/A"}</p>
+          <p><strong>Amount:</strong> ₹${orderDetails.amount || "N/A"}</p>
+
+          ${
+            orderDetails.items
+              ? `
             <h4>Items:</h4>
             <ul>
-              ${orderDetails.items.map((item: any) => `<li>${item.productSlug || item.name} - ₹${item.price} (Qty: ${item.qty})</li>`).join('')}
+              ${orderDetails.items
+                .map(
+                  (item) =>
+                    `<li>${item.productSlug || item.name} - ₹${item.price} (Qty: ${item.qty})</li>`
+                )
+                .join("")}
             </ul>
-          ` : ''}
+          `
+              : ""
+          }
         </div>
 
         <p>Thank you for shopping with Basho!</p>
@@ -42,20 +79,23 @@ export const sendPaymentSuccessEmail = async (
     `,
   };
 
-  // Add PDF attachment if provided
+  // Attach invoice if present
   if (orderDetails.pdfInvoice) {
-    customerMailOptions.attachments = [{
-      filename: `invoice-${orderDetails.orderId || paymentId}.pdf`,
-      content: orderDetails.pdfInvoice,
-      contentType: 'application/pdf'
-    }];
-    customerMailOptions.subject = 'Payment Successful - Order Confirmed (Invoice Attached)';
+    customerMailOptions.attachments = [
+      {
+        filename: `invoice-${orderDetails.orderId || paymentId}.pdf`,
+        content: orderDetails.pdfInvoice,
+        contentType: "application/pdf",
+      },
+    ];
+    customerMailOptions.subject =
+      "Payment Successful - Order Confirmed (Invoice Attached)";
   }
 
-  const ownerMailOptions = {
+  const ownerMailOptions: SendMailOptions = {
     from: process.env.EMAIL_USER,
     to: process.env.OWNER_EMAIL,
-    subject: 'New Order Received - Payment Successful',
+    subject: "New Order Received - Payment Successful",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #333;">New Order Received!</h2>
@@ -64,21 +104,36 @@ export const sendPaymentSuccessEmail = async (
         <div style="background-color: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 5px;">
           <h3>Order Details:</h3>
           <p><strong>Payment ID:</strong> ${paymentId}</p>
-          <p><strong>Order ID:</strong> ${orderDetails.orderId || 'N/A'}</p>
+          <p><strong>Order ID:</strong> ${orderDetails.orderId || "N/A"}</p>
           <p><strong>Customer Email:</strong> ${customerEmail}</p>
-          <p><strong>Amount:</strong> ₹${orderDetails.amount || 'N/A'}</p>
-          ${orderDetails.items ? `
+          <p><strong>Amount:</strong> ₹${orderDetails.amount || "N/A"}</p>
+
+          ${
+            orderDetails.items
+              ? `
             <h4>Items:</h4>
             <ul>
-              ${orderDetails.items.map((item: any) => `<li>${item.productSlug || item.name} - ₹${item.price} (Qty: ${item.qty})</li>`).join('')}
+              ${orderDetails.items
+                .map(
+                  (item) =>
+                    `<li>${item.productSlug || item.name} - ₹${item.price} (Qty: ${item.qty})</li>`
+                )
+                .join("")}
             </ul>
-          ` : ''}
-          ${orderDetails.customer ? `
+          `
+              : ""
+          }
+
+          ${
+            orderDetails.customer
+              ? `
             <h4>Customer Details:</h4>
-            <p><strong>Name:</strong> ${orderDetails.customer.name || 'N/A'}</p>
-            <p><strong>Phone:</strong> ${orderDetails.customer.phone || 'N/A'}</p>
-            <p><strong>GST Number:</strong> ${orderDetails.customer.gstNumber || 'N/A'}</p>
-          ` : ''}
+            <p><strong>Name:</strong> ${orderDetails.customer.name || "N/A"}</p>
+            <p><strong>Phone:</strong> ${orderDetails.customer.phone || "N/A"}</p>
+            <p><strong>GST Number:</strong> ${orderDetails.customer.gstNumber || "N/A"}</p>
+          `
+              : ""
+          }
         </div>
 
         <p>Please process this order accordingly.</p>
@@ -90,9 +145,9 @@ export const sendPaymentSuccessEmail = async (
   try {
     await transporter.sendMail(customerMailOptions);
     await transporter.sendMail(ownerMailOptions);
-    console.log('Emails sent successfully');
+    console.log("Emails sent successfully");
   } catch (error) {
-    console.error('Error sending emails:', error);
+    console.error("Error sending emails:", error);
     throw error;
   }
 };

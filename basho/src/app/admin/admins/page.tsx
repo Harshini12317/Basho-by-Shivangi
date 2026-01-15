@@ -2,8 +2,14 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+type Admin = {
+  email: string;
+  name?: string;
+  createdAt?: string;
+};
+
 export default function AdminManagement() {
-  const [admins, setAdmins] = useState<Array<any>>([]);
+  const [admins, setAdmins] = useState<Admin[]>([]);
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [adding, setAdding] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
@@ -15,7 +21,7 @@ export default function AdminManagement() {
   const loadAdmins = () => {
     fetch('/api/admin/admins')
       .then((r) => r.json())
-      .then((data) => {
+      .then((data: Admin[]) => {
         if (Array.isArray(data)) setAdmins(data);
       })
       .catch(() => {});
@@ -30,14 +36,22 @@ export default function AdminManagement() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: newAdminEmail.trim() }),
       });
-      const data = await res.json();
+
+      const data: { message?: string } = await res.json();
+
       if (res.ok) {
-        setAdmins((s) => [...s, { email: newAdminEmail.trim(), name: newAdminEmail.split('@')[0] }]);
+        setAdmins((s) => [
+          ...s,
+          {
+            email: newAdminEmail.trim(),
+            name: newAdminEmail.split('@')[0],
+          },
+        ]);
         setNewAdminEmail('');
       } else {
         alert(data.message || 'Failed to add admin');
       }
-    } catch (e) {
+    } catch {
       alert('Request failed');
     } finally {
       setAdding(false);
@@ -53,13 +67,15 @@ export default function AdminManagement() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-      const data = await res.json();
+
+      const data: { message?: string } = await res.json();
+
       if (res.ok) {
-        setAdmins((s) => s.filter(a => a.email !== email));
+        setAdmins((s) => s.filter((a) => a.email !== email));
       } else {
         alert(data.message || 'Failed to remove admin');
       }
-    } catch (e) {
+    } catch {
       alert('Request failed');
     } finally {
       setRemoving(null);
@@ -97,24 +113,9 @@ export default function AdminManagement() {
           <button
             onClick={addAdmin}
             disabled={adding || !newAdminEmail.trim()}
-            className="bg-slate-900 text-white px-6 py-2 rounded-lg font-medium hover:bg-slate-800 focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="bg-slate-900 text-white px-6 py-2 rounded-lg font-medium hover:bg-slate-800 disabled:opacity-50"
           >
-            {adding ? (
-              <>
-                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Adding...
-              </>
-            ) : (
-              <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Add Admin
-              </>
-            )}
+            {adding ? 'Adding...' : 'Add Admin'}
           </button>
         </div>
 
@@ -124,9 +125,14 @@ export default function AdminManagement() {
             <p className="text-slate-500 text-center py-8">No admins configured yet</p>
           ) : (
             admins.map((admin) => (
-              <div key={admin.email} className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+              <div
+                key={admin.email}
+                className="flex items-center justify-between p-4 border border-slate-200 rounded-lg"
+              >
                 <div>
-                  <p className="font-medium text-slate-900">{admin.name || admin.email.split('@')[0]}</p>
+                  <p className="font-medium text-slate-900">
+                    {admin.name || admin.email.split('@')[0]}
+                  </p>
                   <p className="text-sm text-slate-600">{admin.email}</p>
                   {admin.createdAt && (
                     <p className="text-xs text-slate-500">
@@ -137,19 +143,9 @@ export default function AdminManagement() {
                 <button
                   onClick={() => removeAdmin(admin.email)}
                   disabled={removing === admin.email}
-                  className="text-red-600 hover:text-red-800 p-2 rounded-md hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Remove admin"
+                  className="text-red-600 hover:text-red-800 disabled:opacity-50"
                 >
-                  {removing === admin.email ? (
-                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  ) : (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  )}
+                  Remove
                 </button>
               </div>
             ))

@@ -1,6 +1,14 @@
-import mongoose, { Schema, model, models } from "mongoose";
+import { Schema, model, models, type Document } from "mongoose";
 
-const CustomOrderPhotoSchema = new Schema(
+export interface CustomOrderPhotoDocument extends Document {
+  title: string;
+  description: string;
+  images: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const CustomOrderPhotoSchema = new Schema<CustomOrderPhotoDocument>(
   {
     title: {
       type: String,
@@ -12,17 +20,24 @@ const CustomOrderPhotoSchema = new Schema(
       required: true,
       trim: true,
     },
-    images: [{
-      type: String,
-      required: true,
-    }],
+    images: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
   },
   {
-    timestamps: true, // adds createdAt & updatedAt
+    timestamps: true,
   }
 );
 
 // Prevent model overwrite error in Next.js
-const CustomOrderPhoto = models.CustomOrderPhoto || model("CustomOrderPhoto", CustomOrderPhotoSchema);
+const CustomOrderPhoto =
+  models.CustomOrderPhoto ||
+  model<CustomOrderPhotoDocument>(
+    "CustomOrderPhoto",
+    CustomOrderPhotoSchema
+  );
 
 export default CustomOrderPhoto;

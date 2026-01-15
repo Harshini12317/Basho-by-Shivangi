@@ -78,16 +78,26 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
   const workshopData = workshops.length > 0 ? workshops : (initialWorkshops || []);
 
   // Map workshops to display format
-  const displayList = workshopData.map((w) => ({
-    slug: w.slug,
-    img: w.images?.[0] || '/images/img12.png',
-    title: w.title,
-    date: 'Select Date', // Since users choose their own date
-    level: w.level,
-    price: w.price,
-    description: w.description,
-    spotsLeft: w.seats // Could calculate based on registrations if needed
-  }));
+  const displayList = workshopData.map((w) => {
+    // Determine image based on type
+    let imgSrc = '/images/img12.png';
+    if ('images' in w && Array.isArray(w.images)) {
+      imgSrc = w.images[0] || imgSrc;
+    } else if ('image' in w && w.image) {
+      imgSrc = w.image;
+    }
+    
+    return {
+      slug: w.slug,
+      img: imgSrc,
+      title: w.title,
+      date: 'Select Date', // Since users choose their own date
+      level: w.level,
+      price: w.price,
+      description: w.description,
+      spotsLeft: w.seats // Could calculate based on registrations if needed
+    };
+  });
 
   const filenameOf = (src: string) => {
     const s = src || '';

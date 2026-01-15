@@ -1,12 +1,48 @@
 import PDFDocument from "pdfkit/js/pdfkit.standalone";
 
-export function generateInvoicePDF(order: any): Promise<Buffer> {
+/* ---------------- Types ---------------- */
+
+interface OrderItem {
+  productSlug: string;
+  price: number;
+  qty: number;
+}
+
+interface CustomerInfo {
+  name: string;
+  email: string;
+  phone: string;
+  gstNumber?: string;
+}
+
+interface Address {
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+}
+
+interface Order {
+  razorpayOrderId: string;
+  createdAt: string | Date;
+  customer: CustomerInfo;
+  address: Address;
+  items: OrderItem[];
+  hsnCode?: string;
+  subtotal: number;
+  gstAmount: number;
+  totalAmount: number;
+}
+
+/* ---------------- PDF Generator ---------------- */
+
+export function generateInvoicePDF(order: Order): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     try {
       const doc = new PDFDocument({ size: "A4", margin: 50 });
 
       const buffers: Uint8Array[] = [];
-      doc.on("data", (chunk) => buffers.push(chunk));
+      doc.on("data", (chunk: Uint8Array) => buffers.push(chunk));
       doc.on("end", () => resolve(Buffer.concat(buffers)));
       doc.on("error", reject);
 
@@ -26,7 +62,10 @@ export function generateInvoicePDF(order: any): Promise<Buffer> {
       // ================= INVOICE META =================
       doc.fontSize(10);
       doc.text(`Invoice No: ${order.razorpayOrderId}`, 50);
-      doc.text(`Invoice Date: ${new Date(order.createdAt).toLocaleDateString()}`, 400);
+      doc.text(
+        `Invoice Date: ${new Date(order.createdAt).toLocaleDateString()}`,
+        400
+      );
 
       doc.moveDown(1);
 
@@ -43,7 +82,10 @@ export function generateInvoicePDF(order: any): Promise<Buffer> {
 
       doc.text("SHIP TO:", 350);
       doc.text(order.address.street, 350);
-      doc.text(`${order.address.city}, ${order.address.state} - ${order.address.zip}`, 350);
+      doc.text(
+        `${order.address.city}, ${order.address.state} - ${order.address.zip}`,
+        350
+      );
 
       doc.moveDown(1.5);
 
@@ -62,9 +104,9 @@ export function generateInvoicePDF(order: any): Promise<Buffer> {
       // ================= ITEMS =================
       let y = tableTop + 25;
 
-      order.items.forEach((item: any) => {
+      order.items.forEach((item: OrderItem) => {
         doc.text(item.productSlug, 50, y, { width: 190 });
-        doc.text(order.hsnCode || '', 250, y);
+        doc.text(order.hsnCode || "", 250, y);
         doc.text(item.qty.toString(), 320, y);
         doc.text(`₹${item.price}`, 380, y);
         doc.text(`₹${(item.price * item.qty).toFixed(2)}`, 450, y);
@@ -94,10 +136,13 @@ export function generateInvoicePDF(order: any): Promise<Buffer> {
       // ================= FOOTER =================
       doc.moveDown(3);
       doc.fontSize(10);
-      doc.text("Thank you for shopping with Bashō Pottery.", { align: "center" });
-      doc.text("This is a computer-generated invoice and does not require a signature.", {
+      doc.text("Thank you for shopping with Bashō Pottery.", {
         align: "center",
       });
+      doc.text(
+        "This is a computer-generated invoice and does not require a signature.",
+        { align: "center" }
+      );
 
       doc.end();
     } catch (err) {

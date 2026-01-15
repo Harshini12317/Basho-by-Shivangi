@@ -88,7 +88,8 @@ export default function StaticDataPage() {
 
     setSaving(true);
     try {
-      const updateData: any = {};
+      const updateData: Partial<StaticData> = {};
+
 
       if (section === 'studioLocation') {
         updateData.studioLocation = studioForm;
