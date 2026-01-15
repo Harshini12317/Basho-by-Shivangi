@@ -401,7 +401,7 @@ export default function WorkshopManagement() {
                       <label className="block text-sm font-medium text-gray-700 mb-1">Level</label>
                       <select
                         value={formData.level}
-                        onChange={(e) => setFormData(prev => ({ ...prev, level: e.target.value }))}
+                        onChange={(e) => setFormData(prev => ({ ...prev, level: e.target.value as "None" | "Beginner" | "Intermediate" | "Advanced" }))}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8E5022]"
                       >
                         <option value="None">None</option>

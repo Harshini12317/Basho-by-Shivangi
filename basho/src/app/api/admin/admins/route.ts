@@ -6,7 +6,7 @@ import { authOptions } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 
 async function requireAdminSession() {
-  const session = await getServerSession(authOptions as any);
+  const session = await getServerSession(authOptions as any) as any;
   if (!session?.user?.email) return { ok: false, status: 401 };
 
   await connectDB();
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   // If check param present, return whether current session user is admin
   if (url.searchParams.get('check') === 'true') {
-    const session = await getServerSession(authOptions as any);
+    const session = await getServerSession(authOptions as any) as any;
     if (!session?.user?.email) return NextResponse.json({ isAdmin: false }, { status: 200 });
     await connectDB();
     const me = await User.findOne({ email: session.user.email }).lean();
