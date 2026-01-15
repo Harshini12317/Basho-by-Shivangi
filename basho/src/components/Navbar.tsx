@@ -1,5 +1,6 @@
 "use client";
 
+
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { FiSearch, FiShoppingBag, FiMenu, FiX } from "react-icons/fi";
@@ -114,10 +115,13 @@ export default function Navbar() {
   <Link href="/gallery">Gallery</Link>
 </div>
 
-    <div className="nav-logo">
-      <span className="logo-main">basho</span>
-      <span className="logo-sub">BYY SHIVANGI</span>
-    </div>
+<div className="nav-logo">
+  <img
+    src="/images/basho-logo.png"
+    alt="Basho by Shivangi"
+  />
+</div>
+
 
     <div className="nav-links right-links">
       <Link href="/products">Products</Link>

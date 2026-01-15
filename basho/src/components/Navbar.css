@@ -41,6 +41,19 @@
   text-align: center;
   line-height: 1;
 }
+.nav-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-logo img {
+  height: 155px;        /* 👈 main size control */
+  width: auto;
+  display: block;
+}
+
+
 
 .logo-main {
   display: block;            /* forces new line */

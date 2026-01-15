@@ -24,9 +24,10 @@
 ================================ */
 .gsap-slider-circle {
   position: relative;
-  width: 1000px;              /* ⬅ BIGGER CONTAINER */
-  height: 1000px;
+  width: clamp(320px, 80vw, 1000px);
+  height: clamp(320px, 80vw, 1000px);
 }
+
 
 /* ===============================
    CENTER TEXT
@@ -38,7 +39,8 @@
   place-items: center;
 
   font-family: serif;
-  font-size: 4.5rem;
+  font-size: clamp(1.6rem, 4vw, 4.5rem);
+
   letter-spacing: 0.14em;
   color: var(--text-primary);
   text-align: center;
@@ -51,15 +53,15 @@
    CARD – RESPONSIVE & SAFE
 ================================ */
 .gsap-slider-card {
-  position: absolute;
+ position: absolute;
   top: 50%;
   left: 50%;
 
-  width: 240px;               /* ⬅ SLIGHTLY SMALLER */
-  height: 340px;
+  width: clamp(120px, 26vw, 240px);
+  height: clamp(180px, 38vw, 340px);
 
   transform: translate(-50%, -50%);
-  border-radius: 24px;
+  border-radius: 20px;
 
   background: var(--bg-secondary);
   overflow: hidden;
@@ -80,4 +82,15 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+@media (max-width: 768px) {
+  .gsap-slider-section {
+    min-height: 110vh;
+    padding: 100px 0;
+  }
+
+  .gsap-slider-circle {
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }
 }
