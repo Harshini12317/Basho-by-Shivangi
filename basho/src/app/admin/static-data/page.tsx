@@ -184,9 +184,17 @@ export default function StaticDataPage() {
 
   return (
     <div className="px-4 py-6 sm:px-0">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900">Static Data Management</h1>
-        <p className="mt-2 text-slate-600">Manage studio location, contact information, and FAQs</p>
+      <div className="flex justify-between items-start mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">Static Data Management</h1>
+          <p className="mt-2 text-slate-600">Manage studio location, contact information, and FAQs</p>
+        </div>
+        <a href="/admin" className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2 whitespace-nowrap">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Dashboard
+        </a>
       </div>
 
       <div className="space-y-6">

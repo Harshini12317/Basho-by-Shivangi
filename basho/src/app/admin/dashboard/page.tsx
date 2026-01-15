@@ -187,6 +187,21 @@ export default function AdminDashboard() {
           <p className="text-slate-600 text-sm">Add or remove admin users who can access this panel.</p>
         </Link>
 
+        {/* Customer Management */}
+        <Link
+          href="/admin/customers"
+          className="relative bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow group"
+        >
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-green-500 text-white mb-4 group-hover:scale-110 transition-transform">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M12 4.354a4 4 0 110 5.292M15 12H9m6 0l-3 3m-6-3l3 3m6-9H9m6 0l-3-3m-6 3l3-3m6 9H9m6 0l-3-3m-6 3l3-3M9.172 19.172a4 4 0 015.656 0" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">Customer Management</h3>
+          <p className="text-slate-600 text-sm">View customer details, products purchased, and workshop registrations.</p>
+        </Link>
+
         {adminSections.map((section) => (
           <Link
             key={section.href}

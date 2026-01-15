@@ -223,9 +223,17 @@ export default function AdminPopupsPage() {
 
   return (
     <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200 p-8 space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Popup Management</h1>
-        <p className="text-slate-600">Create and manage popups for your site</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Popup Management</h1>
+          <p className="text-slate-600">Create and manage popups for your site</p>
+        </div>
+        <a href="/admin" className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Dashboard
+        </a>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">

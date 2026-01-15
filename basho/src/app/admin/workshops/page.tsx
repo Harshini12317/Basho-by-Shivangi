@@ -269,28 +269,42 @@ export default function WorkshopManagement() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Workshop Management</h1>
-          <button
-            onClick={() => {
-              setSelectedWorkshop(null);
-              setFormData({
-                title: '',
-                description: '',
-                level: 'None',
-                location: '',
-                googleMapLink: '',
-                price: 0,
-                whatYouWillLearn: '',
-                includes: '',
-                moreInfo: '',
-                images: [],
-                imageUrls: []
-              });
-              setShowAddForm(true);
-            }}
-            className="bg-[#8E5022] text-white px-4 py-2 rounded-lg hover:bg-[#7a4520] transition-colors"
-          >
-            Add Workshop
-          </button>
+          <div className="flex gap-2">
+            <a
+              href="/admin"
+              className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to Dashboard
+            </a>
+            <button
+              onClick={() => {
+                setSelectedWorkshop(null);
+                setFormData({
+                  title: '',
+                  description: '',
+                  level: 'None',
+                  location: '',
+                  googleMapLink: '',
+                  price: 0,
+                  whatYouWillLearn: '',
+                  includes: '',
+                  moreInfo: '',
+                  images: [],
+                  imageUrls: []
+                });
+                setShowAddForm(true);
+              }}
+              className="bg-[#8E5022] text-white px-4 py-2 rounded-lg hover:bg-[#7a4520] transition-colors flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add Workshop
+            </button>
+          </div>
         </div>
 
         {/* Workshops Grid */}
