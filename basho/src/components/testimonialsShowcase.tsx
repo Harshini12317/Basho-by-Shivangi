@@ -1,5 +1,7 @@
 "use client"
 import { useState, useEffect, useRef } from 'react'
+import { useSession } from 'next-auth/react'
+import Link from 'next/link'
 import './TestimonialsShowcase.css'
 import { colors } from '../constants/colors'
 import { FiPlay, FiChevronLeft, FiChevronRight, FiMessageSquare, FiUpload, FiStar, FiCheckCircle } from 'react-icons/fi'
@@ -25,14 +27,16 @@ interface VideoTestimonial {
 }
 
 export default function TestimonialsShowcase() {
-  const [activeSlide, setActiveSlide] = useState(0);
+  const { data: session } = useSession();
+  const [activePhotoSlide, setActivePhotoSlide] = useState(0);
+  const [activeTextSlide, setActiveTextSlide] = useState(0);
   const [formSending, setFormSending] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textScrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     message: '',
     rating: 5,
     image: '',
@@ -42,6 +46,7 @@ export default function TestimonialsShowcase() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const [textTestimonials, setTextTestimonials] = useState<Testimonial[]>([]);
+  const [photoTestimonials, setPhotoTestimonials] = useState<Testimonial[]>([]);
   const [videoTestimonials, setVideoTestimonials] = useState<VideoTestimonial[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -54,7 +59,8 @@ export default function TestimonialsShowcase() {
       const response = await fetch('/api/testimonials');
       const data = await response.json();
 
-      const textOnes = data.filter((t: Testimonial) => t.testimonialType === 'text');
+      const textOnes = data.filter((t: Testimonial) => t.testimonialType === 'text' && !t.image);
+      const photoOnes = data.filter((t: Testimonial) => t.testimonialType === 'text' && t.image);
       const videoOnes = data.filter((t: Testimonial) => t.testimonialType === 'video').map((t: Testimonial) => ({
         who: t.name,
         description: t.message,
@@ -62,6 +68,7 @@ export default function TestimonialsShowcase() {
       }));
 
       setTextTestimonials(textOnes);
+      setPhotoTestimonials(photoOnes);
       setVideoTestimonials(videoOnes);
       setLoading(false);
     } catch (error) {
@@ -70,35 +77,72 @@ export default function TestimonialsShowcase() {
     }
   };
 
-  const nextSlide = () => setActiveSlide((prev) => (prev + 1) % textTestimonials.length);
-  const prevSlide = () => setActiveSlide((prev) => (prev - 1 + textTestimonials.length) % textTestimonials.length);
+  const nextPhotoSlide = () => setActivePhotoSlide((prev) => (prev + 1) % photoTestimonials.length);
+  const prevPhotoSlide = () => setActivePhotoSlide((prev) => (prev - 1 + photoTestimonials.length) % photoTestimonials.length);
+
+  const nextTextSlide = () => setActiveTextSlide((prev) => (prev + 1) % textTestimonials.length);
+  const prevTextSlide = () => setActiveTextSlide((prev) => (prev - 1 + textTestimonials.length) % textTestimonials.length);
 
   useEffect(() => {
-    if (textTestimonials.length > 0) {
-      const timer = setInterval(nextSlide, 4000);
-      return () => clearInterval(timer);
+    if (session?.user?.email) {
+      setFormData(prev => ({
+        ...prev,
+        name: session.user.name || '',
+      }));
     }
-  }, [textTestimonials.length]);
+  }, [session]);
+
+  // Auto-rotate photo testimonials every 4 seconds
+  useEffect(() => {
+    if (photoTestimonials.length === 0) return;
+    
+    const interval = setInterval(() => {
+      setActivePhotoSlide((prev) => (prev + 1) % photoTestimonials.length);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [photoTestimonials.length]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!session?.user?.email) {
+      alert('Please login to submit a review');
+      return;
+    }
+
     setFormSending(true);
 
     try {
-      const imageUrl = '';
-      const videoUrl = '';
+      let imageUrl = '';
+      let videoUrl = '';
 
-      // For now, we'll skip file upload and just submit the text data
-      // TODO: Implement proper file upload when Cloudinary is configured
+      // Upload file to Cloudinary if selected
       if (selectedFile) {
-        console.log('File selected but upload not implemented yet:', selectedFile.name);
-        // For now, we'll just submit without the file
+        const formDataUpload = new FormData();
+        formDataUpload.append('file', selectedFile);
+
+        const uploadResponse = await fetch('/api/upload', {
+          method: 'POST',
+          body: formDataUpload,
+        });
+
+        if (uploadResponse.ok) {
+          const uploadData = await uploadResponse.json();
+          if (selectedFile.type.startsWith('video/')) {
+            videoUrl = uploadData.url;
+          } else {
+            imageUrl = uploadData.url;
+          }
+        } else {
+          throw new Error('Failed to upload file');
+        }
       }
 
-      // Submit review
+      // Submit review with email from session
       const reviewData = {
         name: formData.name,
-        email: formData.email,
+        email: session.user.email,
         message: formData.message,
         rating: formData.rating,
         image: imageUrl || formData.image,
@@ -117,8 +161,7 @@ export default function TestimonialsShowcase() {
       if (response.ok) {
         setFormSubmitted(true);
         setFormData({
-          name: '',
-          email: '',
+          name: session.user.name || '',
           message: '',
           rating: 5,
           image: '',
@@ -167,7 +210,7 @@ export default function TestimonialsShowcase() {
             <div key={i} className={`ts-zigzag-item ${i % 2 !== 0 ? 'reverse' : ''}`}>
               <div className="ts-video-box">
                 <div className="ts-video-frame">
-                  <iframe src={v.videoUrl} title={v.who} allowFullScreen />
+                  <iframe src={`${v.videoUrl}?autoplay=1&muted=1`} title={v.who} allowFullScreen />
                 </div>
               </div>
               <div className="ts-video-desc">
@@ -186,38 +229,76 @@ export default function TestimonialsShowcase() {
 
       <div className="ts-slider-section">
         <h3 className="ts-section-title">Customer Spotlight</h3>
-        {textTestimonials.length > 0 ? (
+        {photoTestimonials.length > 0 ? (
           <div className="ts-slider-wrapper">
-            <button className="ts-nav-btn ts-prev" onClick={prevSlide}><FiChevronLeft /></button>
+            <button className="ts-nav-btn ts-prev" onClick={prevPhotoSlide}><FiChevronLeft /></button>
             <div className="ts-slider-main">
               <div className="ts-slide-image-box">
-                <img src={textTestimonials[activeSlide].image || '/images/img10.png'} alt={textTestimonials[activeSlide].name} />
+                <img src={photoTestimonials[activePhotoSlide].image || '/images/img10.png'} alt={photoTestimonials[activePhotoSlide].name} />
               </div>
               <div className="ts-slide-text-box">
                 <div className="ts-rating">
                   {[...Array(5)].map((_, i) => (
-                    <FiStar key={i} className={i < textTestimonials[activeSlide].rating ? 'star-active' : 'star-inactive'} />
+                    <FiStar key={i} className={i < photoTestimonials[activePhotoSlide].rating ? 'star-active' : 'star-inactive'} />
                   ))}
                 </div>
-                <p className="ts-quote-text">&quot;{textTestimonials[activeSlide].message}&quot;</p>
+                <p className="ts-quote-text">&quot;{photoTestimonials[activePhotoSlide].message}&quot;</p>
                 <div className="ts-author-info">
-                  <span className="ts-author-name"> — {textTestimonials[activeSlide].name}</span>
+                  <span className="ts-author-name"> — {photoTestimonials[activePhotoSlide].name}</span>
                 </div>
               </div>
             </div>
-            <button className="ts-nav-btn ts-next" onClick={nextSlide}><FiChevronRight /></button>
+            <button className="ts-nav-btn ts-next" onClick={nextPhotoSlide}><FiChevronRight /></button>
           </div>
         ) : (
           <p className="ts-no-testimonials">No testimonials available yet.</p>
         )}
-        {textTestimonials.length > 1 && (
+        {photoTestimonials.length > 1 && (
           <div className="ts-pagination">
-            {textTestimonials.map((_, i) => (
-              <div key={i} className={`ts-p-dot ${i === activeSlide ? 'active' : ''}`} onClick={() => setActiveSlide(i)} />
+            {photoTestimonials.map((_, i) => (
+              <div key={i} className={`ts-p-dot ${i === activePhotoSlide ? 'active' : ''}`} onClick={() => setActivePhotoSlide(i)} />
             ))}
           </div>
         )}
       </div>
+
+      {/* Text Reviews Section */}
+      {textTestimonials.length > 0 && (
+        <div className="ts-text-reviews-section">
+          <h3 className="ts-section-title">What Our Customers Say</h3>
+          <div className="ts-text-carousel-wrapper">
+            <button className="ts-nav-btn ts-prev" onClick={prevTextSlide}><FiChevronLeft /></button>
+            <div className="ts-text-carousel-container" ref={textScrollContainerRef}>
+              <div className="ts-text-carousel">
+                {textTestimonials.map((review, index) => (
+                  <div 
+                    key={review._id} 
+                    className={`ts-text-review-card ${index === activeTextSlide ? 'active' : ''}`}
+                  >
+                    <div className="ts-text-rating">
+                      {[...Array(5)].map((_, i) => (
+                        <FiStar key={i} className={i < review.rating ? 'star-active' : 'star-inactive'} />
+                      ))}
+                    </div>
+                    <p className="ts-text-review-message">&quot;{review.message}&quot;</p>
+                    <div className="ts-text-review-author">
+                      <strong>{review.name}</strong>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <button className="ts-nav-btn ts-next" onClick={nextTextSlide}><FiChevronRight /></button>
+          </div>
+          {textTestimonials.length > 1 && (
+            <div className="ts-pagination">
+              {textTestimonials.map((_, i) => (
+                <div key={i} className={`ts-p-dot ${i === activeTextSlide ? 'active' : ''}`} onClick={() => setActiveTextSlide(i)} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="ts-form-section">
         <div className="ts-form-glass">
@@ -233,7 +314,16 @@ export default function TestimonialsShowcase() {
           </div>
           
           <div className="ts-form-container">
-            {formSubmitted ? (
+            {!session?.user?.email ? (
+              <div className="ts-success-msg">
+                <FiCheckCircle className="success-icon" />
+                <h4>Login Required</h4>
+                <p>Please login to share your story with us.</p>
+                <Link href="/auth" className="ts-premium-btn" style={{ display: 'inline-block', marginTop: '1rem' }}>
+                  Login
+                </Link>
+              </div>
+            ) : formSubmitted ? (
               <div className="ts-success-msg">
                 <FiCheckCircle className="success-icon" />
                 <h4>Thank You!</h4>
@@ -247,13 +337,6 @@ export default function TestimonialsShowcase() {
                     placeholder="Full Name"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    required
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email Address"
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                     required
                   />
                 </div>

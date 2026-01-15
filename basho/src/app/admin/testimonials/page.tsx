@@ -35,6 +35,8 @@ export default function AdminTestimonials() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null);
+  const [reviewFilter, setReviewFilter] = useState<'all' | 'text-only' | 'photo' | 'video'>('all');
+  const [testimonialFilter, setTestimonialFilter] = useState<'all' | 'text-only' | 'photo' | 'video'>('all');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -86,6 +88,28 @@ export default function AdminTestimonials() {
       testimonialType: 'text' as 'text' | 'video',
       isPublished: false,
       featured: false,
+    });
+  };
+
+  const getFilteredReviews = () => {
+    return userReviews.filter(review => {
+      if (reviewFilter === 'all') return true;
+      if (reviewFilter === 'text-only') return !review.image && !review.videoUrl;
+      if (reviewFilter === 'photo') return review.image && !review.videoUrl;
+      if (reviewFilter === 'video') return review.videoUrl;
+      
+      return true;
+    });
+  };
+
+  const getFilteredTestimonials = () => {
+    return testimonials.filter(testimonial => {
+      if (testimonialFilter === 'all') return true;
+      if (testimonialFilter === 'text-only') return !testimonial.image && !testimonial.videoUrl;
+      if (testimonialFilter === 'photo') return testimonial.image && !testimonial.videoUrl;
+      if (testimonialFilter === 'video') return testimonial.videoUrl;
+      
+      return true;
     });
   };
 
@@ -152,41 +176,23 @@ export default function AdminTestimonials() {
 
   const handleAddToWebsite = async (userReview: UserReview) => {
     try {
-      const testimonialData = {
-        name: userReview.name,
-        email: userReview.email,
-        message: userReview.message,
-        rating: userReview.rating,
-        image: userReview.image,
-        videoUrl: userReview.videoUrl,
-        testimonialType: userReview.testimonialType,
-        isPublished: true,
-        featured: false,
-      };
-
-      const response = await fetch('/api/admin/testimonials', {
-        method: 'POST',
+      // Update user review status to approved - this will create the testimonial on the backend
+      const response = await fetch('/api/admin/user-reviews', {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(testimonialData),
+        body: JSON.stringify({
+          id: userReview._id,
+          action: 'approve',
+          testimonialType: userReview.testimonialType,
+          videoUrl: userReview.videoUrl,
+          image: userReview.image,
+          reviewedBy: 'Admin',
+        }),
       });
 
       if (response.ok) {
-        // Update user review status to approved
-        await fetch('/api/admin/user-reviews', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            id: userReview._id,
-            action: 'approve',
-            testimonialType: userReview.testimonialType,
-            reviewedBy: 'Admin',
-          }),
-        });
-
         fetchTestimonials();
         fetchUserReviews();
       }
@@ -234,12 +240,6 @@ export default function AdminTestimonials() {
             Dashboard
           </a>
           <a
-            href="/admin/user-reviews"
-            className="text-slate-600 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium"
-          >
-            User Reviews
-          </a>
-          <a
             href="/admin/testimonials"
             className="bg-slate-900 text-white px-3 py-2 rounded-md text-sm font-medium"
           >
@@ -250,8 +250,8 @@ export default function AdminTestimonials() {
 
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Testimonials Management</h1>
-          <p className="mt-2 text-slate-600">Manage customer testimonials</p>
+          <h1 className="text-3xl font-bold text-slate-900">Testimonials & Reviews</h1>
+          <p className="mt-2 text-slate-600">Review and manage customer testimonials. Approve pending reviews to publish them on the website.</p>
         </div>
         <button
           onClick={() => {
@@ -399,12 +399,63 @@ export default function AdminTestimonials() {
       )}
 
       {/* User Reviews Section */}
-      {userReviews.filter(review => review.status === 'pending').length > 0 && (
+      {userReviews.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">Pending User Reviews</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">All Reviews</h2>
+          <p className="text-slate-600 mb-4">Manage all customer reviews. Filter by type below. Pending reviews await approval, approved reviews are published, and rejected reviews are hidden.</p>
+          
+          {/* Filter Buttons */}
+          <div className="flex gap-2 mb-6 flex-wrap">
+            <button
+              onClick={() => setReviewFilter('all')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                reviewFilter === 'all'
+                  ? 'bg-slate-900 text-white'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              All Reviews ({userReviews.length})
+            </button>
+            <button
+              onClick={() => setReviewFilter('text-only')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                reviewFilter === 'text-only'
+                  ? 'bg-slate-900 text-white'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              Text Only ({userReviews.filter(r => !r.image && !r.videoUrl).length})
+            </button>
+            <button
+              onClick={() => setReviewFilter('photo')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                reviewFilter === 'photo'
+                  ? 'bg-slate-900 text-white'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              With Photo ({userReviews.filter(r => r.image && !r.videoUrl).length})
+            </button>
+            <button
+              onClick={() => setReviewFilter('video')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                reviewFilter === 'video'
+                  ? 'bg-slate-900 text-white'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              With Video ({userReviews.filter(r => r.videoUrl).length})
+            </button>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {userReviews.filter(review => review.status === 'pending').map((review) => (
-              <div key={review._id} className="bg-yellow-50 rounded-lg shadow-sm border border-yellow-200 p-6">
+            {getFilteredReviews().length > 0 ? (
+              getFilteredReviews().map((review) => (
+            <div key={review._id} className={`rounded-lg shadow-sm border p-6 ${
+              review.status === 'pending' ? 'bg-yellow-50 border-yellow-200' :
+              review.status === 'approved' ? 'bg-green-50 border-green-200' :
+              'bg-red-50 border-red-200'
+            }`}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     {review.image ? (
@@ -438,17 +489,25 @@ export default function AdminTestimonials() {
 
                 <p className="text-slate-700 mb-4">&quot;{review.message}&quot;</p>
 
-                {review.videoUrl && (
+                {review.image && review.testimonialType === 'text' && (
                   <div className="mb-4">
-                    <p className="text-sm text-slate-600 mb-1">Video:</p>
-                    <a
-                      href={review.videoUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 text-sm break-all"
-                    >
-                      {review.videoUrl}
-                    </a>
+                    <p className="text-sm text-slate-600 mb-2">Photo Submitted:</p>
+                    <img
+                      src={review.image}
+                      alt="User uploaded"
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                  </div>
+                )}
+
+                {review.videoUrl && review.testimonialType === 'video' && (
+                  <div className="mb-4">
+                    <p className="text-sm text-slate-600 mb-2">Video Submitted:</p>
+                    <video
+                      src={review.videoUrl}
+                      controls
+                      className="w-full h-48 object-cover rounded-lg bg-gray-900"
+                    />
                   </div>
                 )}
 
@@ -457,122 +516,190 @@ export default function AdminTestimonials() {
                 </div>
 
                 <div className="flex gap-2">
-                  <button
-                    onClick={() => handleAddToWebsite(review)}
-                    className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-                  >
-                    Add to Website
-                  </button>
-                  <button
-                    onClick={async () => {
-                      await fetch('/api/admin/user-reviews', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id: review._id, action: 'reject', reviewedBy: 'Admin' }),
-                      });
-                      fetchUserReviews();
-                    }}
-                    className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
-                  >
-                    Reject
-                  </button>
+                  {review.status === 'pending' ? (
+                    <>
+                      <button
+                        onClick={() => handleAddToWebsite(review)}
+                        className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                      >
+                        Approve & Add
+                      </button>
+                      <button
+                        onClick={async () => {
+                          await fetch('/api/admin/user-reviews', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: review._id, action: 'reject', reviewedBy: 'Admin' }),
+                          });
+                          fetchUserReviews();
+                        }}
+                        className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                      >
+                        Reject
+                      </button>
+                    </>
+                  ) : (
+                    <div className="w-full px-4 py-2 rounded-lg text-sm font-medium text-center" style={{
+                      backgroundColor: review.status === 'approved' ? '#d1fae5' : '#fee2e2',
+                      color: review.status === 'approved' ? '#065f46' : '#991b1b'
+                    }}>
+                      {review.status === 'approved' ? '✓ Approved' : '✗ Rejected'}
+                    </div>
+                  )}
                 </div>
               </div>
-            ))}
+              ))
+            ) : (
+              <div className="col-span-1 lg:col-span-2 bg-slate-50 rounded-lg p-8 text-center">
+                <p className="text-slate-600 font-medium">No reviews found with selected filter</p>
+              </div>
+            )}
           </div>
         </div>
       )}
 
       {/* Testimonials List */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-slate-900">Published Testimonials</h2>
-        <p className="mt-2 text-slate-600">Manage testimonials that are currently displayed on the website</p>
+        <h2 className="text-2xl font-bold text-slate-900">Approved Testimonials</h2>
+        <p className="mt-2 text-slate-600">These testimonials are currently displayed on the website. Click Edit to modify or Delete to remove.</p>
+        
+        {/* Testimonials Filter Buttons */}
+        <div className="flex flex-wrap gap-2 mt-4">
+          <button
+            onClick={() => setTestimonialFilter('all')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              testimonialFilter === 'all'
+                ? 'bg-slate-900 text-white'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            All ({testimonials.length})
+          </button>
+          <button
+            onClick={() => setTestimonialFilter('text-only')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              testimonialFilter === 'text-only'
+                ? 'bg-slate-900 text-white'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            Text Only ({testimonials.filter(t => !t.image && !t.videoUrl).length})
+          </button>
+          <button
+            onClick={() => setTestimonialFilter('photo')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              testimonialFilter === 'photo'
+                ? 'bg-slate-900 text-white'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            With Photo ({testimonials.filter(t => t.image && !t.videoUrl).length})
+          </button>
+          <button
+            onClick={() => setTestimonialFilter('video')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              testimonialFilter === 'video'
+                ? 'bg-slate-900 text-white'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            With Video ({testimonials.filter(t => t.videoUrl).length})
+          </button>
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {testimonials.map((testimonial) => (
-          <div key={testimonial._id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                {testimonial.image ? (
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center">
-                    <span className="text-slate-600 font-medium">
-                      {testimonial.name.charAt(0).toUpperCase()}
-                    </span>
+        {getFilteredTestimonials().length > 0 ? (
+          getFilteredTestimonials().map((testimonial) => (
+            <div key={testimonial._id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  {testimonial.image ? (
+                    <img
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center">
+                      <span className="text-slate-600 font-medium">
+                        {testimonial.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="font-medium text-slate-900">{testimonial.name}</h3>
+                    <p className="text-sm text-slate-500">{testimonial.email}</p>
                   </div>
-                )}
-                <div>
-                  <h3 className="font-medium text-slate-900">{testimonial.name}</h3>
-                  <p className="text-sm text-slate-500">{testimonial.email}</p>
+                </div>
+                <div className="flex gap-1">
+                  {testimonial.featured && (
+                    <span className="inline-flex px-2 py-1 text-xs font-medium rounded bg-yellow-100 text-yellow-800">
+                      Featured
+                    </span>
+                  )}
+                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
+                    testimonial.testimonialType === 'video' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {testimonial.testimonialType === 'video' ? 'Video' : 'Text'}
+                  </span>
+                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
+                    testimonial.isPublished ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}>
+                    {testimonial.isPublished ? 'Published' : 'Draft'}
+                  </span>
                 </div>
               </div>
-              <div className="flex gap-1">
-                {testimonial.featured && (
-                  <span className="inline-flex px-2 py-1 text-xs font-medium rounded bg-yellow-100 text-yellow-800">
-                    Featured
-                  </span>
-                )}
-                <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
-                  testimonial.testimonialType === 'video' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {testimonial.testimonialType === 'video' ? 'Video' : 'Text'}
-                </span>
-                <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
-                  testimonial.isPublished ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
-                  {testimonial.isPublished ? 'Published' : 'Draft'}
-                </span>
-              </div>
-            </div>
 
-            <div className="mb-4">
-              {renderStars(testimonial.rating)}
-            </div>
-
-            <p className="text-slate-700 mb-4 line-clamp-3">&quot;{testimonial.message}&quot;</p>
-
-            {testimonial.videoUrl && (
               <div className="mb-4">
-                <p className="text-sm text-slate-600 mb-1">Video:</p>
-                <a
-                  href={testimonial.videoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 text-sm break-all"
-                >
-                  {testimonial.videoUrl}
-                </a>
+                {renderStars(testimonial.rating)}
               </div>
-            )}
 
-            <div className="flex justify-between items-center text-sm text-slate-500">
-              <span>{new Date(testimonial.createdAt).toLocaleDateString()}</span>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleEdit(testimonial)}
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(testimonial._id)}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  Delete
-                </button>
+              <p className="text-slate-700 mb-4 line-clamp-3">&quot;{testimonial.message}&quot;</p>
+
+              {testimonial.image && testimonial.testimonialType === 'text' && (
+                <div className="mb-4">
+                  <p className="text-sm text-slate-600 mb-2">Photo:</p>
+                  <img
+                    src={testimonial.image}
+                    alt="Testimonial"
+                    className="w-full h-40 object-cover rounded-lg"
+                  />
+                </div>
+              )}
+
+              {testimonial.videoUrl && testimonial.testimonialType === 'video' && (
+                <div className="mb-4">
+                  <p className="text-sm text-slate-600 mb-2">Video:</p>
+                  <video
+                    src={testimonial.videoUrl}
+                    controls
+                    className="w-full h-40 object-cover rounded-lg bg-gray-900"
+                  />
+                </div>
+              )}
+
+              <div className="flex justify-between items-center text-sm text-slate-500">
+                <span>{new Date(testimonial.createdAt).toLocaleDateString()}</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(testimonial)}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(testimonial._id)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-
-        {testimonials.length === 0 && (
-          <div className="col-span-full text-center py-12">
-            <p className="text-slate-500">No testimonials found</p>
+          ))
+        ) : (
+          <div className="col-span-full bg-slate-50 rounded-lg p-8 text-center">
+            <p className="text-slate-600 font-medium">No testimonials found with selected filter</p>
           </div>
         )}
       </div>

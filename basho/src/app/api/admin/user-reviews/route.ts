@@ -19,7 +19,7 @@ export async function GET() {
 export async function PUT(request: NextRequest) {
   try {
     await connectDB();
-    const { id, action, testimonialType, videoUrl, reviewedBy } = await request.json();
+    const { id, action, testimonialType, videoUrl, image, reviewedBy } = await request.json();
 
     if (action === 'approve') {
       // Find the user review
@@ -37,8 +37,8 @@ export async function PUT(request: NextRequest) {
         email: userReview.email,
         message: userReview.message,
         rating: userReview.rating,
-        image: userReview.image,
-        videoUrl: testimonialType === 'video' ? videoUrl : undefined,
+        image: image || userReview.image,
+        videoUrl: testimonialType === 'video' ? (videoUrl || userReview.videoUrl) : undefined,
         testimonialType: testimonialType || userReview.testimonialType,
         isPublished: true,
         featured: false,
@@ -52,7 +52,7 @@ export async function PUT(request: NextRequest) {
         reviewedAt: new Date(),
         reviewedBy,
         testimonialType: testimonialType || userReview.testimonialType,
-        videoUrl: testimonialType === 'video' ? videoUrl : userReview.videoUrl,
+        videoUrl: testimonialType === 'video' ? (videoUrl || userReview.videoUrl) : userReview.videoUrl,
       });
 
       return NextResponse.json({
