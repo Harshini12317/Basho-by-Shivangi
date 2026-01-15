@@ -30,8 +30,13 @@ export default function PopupDisplay({ currentPage }: { currentPage: string }) {
   const slugMatch = pathname.match(/^\/workshop\/([^/?#]+)/);
   const currentSlug = slugMatch?.[1] || null;
   const [imgIndex, setImgIndex] = useState(0);
+  
   useEffect(() => {
-    setImgIndex(0);
+    // Reset image index when popup changes, but do it in a callback
+    const timer = setTimeout(() => {
+      setImgIndex(0);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [popup, showPopup]);
 
   const shouldShowByFrequency = (p: PopupItem) => {

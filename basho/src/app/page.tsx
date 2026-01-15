@@ -1,8 +1,22 @@
-import HeroPot from "@/components/HeroPot";
-import GsapSlider from "@/components/GsapSlider";
-import FeaturesSection from "@/components/FeaturesSection";
-import Footer from "@/components/Footer";
+'use client';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 
+// Dynamic imports for heavy components
+const HeroPot = dynamic(() => import('@/components/HeroPot'), {
+  loading: () => <div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />,
+  ssr: true,
+});
+
+const GsapSlider = dynamic(() => import('@/components/GsapSlider'), {
+  loading: () => <div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />,
+  ssr: false, // This is animation-heavy
+});
+
+const FeaturesSection = dynamic(() => import('@/components/FeaturesSection'), {
+  loading: () => <div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />,
+  ssr: true,
+});
 
 export default function Home() {
   return (
@@ -45,7 +59,9 @@ export default function Home() {
 
             {/* RIGHT — 3D POT */}
             <div className="flex justify-center lg:justify-end">
-              <HeroPot />
+              <Suspense fallback={<div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />}>
+                <HeroPot />
+              </Suspense>
             </div>
 
           </div>
@@ -53,9 +69,13 @@ export default function Home() {
       </section>
 
       {/* ================= GSAP PRODUCT SLIDER ================= */}
-      <GsapSlider />
-      <FeaturesSection />
+      <Suspense fallback={<div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />}>
+        <GsapSlider />
+      </Suspense>
       
+      <Suspense fallback={<div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />}>
+        <FeaturesSection />
+      </Suspense>
       
     </>
   );

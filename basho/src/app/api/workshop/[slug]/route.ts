@@ -4,11 +4,12 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   req: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
+  const { slug } = await params;
   await connectDB();
 
-  const workshop = await Workshop.findOne({ slug: params.slug });
+  const workshop = await Workshop.findOne({ slug });
   if (!workshop) {
     return NextResponse.json({ error: 'Workshop not found' }, { status: 404 });
   }

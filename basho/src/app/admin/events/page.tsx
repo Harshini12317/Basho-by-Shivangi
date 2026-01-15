@@ -1,10 +1,17 @@
-// 'use client';
+'use client';
 
-// import { useState, useEffect } from 'react';
-// import { IEvent } from '@/models/Event';
-
-// interface EventFormData {
-//   title: string;
+export default function EventsManagement() {
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-gray-900">Events Management</h1>
+      </div>
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <p className="text-gray-600">Events management is currently under development.</p>
+      </div>
+    </div>
+  );
+}
 //   description: string;
 //   date: string;
 //   endDate: string;

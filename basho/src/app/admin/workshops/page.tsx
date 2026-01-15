@@ -25,7 +25,6 @@ export default function WorkshopManagement() {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -334,7 +333,7 @@ export default function WorkshopManagement() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No workshops yet</h3>
-                <p className="text-gray-500 mb-6">Get started by creating your first workshop. Click the "Add Workshop" button above to begin.</p>
+                <p className="text-gray-500 mb-6">Get started by creating your first workshop. Click the &quot;Add Workshop&quot; button above to begin.</p>
                 <button
                   onClick={() => {
                     setSelectedWorkshop(null);
@@ -402,7 +401,7 @@ export default function WorkshopManagement() {
                       <label className="block text-sm font-medium text-gray-700 mb-1">Level</label>
                       <select
                         value={formData.level}
-                        onChange={(e) => setFormData(prev => ({ ...prev, level: e.target.value as any }))}
+                        onChange={(e) => setFormData(prev => ({ ...prev, level: e.target.value }))}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8E5022]"
                       >
                         <option value="None">None</option>
