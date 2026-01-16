@@ -5,7 +5,7 @@ import Event from '@/models/Event';
 export async function GET() {
   try {
     await connectDB();
-    const events = await Event.find({}).sort({ date: 1 });
+    const events = await Event.find({}).sort({ createdAt: -1 });
     return NextResponse.json(events);
   } catch (error) {
     return NextResponse.json(
@@ -19,12 +19,34 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB();
     const body = await request.json();
+    
+    // Ensure date fields have valid values
+    if (!body.date) {
+      body.date = null;
+    }
+    if (!body.endDate) {
+      body.endDate = null;
+    }
+    
+    // Generate unique slug
+    let slug = body.slug;
+    let existingEvent = await Event.findOne({ slug });
+    let counter = 1;
+    
+    while (existingEvent) {
+      slug = `${body.slug}-${counter}`;
+      existingEvent = await Event.findOne({ slug });
+      counter++;
+    }
+    
+    body.slug = slug;
     const event = new Event(body);
     await event.save();
     return NextResponse.json(event, { status: 201 });
   } catch (error) {
+    console.error('Event creation error:', error);
     return NextResponse.json(
-      { error: 'Failed to create event' },
+      { error: error instanceof Error ? error.message : 'Failed to create event' },
       { status: 500 }
     );
   }
@@ -50,8 +72,9 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(event);
   } catch (error) {
+    console.error('Event update error:', error);
     return NextResponse.json(
-      { error: 'Failed to update event' },
+      { error: error instanceof Error ? error.message : 'Failed to update event' },
       { status: 500 }
     );
   }

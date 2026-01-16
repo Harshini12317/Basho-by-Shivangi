@@ -4,9 +4,10 @@ export interface IEvent extends Document {
   title: string;
   slug: string;
   description: string;
-  date: Date;
+  date?: Date;
   endDate?: Date;
   location: string;
+  locationLink?: string;
   images: string[];
   type: "workshop" | "exhibition" | "fair" | "other";
   isPublished: boolean;
@@ -19,11 +20,12 @@ export interface IEvent extends Document {
 const EventSchema = new Schema<IEvent>(
   {
     title: { type: String, required: true },
-    slug: { type: String, required: true, unique: true },
+    slug: { type: String, required: true, unique: true, sparse: true },
     description: { type: String, required: true },
-    date: { type: Date, required: true },
-    endDate: Date,
+    date: { type: Date, required: false, default: null },
+    endDate: { type: Date, required: false, default: null },
     location: { type: String, required: true },
+    locationLink: { type: String, required: false, default: null },
     images: [String],
     type: {
       type: String,

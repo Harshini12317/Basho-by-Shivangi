@@ -23,6 +23,11 @@ const StaticDataSchema = new Schema(
       question: { type: String, default: '' },
       answer: { type: String, default: '' },
     }],
+    experiences: [{
+      image: { type: String, default: '' },
+      title: { type: String, default: '' },
+      description: { type: String, default: '' },
+    }],
     hsnCode: { type: String, default: '' },
   },
   {
