@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
     const { searchParams } = new URL(request.url);
-    const eventId = searchParams.get('eventId');
+    const eventId = searchParams.get('eventId') ;
 
     if (!eventId) {
       return NextResponse.json(
