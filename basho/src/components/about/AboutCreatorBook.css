@@ -2,7 +2,7 @@
 
 .book-stage {
   height: 100vh;
-  background: #f7eada;
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245,238,232,0.6));
   display: flex;
   align-items: center;
   overflow: hidden;

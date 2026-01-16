@@ -27,19 +27,11 @@ export default function AboutPhilosophy() {
 
   return (
     <section className="philosophy-section">
-      <div className="philosophy-inner">
-        <h3>The Philosophy of Basho</h3>
-
-        <p>
-          Basho is a quiet practice of patience and presence. Each piece begins
-          as earth, shaped slowly by hand, guided not by perfection but by
-          intention.
-        </p>
-
-        <p>
-          Subtle irregularities are not corrected — they are preserved, allowing
-          the vessel to carry memory, time, and the marks of its making.
-        </p>
+      <div className="philosophy-container">
+        <h2>The Philosophy of Basho</h2>
+        <div className="philosophy-image">
+          <img src="/images/bashostory1.jpg" alt="Basho Philosophy" />
+        </div>
       </div>
     </section>
   );

@@ -1,6 +1,6 @@
 .process-section {
-  background: #f7eada;
-  padding: 7rem 1.5rem;
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245,238,232,0.6));
+  padding: 4rem 1.5rem;
 }
 
 .process-timeline {
@@ -36,19 +36,14 @@
   border-radius: 50%;
   flex-shrink: 0;
   margin-top: 0.4rem;
-
-  /* Initial state — deep but muted */
   background: rgba(122, 86, 59, 0.45);
-
- 
   transition: background 0.4s ease, box-shadow 0.4s ease;
 }
+
 .process-item:hover .process-dot {
-  /* On hover — brighter with glow */
   background: #da6d3d;
   box-shadow: 0 0 8px rgba(160, 76, 40, 0.6);
 }
-
 
 /* Card */
 .process-card {
@@ -58,6 +53,10 @@
   max-width: 520px;
   transition: transform 0.25s ease;
   transform-origin: center;
+}
+
+.process-card:hover {
+  animation: handmade-shake 0.35s ease-in-out;
 }
 
 /* TEXT */
@@ -72,11 +71,6 @@
   font-size: 1.02rem;
   line-height: 1.8;
   color: #7a563b;
-}
-
-/* 🔥 HANDMADE SHAKE ON HOVER */
-.process-card:hover {
-  animation: handmade-shake 0.35s ease-in-out;
 }
 
 /* Shake keyframes (very subtle) */
