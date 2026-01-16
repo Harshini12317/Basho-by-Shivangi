@@ -14,6 +14,7 @@ interface Event {
   title: string;
   description: string;
   location: string;
+  locationLink?: string;
   images: string[];
   type: string;
   isPublished: boolean;
@@ -469,7 +470,6 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
                       {experience.description}
                     </p>
                     <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Book Now</Link>
-                    <button onClick={() => openModal(experience.title.toLowerCase().replace(/\s+/g, '-'))} className="inline-block mt-3 ml-2 bg-white text-slate-900 px-4 py-2 rounded-full ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">Register Interest</button>
                   </div>
                 </div>
               ))}
