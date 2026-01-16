@@ -9,6 +9,7 @@ interface IEvent {
   date: string;
   endDate?: string;
   location: string;
+  locationLink?: string;
   images: string[];
   type: 'workshop' | 'exhibition' | 'fair' | 'other';
   isPublished: boolean;

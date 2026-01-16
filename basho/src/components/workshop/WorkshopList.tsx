@@ -14,6 +14,7 @@ interface Event {
   title: string;
   description: string;
   location: string;
+  locationLink?: string;
   images: string[];
   type: string;
   isPublished: boolean;
@@ -173,6 +174,12 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
     setShowModal(false);
     setSelectedEventId(null);
     setReg({ name: '', mobile: '', date: '' });
+  };
+
+  const openModal = (slug: string) => {
+    setSelectedSlug(slug);
+    setShowModal(true);
+    setRegStatus('idle');
   };
 
   const submitBooking = async () => {
