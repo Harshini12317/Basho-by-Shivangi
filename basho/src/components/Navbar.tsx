@@ -50,22 +50,6 @@ export default function Navbar() {
           setCartItemCount(0);
         }
       }
-
-      // Check if user is admin
-      if (session?.user?.email) {
-        try {
-          const adminResponse = await fetch('/api/admin/admins?check=true');
-          if (adminResponse.ok) {
-            const adminData = await adminResponse.json();
-            setIsAdmin(!!adminData.isAdmin);
-          }
-        } catch (error) {
-          console.error("Error checking admin status:", error);
-          setIsAdmin(false);
-        }
-      } else {
-        setIsAdmin(false);
-      }
     };
 
     updateCartCount();
@@ -97,6 +81,29 @@ export default function Navbar() {
       window.removeEventListener("cartUpdated", handleCartUpdate);
     };
   }, [session]);
+
+  useEffect(() => {
+    // Only check admin status when session changes
+    if (session?.user?.email) {
+      const checkAdminStatus = async () => {
+        try {
+          const adminResponse = await fetch('/api/admin/admins?check=true');
+          if (adminResponse.ok) {
+            const adminData = await adminResponse.json();
+            setIsAdmin(!!adminData.isAdmin);
+          } else {
+            setIsAdmin(false);
+          }
+        } catch (error) {
+          console.error("Error checking admin status:", error);
+          setIsAdmin(false);
+        }
+      };
+      checkAdminStatus();
+    } else {
+      setIsAdmin(false);
+    }
+  }, [session?.user?.email]);
 
   useEffect(() => {
     const handleScroll = () => {
