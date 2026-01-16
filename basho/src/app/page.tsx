@@ -1,88 +1,79 @@
 'use client';
+
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
-
-// Dynamic imports for heavy components
-const HeroPot = dynamic(() => import('@/components/HeroPot'), {
-  loading: () => <div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />,
-  ssr: true,
-});
+import { FiArrowRight } from 'react-icons/fi';
 
 const GsapSlider = dynamic(() => import('@/components/GsapSlider'), {
-  loading: () => <div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />,
-  ssr: false, // This is animation-heavy
+  loading: () => (
+    <div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />
+  ),
+  ssr: false,
 });
 
 const FeaturesSection = dynamic(() => import('@/components/FeaturesSection'), {
-  loading: () => <div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />,
+  loading: () => (
+    <div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />
+  ),
   ssr: true,
 });
 
 export default function Home() {
   return (
     <>
-      <section className="hero relative min-h-screen">
+      <section
+        className="hero hero-submerged relative min-h-[70vh]"
+        style={{
+          backgroundImage:
+            'linear-gradient(180deg, rgba(255,255,255,0.96), rgba(237,216,180,0.22)), url("/images/pottery-hero.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
         <div className="mx-auto max-w-7xl px-10 pt-8">
-          <div className="grid grid-cols-1 items-center gap-24 lg:grid-cols-2">
-            
-            {/* LEFT — TEXT */}
-            <div className="max-w-xl">
+         <div className="min-h-[60vh] grid grid-cols-1 lg:grid-cols-2 items-center">
+
+           <div className="hero-content max-w-xl ml-auto text-left lg:text-right">
+
+              <p className="hero-badge">FLAT 25% DISCOUNT</p>
               <h1 className="text-5xl font-medium leading-tight text-[var(--text-primary)]">
-                Experience the Artistry <br />
-                of Handmade Pottery
+                Multipurpose Ceramic<br />Dotted Kitchen
               </h1>
-
               <p className="mt-6 text-lg leading-relaxed text-[var(--text-muted)]">
-                Discover the beauty and craftsmanship of Basho, where every
-                piece is thoughtfully handcrafted to bring warmth, balance,
-                and quiet elegance into your living space.
+                Calm, balanced tableware designed for modern homes. Crafted with food-safe glazes and artisanal care.
               </p>
-
-              <div className="mt-10 flex flex-wrap gap-4">
-                <button
-                  className="hero-cta
-                    inline-flex items-center
-                    rounded-full
-                    bg-[var(--accent-clay)]
-                    px-8 py-4
-                    text-base font-medium
-                    text-white
-                    transition-transform
-                    hover:scale-[1.03]
-                  "
-                >
-                  Explore Collection
+              <div className="mt-10 flex gap-4 justify-end">
+                <button className="hero-cta inline-flex items-center rounded-full px-8 py-4 text-base font-medium text-white">
+                  Get Started
+                  <FiArrowRight style={{ marginLeft: 8 }} />
+                </button>
+                <button className="inline-flex items-center rounded-full px-8 py-4 text-base font-medium border border-[rgba(42,31,23,0.12)] text-[var(--text-primary)] bg-white">
+                  Browse
                 </button>
               </div>
-
-              <div className="trust-strip">
-                <span>✔ Handmade</span>
-                <span>✔ Food-safe glazes</span>
-                <span>✔ Crafted in India</span>
-              </div>
             </div>
-
-            {/* RIGHT — 3D POT */}
-            <div className="hero-image flex justify-center lg:justify-end">
-              <Suspense fallback={<div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />}>
-                <HeroPot />
-              </Suspense>
-            </div>
-
           </div>
         </div>
-        <div className="scroll-hint">Scroll</div>
       </section>
 
-      {/* ================= GSAP PRODUCT SLIDER ================= */}
-      <Suspense fallback={<div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />}>
-        <GsapSlider />
+      <Suspense
+        fallback={
+          <div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />
+        }
+      >
+      <section className="relative z-10 mt-24 overflow-hidden">
+      <GsapSlider />
+     </section>
+
       </Suspense>
-      
-      <Suspense fallback={<div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />}>
+
+      <Suspense
+        fallback={
+          <div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />
+        }
+      >
         <FeaturesSection />
       </Suspense>
-      
     </>
   );
 }
