@@ -258,7 +258,7 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
         
 
         {/* Workshop Grid */}
-        <div id="workshops" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-24 scroll-mt-24">
+        <div id="workshops" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 items-stretch gap-4 sm:gap-6 lg:gap-8 mb-24 scroll-mt-24">
           {loading ? (
             // Loading skeleton
             Array.from({ length: 6 }).map((_, idx) => (
@@ -274,12 +274,12 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
             ))
           ) : displayList.length > 0 ? (
             displayList.map((ws, idx) => (
-              <Link key={`${ws.slug}-${idx}`} href={`/workshop/${ws.slug}`} className="group cursor-pointer">
-                <div className="bg-[#FFF8F2] rounded-2xl overflow-hidden shadow-sm transition-all hover:shadow-lg ring-1 ring-[#E2C48D]">
+              <Link key={`${ws.slug}-${idx}`} href={`/workshop/${ws.slug}`} className="group cursor-pointer h-full">
+                <div className="bg-[#FFF8F2] rounded-2xl overflow-hidden shadow-sm transition-all hover:shadow-lg ring-1 ring-[#E2C48D] flex flex-col h-full">
                   <div className="relative aspect-square">
                     <img src={resolveImgSrc(ws.img)} alt={ws.title} className="w-full h-full object-cover" />
                   </div>
-                  <div className="p-4 sm:p-5">
+                  <div className="p-4 sm:p-5 flex flex-col flex-1">
                     <h3 className="text-base sm:text-lg font-bold serif text-[#3d2b1f] mb-1 line-clamp-2">{ws.title}</h3>
                     <p className="text-[#6b5a4c] text-xs mb-3 line-clamp-1">{ws.description}</p>
                     <div className="flex items-center gap-2 text-[#6b5a4c] text-xs mb-3 sm:mb-4">

@@ -92,7 +92,7 @@ export default function CheckoutPage() {
           const userData = await userResponse.json();
           setCustomer({
             name: userData.name || "",
-            email: userData.email || "",
+            email: (session?.user as any)?.email || "",
             phone: userData.phone || "",
             gstNumber: "",
           });
@@ -406,7 +406,7 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen py-16" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold text-[#442D1C] mb-8 text-center">Checkout</h1>
+          <h1 className="text-4xl font-bold text-[#442D1C] mb-8 text-center" style={{ fontFamily: 'Inter, sans-serif' }}>Order Summary & Payment</h1>
           <div className="bg-white/90 elegant-rounded-2xl p-8 shadow-lg border-2 border-[#EDD8B4] clay-morphism">
             <p className="text-[#442D1C] text-center text-xl">No items in checkout.</p>
           </div>
@@ -416,124 +416,132 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen py-16 paper-texture">
+    <div className="min-h-screen py-16" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
       <div className="max-w-6xl mx-auto p-8">
-        <h1 className="text-4xl font-bold text-[#442D1C] mb-8 text-center">Checkout</h1>
+        <h1 className="text-5xl font-bold text-[#442D1C] mb-10 text-center" style={{ fontFamily: 'Inter, sans-serif' }}>Order Summary & Payment</h1>
+        <div className="w-16 h-1 bg-[#EDD8B4] mx-auto mb-8"></div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white/90 elegant-rounded-2xl p-8 shadow-lg border-2 border-[#EDD8B4] clay-morphism">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-[56px]">
+          <div className="bg-gradient-to-br from-white via-[#F9F7F2]/50 to-white/95 elegant-rounded-2xl p-10 shadow-2xl border-2 border-[#EDD8B4] clay-morphism">
             <h2 className="text-2xl font-semibold text-[#442D1C] mb-6">Order Summary</h2>
             {checkoutItems.map((item) => {
               const product = products.find(p => p && p.slug === item.productSlug);
               return (
-                <div key={item.productSlug} className="flex items-center mb-6 p-4 bg-[#EDD8B4]/30 elegant-rounded-xl border border-[#8E5022]/20 clay-morphism hover-lift">
+                <div key={item.productSlug} className="flex items-center mb-6 p-5 bg-[#EDD8B4]/30 elegant-rounded-xl border border-[#8E5022]/20 clay-morphism hover-lift">
                   {product && (
                     <img
                       src={product.images?.[0] || '/images/product1.png'}
-                      className="w-20 h-20 object-cover elegant-rounded-lg border-2 border-white shadow-md mr-4"
+                      className="w-24 h-24 object-cover elegant-rounded-lg border-2 border-white shadow-md mr-5"
                       alt={product.title}
                     />
                   )}
                   <div className="flex-1">
-                    <h3 className="font-semibold text-[#442D1C] text-lg">{product?.title || `Product ${item.productSlug}`}</h3>
-                    <div className="flex items-center gap-2 mt-2">
+                    <h3 className="font-semibold text-[#442D1C] text-lg tracking-tight">{product?.title || `Product ${item.productSlug}`}</h3>
+                    <div className="flex items-center gap-3 mt-3">
                       <button
                         onClick={() => updateQuantity(item.productSlug, item.qty - 1)}
-                        className="w-8 h-8 bg-[#8E5022] text-white rounded-full flex items-center justify-center hover:bg-[#652810] transition-colors"
+                        className="w-10 h-10 bg-[#8E5022] text-white rounded-full flex items-center justify-center hover:bg-[#652810] transition-all shadow-sm hover:-translate-y-[1px] active:scale-[0.98]"
                       >
-                        <FaMinus className="w-3 h-3" />
+                        <FaMinus className="w-3.5 h-3.5" />
                       </button>
-                      <span className="text-[#652810] font-semibold min-w-[2rem] text-center">{item.qty}</span>
+                      <span className="text-[#652810] font-semibold min-w-[2.5rem] text-center">{item.qty}</span>
                       <button
                         onClick={() => updateQuantity(item.productSlug, item.qty + 1)}
-                        className="w-8 h-8 bg-[#8E5022] text-white rounded-full flex items-center justify-center hover:bg-[#652810] transition-colors"
+                        className="w-10 h-10 bg-[#8E5022] text-white rounded-full flex items-center justify-center hover:bg-[#652810] transition-all shadow-sm hover:-translate-y-[1px] active:scale-[0.98]"
                       >
-                        <FaPlus className="w-3 h-3" />
+                        <FaPlus className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => removeItem(item.productSlug)}
-                        className="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors ml-2"
+                        className="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-all ml-2 shadow-sm hover:-translate-y-[1px] active:scale-[0.98]"
                       >
-                        <FaTrash className="w-3 h-3" />
+                        <FaTrash className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    <p className="text-[#8E5022] font-bold mt-1">₹{item.price.toFixed(2)} each</p>
+                    <p className="text-[#8E5022] font-medium text-sm mt-3">₹{item.price.toFixed(2)} each</p>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          <div className="bg-white/90 elegant-rounded-2xl p-8 shadow-lg border-2 border-[#EDD8B4] clay-morphism">
+          <div className="bg-gradient-to-br from-white via-[#F9F7F2]/50 to-white/95 elegant-rounded-2xl p-10 shadow-2xl border-2 border-[#EDD8B4] clay-morphism">
             <h2 className="text-2xl font-semibold text-[#442D1C] mb-6">Customer Details</h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-[#442D1C] font-medium mb-2">Full Name</label>
-                <input
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={customer.name}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setCustomer({ ...customer, name: e.target.value })
-                  }
-                  className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[#442D1C] font-medium mb-2">Email Address</label>
-                <input
-                  type="email"
-                  placeholder="Enter your email address"
-                  value={customer.email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setCustomer({ ...customer, email: e.target.value })
-                  }
-                  className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[#442D1C] font-medium mb-2">Phone Number</label>
-                <input
-                  type="tel"
-                  placeholder="Enter your phone number"
-                  value={customer.phone}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setCustomer({ ...customer, phone: e.target.value })
-                  }
-                  className="w-full p-4 border-2 border-[#EDD8B4] elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[#442D1C] font-medium mb-2">GST Number <span className="text-sm text-gray-500">(Optional - For Invoice)</span></label>
-                <input
-                  type="text"
-                  placeholder="Enter GST number for invoice"
-                  value={customer.gstNumber}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    const gstValue = e.target.value.toUpperCase();
-                    setCustomer({ ...customer, gstNumber: gstValue });
-
-                    if (gstValue) {
-                      if (validateGST(gstValue)) {
-                        setGstError('');
-                      } else {
-                        setGstError('Invalid GST number format');
-                      }
-                    } else {
-                      setGstError('');
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <div className="space-y-4">
+                <h3 className="text-sm uppercase tracking-wide text-[#442D1C]/70">Personal Details</h3>
+                <div>
+                  <label className="block text-[#442D1C] font-medium mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={customer.name}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setCustomer({ ...customer, name: e.target.value })
                     }
-                  }}
-                  className={`w-full p-4 border-2 ${gstError ? 'border-red-500' : 'border-[#EDD8B4]'} elegant-rounded-xl focus:border-[#8E5022] focus:outline-none transition-colors`}
-                />
-                {gstError && (
-                  <p className="text-red-500 text-sm mt-1">{gstError}</p>
-                )}
-                {customer.gstNumber && !gstError && (
-                  <p className="text-green-600 text-sm mt-1">✓ Valid GST number - Invoice will be sent via email</p>
-                )}
+                    className="w-full py-3.5 px-4 border-2 border-[#EDD8B4] elegant-rounded-xl rounded-2xl focus:border-[#8E5022] focus:outline-none focus:ring-2 focus:ring-[#8E5022]/40 transition-all"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-4">
+                <h3 className="text-sm uppercase tracking-wide text-[#442D1C]/70">Contact Details</h3>
+                <div>
+                  <label className="block text-[#442D1C] font-medium mb-2">Email Address</label>
+                  <input
+                    type="email"
+                    placeholder="Email from your login"
+                    value={customer.email}
+                    readOnly
+                    className="w-full py-3.5 px-4 border-2 border-[#EDD8B4] elegant-rounded-xl rounded-2xl focus:border-[#8E5022] focus:outline-none focus:ring-2 focus:ring-[#8E5022]/40 transition-all bg-[#EDD8B4]/10 cursor-not-allowed"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[#442D1C] font-medium mb-2">Phone Number</label>
+                  <input
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    value={customer.phone}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setCustomer({ ...customer, phone: e.target.value })
+                    }
+                    className="w-full py-3.5 px-4 border-2 border-[#EDD8B4] elegant-rounded-xl rounded-2xl focus:border-[#8E5022] focus:outline-none focus:ring-2 focus:ring-[#8E5022]/40 transition-all"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-4">
+                <h3 className="text-sm uppercase tracking-wide text-[#442D1C]/70">Billing / Invoice</h3>
+                <div>
+                  <label className="block text-[#442D1C] font-medium mb-2">GST Number <span className="text-sm text-gray-500">(Optional - For Invoice)</span></label>
+                  <input
+                    type="text"
+                    placeholder="Enter GST number for invoice"
+                    value={customer.gstNumber}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const gstValue = e.target.value.toUpperCase();
+                      setCustomer({ ...customer, gstNumber: gstValue });
+
+                      if (gstValue) {
+                        if (validateGST(gstValue)) {
+                          setGstError('');
+                        } else {
+                          setGstError('Invalid GST number format');
+                        }
+                      } else {
+                        setGstError('');
+                      }
+                    }}
+                    className={`w-full py-3.5 px-4 border-2 ${gstError ? 'border-red-500' : 'border-[#EDD8B4]'} elegant-rounded-xl rounded-2xl focus:border-[#8E5022] focus:outline-none focus:ring-2 focus:ring-[#8E5022]/40 transition-all`}
+                  />
+                  {gstError && (
+                    <p className="text-red-500 text-sm mt-1">{gstError}</p>
+                  )}
+                  {customer.gstNumber && !gstError && (
+                    <p className="text-green-600 text-sm mt-1">✓ Valid GST number - Invoice will be sent via email</p>
+                  )}
+                </div>
               </div>
 
               <h3 className="text-xl font-semibold text-[#442D1C] mt-8 mb-4">Delivery Address</h3>
