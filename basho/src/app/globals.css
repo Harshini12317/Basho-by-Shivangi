@@ -235,3 +235,61 @@ h1, h2, h3, h4, h5, h6 {
     ),
     var(--bg-primary);
 }
+
+
+.hero {
+  position: relative;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  left: 50%;
+  width: 1px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.hero h1 {
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.hero-cta {
+  background: linear-gradient(135deg, #c76b3f, #b55a32);
+  box-shadow: 0 18px 40px rgba(181, 90, 50, 0.35);
+  transition: all 0.3s ease;
+}
+
+.hero-cta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 28px 60px rgba(181, 90, 50, 0.45);
+}
+
+.hero-image {
+  border-radius: 24px;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.18);
+  transform: rotate(-1.2deg);
+}
+
+.hero-image:hover {
+  transform: rotate(0deg) scale(1.02);
+}
+
+.trust-strip {
+  display: flex;
+  gap: 32px;
+  margin-top: 32px;
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+  opacity: 0.5;
+}
