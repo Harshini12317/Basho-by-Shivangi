@@ -42,6 +42,7 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
       script.onload = () => setRazorpayLoaded(true);
       document.body.appendChild(script);
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRazorpayLoaded(true);
     }
   }, []);
