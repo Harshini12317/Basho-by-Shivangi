@@ -77,7 +77,8 @@ export default function GalleryPage() {
   }
 
   return (
-    <main className="ms-root">
+    <div style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed', minHeight: '100vh'}}>
+      <main className="ms-root">
       <header className="ms-hero">
         <h1 className="ms-hero-title">Gallery — Work & Workshops</h1>
         <p className="ms-hero-sub">A curated collection of pieces, moments from our studio, and highlights from our workshops.</p>
@@ -186,6 +187,7 @@ export default function GalleryPage() {
           </div>
         )}
       </section>
-    </main>
+      </main>
+    </div>
   )
 }

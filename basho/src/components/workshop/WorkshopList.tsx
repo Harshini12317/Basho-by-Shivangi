@@ -213,7 +213,7 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
   }, []);
 
   return (
-    <div className="bg-[#F8F7F2] min-h-screen py-16 px-4 sm:px-8">
+    <div className="bg-[#F8F7F2] min-h-screen py-16 px-4 sm:px-8" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
       {popup && showPopup && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
           <div className="rounded-3xl bg-white shadow-2xl w-[92%] max-w-md overflow-hidden">

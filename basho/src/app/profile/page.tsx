@@ -431,7 +431,7 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-[#FDFBF7] via-[#FAF7F0] to-[#F5F1E8] min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
         <div className="text-center">
           <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#8E5022] to-[#C85428] border-4 border-[#EDD8B4] flex items-center justify-center text-white shadow-xl">
             <FaUser className="text-3xl opacity-90" />
@@ -445,7 +445,7 @@ export default function ProfilePage() {
 
   if (!isAuthed) {
     return (
-      <div className="bg-gradient-to-br from-[#FDFBF7] via-[#FAF7F0] to-[#F5F1E8] min-h-screen flex items-center justify-center px-4 py-16">
+      <div className="min-h-screen flex items-center justify-center px-4 py-16" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
         <div className="max-w-lg w-full">
           <div className="bg-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-2xl border-2 border-[#EDD8B4]/60 p-8 lg:p-10 text-center relative overflow-hidden clay-texture">
             {/* Decorative background elements */}
@@ -482,45 +482,48 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-[#FDFBF7] via-[#FAF7F0] to-[#F5F1E8] min-h-screen py-8 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 font-sans" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
       <div className="max-w-7xl mx-auto">
         {/* Profile Header */}
-        <div className="bg-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-xl border-2 border-[#EDD8B4]/60 p-6 sm:p-8 lg:p-10 mb-8 lg:mb-12 relative overflow-hidden clay-texture">
+        <div className="bg-gradient-to-br from-white via-[#F9F7F2] to-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-2xl border border-[#EDD8B4]/40 p-6 sm:p-8 lg:p-12 mb-8 lg:mb-12 relative overflow-hidden">
           {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-[#FFF8F0]/40 to-transparent rounded-bl-full -mr-20 -mt-20 opacity-60"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-[#F0E6D2]/30 to-transparent rounded-tr-full -ml-16 -mb-16 opacity-50"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#8E5022]/5 rounded-full opacity-30"></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#FFF8F0]/30 to-transparent rounded-bl-full -mr-32 -mt-24 opacity-40"></div>
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-[#F0E6D2]/20 to-transparent rounded-tr-full -ml-20 -mb-20 opacity-30"></div>
+          <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-[#8E5022]/3 rounded-full opacity-20"></div>
 
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 lg:gap-8 relative z-10">
-            <div className="flex items-center gap-4 lg:gap-6">
-              <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-full bg-gradient-to-br from-[#8E5022] to-[#C85428] border-4 border-[#EDD8B4] flex items-center justify-center text-white shadow-xl relative">
-                <FaUser className="text-3xl lg:text-4xl opacity-90" />
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-400 rounded-full border-2 border-white shadow-md"></div>
+            <div className="flex items-center gap-4 lg:gap-8">
+              <div className="w-24 h-24 lg:w-28 lg:h-28 rounded-full bg-gradient-to-br from-[#8E5022] via-[#A0612E] to-[#C85428] border-4 border-[#EDD8B4]/80 flex items-center justify-center text-white shadow-2xl relative flex-shrink-0">
+                <FaUser className="text-4xl lg:text-5xl opacity-95" />
+                <div className="absolute -bottom-2 -right-2 w-7 h-7 bg-emerald-400 rounded-full border-3 border-white shadow-lg animate-pulse"></div>
               </div>
-              <div>
-                <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#8E5022] mb-2 serif">Welcome Back</div>
-                <h1 className="text-3xl lg:text-4xl xl:text-5xl font-serif font-bold text-[#442D1C] mb-2 leading-tight">{userName}</h1>
-                <p className="text-[#652810] font-medium flex items-center gap-2 text-sm">
-                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                  {userEmail}
-                </p>
-                <p className="text-[#8E5022] text-sm mt-1 font-medium">Member since {new Date().getFullYear()}</p>
+              <div className="flex-1">
+                <div className="text-[0.65rem] font-bold uppercase tracking-[0.25em] text-[#8E5022]/80 mb-2.5 serif letter-spacing-wide">Welcome to Your Dashboard</div>
+                <h1 className="text-3xl lg:text-5xl xl:text-5xl font-serif font-bold text-[#442D1C] mb-3 leading-tight tracking-tight">{userName}</h1>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                  <p className="text-[#652810] font-semibold flex items-center gap-2 text-sm">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span className="font-mono">{userEmail}</span>
+                  </p>
+                  <div className="hidden sm:block text-[#EDD8B4]">•</div>
+                  <p className="text-[#8E5022]/80 text-sm font-medium">Member since {new Date().getFullYear()}</p>
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 lg:gap-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 lg:gap-4">
               <button
                 onClick={() => signOut()}
-                className="group flex items-center gap-3 px-4 lg:px-6 py-3 lg:py-3.5 rounded-full bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 shadow-lg hover:shadow-xl hover:from-slate-200 hover:to-slate-300 transition-all duration-300 border border-slate-300/50"
+                className="group flex items-center justify-center gap-2 px-5 lg:px-7 py-3 lg:py-3.5 rounded-xl lg:rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 shadow-md hover:shadow-lg transition-all duration-300 border border-slate-200/60 font-bold text-sm"
               >
-                <span className="font-semibold tracking-wide">Sign Out</span>
+                <span>Sign Out</span>
               </button>
               <Link
                 href="/products"
-                className="group flex items-center gap-3 px-6 lg:px-8 py-3 lg:py-3.5 rounded-full bg-gradient-to-r from-[#8E5022] to-[#C85428] text-white shadow-xl shadow-orange-200/50 hover:shadow-2xl hover:from-[#652810] hover:to-[#8E5022] hover:-translate-y-0.5 transition-all duration-300 border-2 border-[#EDD8B4]/30"
+                className="group flex items-center justify-center gap-2 px-5 lg:px-7 py-3 lg:py-3.5 rounded-xl lg:rounded-full bg-gradient-to-r from-[#8E5022] to-[#C85428] text-white shadow-lg hover:shadow-2xl hover:from-[#652810] hover:to-[#8E5022] hover:-translate-y-1 transition-all duration-300 border border-[#EDD8B4]/40 font-bold text-sm"
               >
-                <FaShoppingBag className="text-lg" />
-                <span className="font-semibold tracking-wide">Continue Shopping</span>
+                <FaShoppingBag className="text-base" />
+                <span>Continue Shopping</span>
               </Link>
             </div>
           </div>
@@ -529,59 +532,57 @@ export default function ProfilePage() {
         {/* Horizontal Sections */}
         <div className="space-y-4 lg:space-y-6">
           {/* Wishlist Section */}
-          <div className="bg-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-xl border-2 border-[#EDD8B4]/60 overflow-hidden clay-texture">
+          <div className="bg-gradient-to-br from-white via-[#F9F7F2]/50 to-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-lg border border-[#EDD8B4]/40 overflow-hidden">
             <div
-              className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-[#F9F7F2]/50 transition-all duration-300"
+              className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-[#F9F7F2]/70 transition-all duration-300 group"
               onClick={() => toggleSection('wishlist')}
             >
               <div className="flex items-center gap-4 lg:gap-6">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-red-50 to-red-100 text-red-600 shadow-lg border border-red-200/50">
-                  <FaHeart className="text-2xl" />
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-50 to-red-100 text-red-500 shadow-md border border-red-200/60 group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
+                  <FaHeart className="text-2xl lg:text-3xl" />
                 </div>
                 <div>
-                  <h2 className="text-xl lg:text-2xl font-bold text-[#442D1C] serif">Wishlist</h2>
-                  <p className="text-sm text-[#8E5022] font-semibold uppercase tracking-[0.15em]">Saved Items</p>
+                  <h2 className="text-xl lg:text-2xl font-bold text-[#442D1C] serif tracking-tight">Wishlist</h2>
+                  <p className="text-xs lg:text-sm text-[#8E5022]/80 font-semibold uppercase tracking-[0.12em] mt-1">Saved Items</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="text-sm text-[#8E5022] font-bold bg-[#EDD8B4]/50 px-3 py-1 rounded-full">
+                <div className="text-sm text-[#8E5022] font-bold bg-red-50 px-4 py-2 rounded-full border border-red-200/50">
                   {wishlistItems.length} {wishlistItems.length === 1 ? 'item' : 'items'}
                 </div>
-                {expandedSections.wishlist ? (
-                  <FaChevronUp className="text-[#8E5022] text-xl transition-transform duration-300" />
-                ) : (
-                  <FaChevronDown className="text-[#8E5022] text-xl transition-transform duration-300" />
-                )}
+                <div className="text-[#8E5022] text-xl transition-transform duration-300 group-hover:translate-x-1">
+                  {expandedSections.wishlist ? <FaChevronUp /> : <FaChevronDown />}
+                </div>
               </div>
             </div>
 
             {expandedSections.wishlist && (
-              <div className="px-6 lg:px-8 pb-6 lg:pb-8 border-t border-[#EDD8B4]/30">
+              <div className="px-6 lg:px-8 pb-6 lg:pb-8 border-t border-[#EDD8B4]/20">
                 {wishlistItems.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-[#8E5022]/60">
-                    <div className="p-6 rounded-full bg-[#EDD8B4]/30 mb-4">
-                      <FaHeart className="text-4xl opacity-40" />
+                  <div className="flex flex-col items-center justify-center py-16 text-[#8E5022]/50">
+                    <div className="p-8 rounded-full bg-red-100/30 mb-6">
+                      <FaHeart className="text-5xl opacity-30" />
                     </div>
-                    <div className="text-sm font-semibold mb-1">No saved items</div>
-                    <p className="text-xs text-center opacity-70">Items you love will appear here</p>
+                    <div className="text-base font-semibold mb-2 text-[#442D1C]">No saved items</div>
+                    <p className="text-sm text-center opacity-70 max-w-xs">Items you love will appear here. Start adding your favorite pieces!</p>
                   </div>
                 ) : (
                   <div className="space-y-4 mt-6">
                     {wishlistItems.map((item) => (
                       <Link key={item.productSlug} href={`/products/${item.productSlug}`} className="block">
-                        <div className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] to-[#EDD8B4]/20 border-2 border-[#EDD8B4]/40 hover:border-red-300/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden">
+                        <div className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] via-white to-[#EDD8B4]/10 border border-[#EDD8B4]/40 hover:border-red-300/60 hover:shadow-xl hover:-translate-y-1 hover:bg-gradient-to-br hover:from-red-50/30 hover:via-white hover:to-[#EDD8B4]/20 transition-all duration-300 group cursor-pointer relative overflow-hidden">
                           {/* Subtle background pattern */}
-                          <div className="absolute top-0 right-0 w-16 h-16 bg-red-500/5 rounded-bl-xl"></div>
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-red-400/5 rounded-bl-2xl group-hover:bg-red-400/10 transition-colors duration-300"></div>
 
                           <div className="flex items-center gap-4 mb-4 relative z-10">
                             <img
                               src={item.productImage}
                               alt={item.productTitle}
-                              className="w-16 h-16 object-cover rounded-xl border-2 border-[#EDD8B4] flex-shrink-0 shadow-md"
+                              className="w-16 h-16 lg:w-20 lg:h-20 object-cover rounded-xl border-2 border-[#EDD8B4]/60 flex-shrink-0 shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300"
                             />
                             <div className="flex-1 min-w-0">
-                              <div className="font-bold text-[#442D1C] group-hover:text-red-700 transition-colors text-sm leading-tight overflow-hidden" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}>{item.productTitle}</div>
-                              <div className="text-[#8E5022] font-bold text-lg mt-2">₹{item.productPrice}</div>
+                              <div className="font-bold text-[#442D1C] group-hover:text-red-600 transition-colors text-sm lg:text-base leading-tight overflow-hidden serif" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}>{item.productTitle}</div>
+                              <div className="text-[#8E5022] font-bold text-lg lg:text-xl mt-2">₹{item.productPrice}</div>
                             </div>
                             <button
                               onClick={(e) => {
@@ -589,13 +590,13 @@ export default function ProfilePage() {
                                 e.stopPropagation();
                                 removeFromWishlist(item.productSlug);
                               }}
-                              className="p-3 text-red-400 hover:text-red-600 transition-colors flex-shrink-0 hover:scale-110 transform duration-200"
+                              className="p-3 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 flex-shrink-0 hover:scale-125 transform"
                               title="Remove from wishlist"
                             >
                               <FaHeart className="text-lg fill-current" />
                             </button>
                           </div>
-                          <div className="text-xs text-[#8E5022] hover:text-red-700 font-bold flex items-center gap-2 group-hover:gap-3 transition-all duration-300 relative z-10">
+                          <div className="text-xs lg:text-sm text-[#8E5022] hover:text-red-600 font-bold flex items-center gap-2 group-hover:gap-3 transition-all duration-300 relative z-10">
                             <FaSearch className="text-xs" />
                             View Product
                             <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
@@ -610,69 +611,67 @@ export default function ProfilePage() {
           </div>
 
           {/* Products Ordered Section */}
-          <div className="bg-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-xl border-2 border-[#EDD8B4]/60 overflow-hidden clay-texture">
+          <div className="bg-gradient-to-br from-white via-[#F9F7F2]/50 to-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-lg border border-[#EDD8B4]/40 overflow-hidden">
             <div
-              className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-[#F9F7F2]/50 transition-all duration-300"
+              className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-[#F9F7F2]/70 transition-all duration-300 group"
               onClick={() => toggleSection('orders')}
             >
               <div className="flex items-center gap-4 lg:gap-6">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 text-[#8E5022] shadow-lg border border-orange-200/50">
-                  <FaShoppingBag className="text-2xl" />
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 text-orange-600 shadow-md border border-orange-200/60 group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
+                  <FaShoppingBag className="text-2xl lg:text-3xl" />
                 </div>
                 <div>
-                  <h2 className="text-xl lg:text-2xl font-bold text-[#442D1C] serif">Product Orders</h2>
-                  <p className="text-sm text-[#8E5022] font-semibold uppercase tracking-[0.15em]">Your Purchases</p>
+                  <h2 className="text-xl lg:text-2xl font-bold text-[#442D1C] serif tracking-tight">Product Orders</h2>
+                  <p className="text-xs lg:text-sm text-[#8E5022]/80 font-semibold uppercase tracking-[0.12em] mt-1">Your Purchases</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="text-sm text-[#8E5022] font-bold bg-[#EDD8B4]/50 px-3 py-1 rounded-full">
+                <div className="text-sm text-[#8E5022] font-bold bg-orange-50 px-4 py-2 rounded-full border border-orange-200/50">
                   {productOrders.length} {productOrders.length === 1 ? 'item' : 'items'}
                 </div>
-                {expandedSections.orders ? (
-                  <FaChevronUp className="text-[#8E5022] text-xl transition-transform duration-300" />
-                ) : (
-                  <FaChevronDown className="text-[#8E5022] text-xl transition-transform duration-300" />
-                )}
+                <div className="text-[#8E5022] text-xl transition-transform duration-300 group-hover:translate-x-1">
+                  {expandedSections.orders ? <FaChevronUp /> : <FaChevronDown />}
+                </div>
               </div>
             </div>
 
             {expandedSections.orders && (
-              <div className="px-6 lg:px-8 pb-6 lg:pb-8 border-t border-[#EDD8B4]/30">
+              <div className="px-6 lg:px-8 pb-6 lg:pb-8 border-t border-[#EDD8B4]/20">
                 {productOrders.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-[#8E5022]/60">
-                    <div className="p-6 rounded-full bg-[#EDD8B4]/30 mb-4">
-                      <FaShoppingBag className="text-4xl opacity-40" />
+                  <div className="flex flex-col items-center justify-center py-16 text-[#8E5022]/50">
+                    <div className="p-8 rounded-full bg-orange-100/30 mb-6">
+                      <FaShoppingBag className="text-5xl opacity-30" />
                     </div>
-                    <div className="text-sm font-semibold mb-1">No orders yet</div>
-                    <p className="text-xs text-center opacity-70">Your purchased items will appear here</p>
+                    <div className="text-base font-semibold mb-2 text-[#442D1C]">No orders yet</div>
+                    <p className="text-sm text-center opacity-70 max-w-xs">Your purchased items will appear here</p>
                   </div>
                 ) : (
                   <div className="space-y-4 mt-6">
                     {productOrders.map((o) => (
                       o.type === 'custom-order' ? (
-                        <div key={o.id} className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] to-[#EDD8B4]/20 border-2 border-[#EDD8B4]/40 hover:border-[#C85428]/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden">
-                          <div className="absolute top-0 right-0 w-16 h-16 bg-[#C85428]/5 rounded-bl-xl"></div>
+                        <div key={o.id} className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] via-white to-[#EDD8B4]/10 border border-[#EDD8B4]/40 hover:border-orange-300/60 hover:shadow-xl hover:-translate-y-1 hover:bg-gradient-to-br hover:from-orange-50/30 hover:via-white hover:to-[#EDD8B4]/20 transition-all duration-300 group cursor-pointer relative overflow-hidden">
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-orange-400/5 rounded-bl-2xl group-hover:bg-orange-400/10 transition-colors duration-300"></div>
                           <div className="flex items-start justify-between mb-4 relative z-10">
                             <div className="flex items-center gap-4 flex-1">
                               {o.image && (
                                 <img
                                   src={o.image}
                                   alt={o.title}
-                                  className="w-16 h-16 object-cover rounded-xl border-2 border-[#EDD8B4] flex-shrink-0 shadow-md"
+                                  className="w-16 h-16 lg:w-20 lg:h-20 object-cover rounded-xl border-2 border-[#EDD8B4]/60 flex-shrink-0 shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300"
                                 />
                               )}
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-2">
+                                <div className="flex items-center gap-2 mb-2 flex-wrap">
                                   <div className="text-xs text-[#8E5022] font-bold uppercase tracking-wide">Custom Order #{o.id.slice(-8)}</div>
-                                  <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">Custom</span>
+                                  <span className="inline-flex px-2 py-1 text-xs font-bold rounded-full bg-purple-100 text-purple-800 border border-purple-200">Custom</span>
                                 </div>
-                                <div className="font-bold text-[#442D1C] text-sm leading-tight serif">{o.title}</div>
+                                <div className="font-bold text-[#442D1C] text-sm lg:text-base leading-tight serif group-hover:text-orange-700 transition-colors">{o.title}</div>
                               </div>
                             </div>
-                            <div className="text-[#C85428] font-bold bg-white px-4 py-2 rounded-xl shadow-lg border-2 border-[#EDD8B4] text-sm ml-3">₹{o.amount}</div>
+                            <div className="text-[#C85428] font-bold bg-orange-50 px-4 py-2 rounded-xl shadow-md border border-[#EDD8B4]/60 text-sm ml-3 flex-shrink-0">₹{o.amount}</div>
                           </div>
-                          <div className="flex items-center justify-between relative z-10">
-                            <div className="text-green-700 text-xs font-semibold bg-green-50 px-3 py-1.5 rounded-lg border border-green-200">Payment Completed</div>
+                          <div className="flex items-center justify-between relative z-10 flex-wrap gap-3">
+                            <div className="text-emerald-700 text-xs font-bold bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">✓ Payment Completed</div>
                             <div className="text-xs text-[#8E5022] font-medium">
                               {new Date(o.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </div>
@@ -680,31 +679,31 @@ export default function ProfilePage() {
                         </div>
                       ) : (
                         <Link key={o.id} href={`/profile/orders/${o.id}`} className="block">
-                          <div className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] to-[#EDD8B4]/20 border-2 border-[#EDD8B4]/40 hover:border-[#8E5022]/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-16 h-16 bg-[#8E5022]/5 rounded-bl-xl"></div>
+                          <div className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] via-white to-[#EDD8B4]/10 border border-[#EDD8B4]/40 hover:border-[#8E5022]/60 hover:shadow-xl hover:-translate-y-1 hover:bg-gradient-to-br hover:from-amber-50/30 hover:via-white hover:to-[#EDD8B4]/20 transition-all duration-300 group cursor-pointer relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-20 h-20 bg-[#8E5022]/5 rounded-bl-2xl group-hover:bg-[#8E5022]/10 transition-colors duration-300"></div>
                             <div className="flex items-start justify-between mb-4 relative z-10">
                               <div className="flex items-center gap-4 flex-1">
                                 {o.image && (
                                   <img
                                     src={o.image}
                                     alt={o.title}
-                                    className="w-16 h-16 object-cover rounded-xl border-2 border-[#EDD8B4] flex-shrink-0 shadow-md"
+                                    className="w-16 h-16 lg:w-20 lg:h-20 object-cover rounded-xl border-2 border-[#EDD8B4]/60 flex-shrink-0 shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300"
                                   />
                                 )}
                                 <div className="flex-1 min-w-0">
                                   <div className="text-xs text-[#8E5022] font-bold mb-2 uppercase tracking-wide">Order #{o.id.slice(-8)}</div>
-                                  <div className="font-bold text-[#442D1C] group-hover:text-[#8E5022] transition-colors text-sm leading-tight serif">{o.title}</div>
+                                  <div className="font-bold text-[#442D1C] group-hover:text-[#8E5022] transition-colors text-sm lg:text-base leading-tight serif">{o.title}</div>
                                 </div>
                               </div>
-                              <div className="text-[#8E5022] font-bold bg-white px-4 py-2 rounded-xl shadow-lg border-2 border-[#EDD8B4] text-sm ml-3">₹{o.amount}</div>
+                              <div className="text-[#8E5022] font-bold bg-orange-50 px-4 py-2 rounded-xl shadow-md border border-[#EDD8B4]/60 text-sm ml-3 flex-shrink-0">₹{o.amount}</div>
                             </div>
-                            <div className="flex items-center justify-between relative z-10">
-                              <div className="text-[#652810] text-xs font-semibold bg-[#EDD8B4]/50 px-3 py-1.5 rounded-lg border border-[#EDD8B4]">Qty: {o.qty}</div>
+                            <div className="flex items-center justify-between relative z-10 flex-wrap gap-3">
+                              <div className="text-[#652810] text-xs font-bold bg-[#EDD8B4]/50 px-3 py-1.5 rounded-lg border border-[#EDD8B4]/60">Qty: {o.qty}</div>
                               <div className="text-xs text-[#8E5022] font-medium">
                                 {new Date(o.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                               </div>
                             </div>
-                            <div className="mt-4 text-xs text-[#8E5022] hover:text-[#652810] font-bold flex items-center gap-2 group-hover:gap-3 transition-all duration-300 relative z-10">
+                            <div className="mt-4 text-xs lg:text-sm text-[#8E5022] hover:text-[#652810] font-bold flex items-center gap-2 group-hover:gap-3 transition-all duration-300 relative z-10">
                               <FaSearch className="text-xs" />
                               View Details
                               <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
@@ -720,59 +719,57 @@ export default function ProfilePage() {
           </div>
 
           {/* Workshop Registrations Section */}
-          <div className="bg-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-xl border-2 border-[#EDD8B4]/60 overflow-hidden clay-texture">
+          <div className="bg-gradient-to-br from-white via-[#F9F7F2]/50 to-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-lg border border-[#EDD8B4]/40 overflow-hidden">
             <div
-              className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-[#F9F7F2]/50 transition-all duration-300"
+              className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-[#F9F7F2]/70 transition-all duration-300 group"
               onClick={() => toggleSection('workshops')}
             >
               <div className="flex items-center gap-4 lg:gap-6">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-teal-50 to-teal-100 text-teal-600 shadow-lg border border-teal-200/50">
-                  <FaCalendarAlt className="text-2xl" />
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-teal-50 to-teal-100 text-teal-600 shadow-md border border-teal-200/60 group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
+                  <FaCalendarAlt className="text-2xl lg:text-3xl" />
                 </div>
                 <div>
-                  <h2 className="text-xl lg:text-2xl font-bold text-[#442D1C] serif">Workshop</h2>
-                  <p className="text-sm text-[#8E5022] font-semibold uppercase tracking-[0.15em]">Registrations</p>
+                  <h2 className="text-xl lg:text-2xl font-bold text-[#442D1C] serif tracking-tight">Workshops</h2>
+                  <p className="text-xs lg:text-sm text-[#8E5022]/80 font-semibold uppercase tracking-[0.12em] mt-1">Registrations</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="text-sm text-[#8E5022] font-bold bg-[#EDD8B4]/50 px-3 py-1 rounded-full">
+                <div className="text-sm text-[#8E5022] font-bold bg-teal-50 px-4 py-2 rounded-full border border-teal-200/50">
                   {registrations.length} {registrations.length === 1 ? 'item' : 'items'}
                 </div>
-                {expandedSections.workshops ? (
-                  <FaChevronUp className="text-[#8E5022] text-xl transition-transform duration-300" />
-                ) : (
-                  <FaChevronDown className="text-[#8E5022] text-xl transition-transform duration-300" />
-                )}
+                <div className="text-[#8E5022] text-xl transition-transform duration-300 group-hover:translate-x-1">
+                  {expandedSections.workshops ? <FaChevronUp /> : <FaChevronDown />}
+                </div>
               </div>
             </div>
 
             {expandedSections.workshops && (
-              <div className="px-6 lg:px-8 pb-6 lg:pb-8 border-t border-[#EDD8B4]/30">
+              <div className="px-6 lg:px-8 pb-6 lg:pb-8 border-t border-[#EDD8B4]/20">
                 {registrations.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-[#8E5022]/60">
-                    <div className="p-6 rounded-full bg-[#EDD8B4]/30 mb-4">
-                      <FaCalendarAlt className="text-4xl opacity-40" />
+                  <div className="flex flex-col items-center justify-center py-16 text-[#8E5022]/50">
+                    <div className="p-8 rounded-full bg-teal-100/30 mb-6">
+                      <FaCalendarAlt className="text-5xl opacity-30" />
                     </div>
-                    <div className="text-sm font-semibold mb-1">No workshop registrations</div>
-                    <p className="text-xs text-center opacity-70">Your workshop bookings will appear here</p>
+                    <div className="text-base font-semibold mb-2 text-[#442D1C]">No workshop registrations</div>
+                    <p className="text-sm text-center opacity-70 max-w-xs">Your workshop bookings will appear here</p>
                   </div>
                 ) : (
                   <div className="space-y-4 mt-6">
                     {registrations.map((r) => (
-                      <div key={r._id} className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] to-[#EDD8B4]/20 border-2 border-[#EDD8B4]/40 hover:border-teal-300/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden">
+                      <div key={r._id} className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] via-white to-[#EDD8B4]/10 border border-[#EDD8B4]/40 hover:border-teal-300/60 hover:shadow-xl hover:-translate-y-1 hover:bg-gradient-to-br hover:from-teal-50/30 hover:via-white hover:to-[#EDD8B4]/20 transition-all duration-300 group relative overflow-hidden">
                         {/* Subtle background pattern */}
-                        <div className="absolute top-0 right-0 w-16 h-16 bg-teal-500/5 rounded-bl-xl"></div>
+                        <div className="absolute top-0 right-0 w-20 h-20 bg-teal-500/5 rounded-bl-2xl group-hover:bg-teal-500/10 transition-colors duration-300"></div>
 
                         <div className="flex items-start justify-between mb-4 relative z-10">
                           <div className="flex-1">
                             <div className="text-xs text-[#8E5022] font-bold mb-2 uppercase tracking-wide">Registration #{r._id.slice(-8)}</div>
-                            <div className="font-bold text-[#442D1C] group-hover:text-teal-700 transition-colors text-sm leading-tight serif">{r.workshopSlug}</div>
+                            <div className="font-bold text-[#442D1C] group-hover:text-teal-700 transition-colors text-sm lg:text-base leading-tight serif">{r.workshopSlug}</div>
                           </div>
                         </div>
-                        <div className="flex items-center justify-between relative z-10">
-                          <div className="text-[#652810] text-xs flex items-center gap-2 font-semibold">
-                            <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
-                            <span className="text-[#442D1C]">{r.name}</span>
+                        <div className="flex items-center justify-between relative z-10 flex-wrap gap-3">
+                          <div className="text-[#442D1C] text-xs flex items-center gap-2 font-semibold">
+                            <span className="w-2.5 h-2.5 rounded-full bg-teal-500 animate-pulse"></span>
+                            {r.name}
                           </div>
                           <div className="text-xs text-[#8E5022] font-medium">
                             {r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
@@ -787,71 +784,69 @@ export default function ProfilePage() {
           </div>
 
           {/* Custom Orders Section */}
-          <div className="bg-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-xl border-2 border-[#EDD8B4]/60 overflow-hidden clay-texture">
+          <div className="bg-gradient-to-br from-white via-[#F9F7F2]/50 to-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-lg border border-[#EDD8B4]/40 overflow-hidden">
             <div
-              className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-[#F9F7F2]/50 transition-all duration-300"
+              className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-[#F9F7F2]/70 transition-all duration-300 group"
               onClick={() => toggleSection('customOrders')}
             >
               <div className="flex items-center gap-4 lg:gap-6">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100 text-[#C85428] shadow-lg border border-purple-200/50">
-                  <FaPaintBrush className="text-2xl" />
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100 text-purple-600 shadow-md border border-purple-200/60 group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
+                  <FaPaintBrush className="text-2xl lg:text-3xl" />
                 </div>
                 <div>
-                  <h2 className="text-xl lg:text-2xl font-bold text-[#442D1C] serif">Custom Orders</h2>
-                  <p className="text-sm text-[#8E5022] font-semibold uppercase tracking-[0.15em]">Bespoke Creations</p>
+                  <h2 className="text-xl lg:text-2xl font-bold text-[#442D1C] serif tracking-tight">Custom Orders</h2>
+                  <p className="text-xs lg:text-sm text-[#8E5022]/80 font-semibold uppercase tracking-[0.12em] mt-1">Bespoke Creations</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="text-sm text-[#8E5022] font-bold bg-[#EDD8B4]/50 px-3 py-1 rounded-full">
+                <div className="text-sm text-[#8E5022] font-bold bg-purple-50 px-4 py-2 rounded-full border border-purple-200/50">
                   {customOrders.length} {customOrders.length === 1 ? 'item' : 'items'}
                 </div>
-                {expandedSections.customOrders ? (
-                  <FaChevronUp className="text-[#8E5022] text-xl transition-transform duration-300" />
-                ) : (
-                  <FaChevronDown className="text-[#8E5022] text-xl transition-transform duration-300" />
-                )}
+                <div className="text-[#8E5022] text-xl transition-transform duration-300 group-hover:translate-x-1">
+                  {expandedSections.customOrders ? <FaChevronUp /> : <FaChevronDown />}
+                </div>
               </div>
             </div>
 
             {expandedSections.customOrders && (
-              <div className="px-6 lg:px-8 pb-6 lg:pb-8 border-t border-[#EDD8B4]/30">
+              <div className="px-6 lg:px-8 pb-6 lg:pb-8 border-t border-[#EDD8B4]/20">
                 {customOrders.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-[#8E5022]/60">
-                    <div className="p-6 rounded-full bg-[#EDD8B4]/30 mb-4">
-                      <FaPaintBrush className="text-4xl opacity-40" />
+                  <div className="flex flex-col items-center justify-center py-16 text-[#8E5022]/50">
+                    <div className="p-8 rounded-full bg-purple-100/30 mb-6">
+                      <FaPaintBrush className="text-5xl opacity-30" />
                     </div>
-                    <div className="text-sm font-semibold mb-1">No custom orders</div>
-                    <p className="text-xs text-center opacity-70">Your bespoke pottery requests will appear here</p>
+                    <div className="text-base font-semibold mb-2 text-[#442D1C]">No custom orders</div>
+                    <p className="text-sm text-center opacity-70 max-w-xs">Your bespoke pottery requests will appear here</p>
                   </div>
                 ) : (
                   <div className="space-y-4 mt-6">
                     {customOrders.map((co) => (
-                      <div key={co._id} className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] to-[#EDD8B4]/20 border-2 border-[#EDD8B4]/40 hover:border-[#C85428]/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                      <div key={co._id} className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] via-white to-[#EDD8B4]/10 border border-[#EDD8B4]/40 hover:border-purple-300/60 hover:shadow-xl hover:-translate-y-1 hover:bg-gradient-to-br hover:from-purple-50/30 hover:via-white hover:to-[#EDD8B4]/20 transition-all duration-300 relative overflow-hidden group">
                         {/* Subtle background pattern */}
-                        <div className="absolute top-0 right-0 w-16 h-16 bg-[#C85428]/5 rounded-bl-xl"></div>
+                        <div className="absolute top-0 right-0 w-20 h-20 bg-purple-400/5 rounded-bl-2xl group-hover:bg-purple-400/10 transition-colors duration-300"></div>
 
                         <div className="flex items-start justify-between mb-4 relative z-10">
                           <div className="flex-1">
                             <div className="text-xs text-[#8E5022] font-bold mb-2 uppercase tracking-wide">Request #{co._id.slice(-8)}</div>
-                            <div className="font-bold text-[#442D1C] text-sm leading-tight overflow-hidden" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}>{co.description}</div>
+                            <div className="font-bold text-[#442D1C] text-sm lg:text-base leading-tight overflow-hidden serif group-hover:text-purple-700 transition-colors" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}>{co.description}</div>
                           </div>
                           {typeof co.quotedPrice === "number" && (
-                            <div className="text-[#C85428] font-bold bg-white px-4 py-2 rounded-xl shadow-lg border-2 border-[#EDD8B4] text-sm ml-3">₹{co.quotedPrice}</div>
+                            <div className="text-purple-700 font-bold bg-purple-50 px-4 py-2 rounded-xl shadow-md border border-purple-200/60 text-sm ml-3 flex-shrink-0">₹{co.quotedPrice}</div>
                           )}
                         </div>
-                        <div className="flex items-center justify-between relative z-10">
-                          <div className={`text-xs font-bold px-4 py-2 rounded-full uppercase tracking-wide border-2 ${
+                        <div className="flex items-center justify-between relative z-10 flex-wrap gap-3 mb-4">
+                          <div className={`text-xs font-bold px-4 py-2 rounded-full uppercase tracking-wide border ${
                             co.status === 'completed' ? 'bg-green-50 text-green-700 border-green-200' : 
                             co.status === 'paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
                             co.status === 'in-progress' ? 'bg-purple-50 text-purple-700 border-purple-200' :
                             co.status === 'quoted' ? 'bg-blue-50 text-blue-700 border-blue-200' :
                             co.status === 'requested' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-50 text-slate-600 border-slate-200'
                           }`}>
-                            {co.status === 'requested' ? 'Request Submitted' :
-                             co.status === 'quoted' ? 'Quote Received' :
-                             co.status === 'paid' ? 'Payment Completed' :
-                             co.status === 'in-progress' ? 'In Progress' :
-                             co.status === 'completed' ? 'Completed' : co.status}
+                            {co.status === 'requested' ? '📝 Request Submitted' :
+                             co.status === 'quoted' ? '💰 Quote Received' :
+                             co.status === 'paid' ? '✓ Payment Completed' :
+                             co.status === 'in-progress' ? '🎨 In Progress' :
+                             co.status === 'completed' ? '✓ Completed' : co.status}
                           </div>
                           <div className="flex items-center gap-3">
                             <button
@@ -859,23 +854,23 @@ export default function ProfilePage() {
                                 setSelectedCustomOrder(co);
                                 setChatOpen(true);
                               }}
-                              className="relative flex items-center gap-2 px-3 py-2 bg-[#8E5022] hover:bg-[#652810] text-white text-xs font-semibold rounded-lg transition-colors"
+                              className="flex items-center gap-2 px-4 py-2 bg-[#8E5022] hover:bg-[#652810] text-white text-xs font-bold rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105 transform"
                             >
                               <FaComments className="text-sm" />
                               Chat
                             </button>
-                            <div className="text-xs text-[#8E5022] font-medium">
-                              {co.createdAt ? new Date(co.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
-                            </div>
                           </div>
+                        </div>
+                        <div className="text-xs text-[#8E5022] font-medium relative z-10">
+                          {co.createdAt ? new Date(co.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
                         </div>
                         {co.status === 'quoted' && typeof co.quotedPrice === "number" && (
                           <div className="mt-4 relative z-10">
                             <button
                               onClick={() => handleCustomOrderPayment(co)}
-                              className="w-full bg-gradient-to-r from-[#8E5022] to-[#C85428] hover:from-[#652810] hover:to-[#8E5022] text-white py-3 px-4 elegant-rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                              className="w-full bg-gradient-to-r from-[#8E5022] to-[#C85428] hover:from-[#652810] hover:to-[#8E5022] text-white py-3 px-4 elegant-rounded-lg font-bold text-sm transition-all duration-300 transform hover:shadow-lg hover:scale-105 hover:-translate-y-1"
                             >
-                              Pay ₹{co.quotedPrice}
+                              💳 Pay ₹{co.quotedPrice}
                             </button>
                           </div>
                         )}
@@ -888,34 +883,32 @@ export default function ProfilePage() {
           </div>
 
           {/* Address Book Section */}
-          <div className="bg-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-xl border-2 border-[#EDD8B4]/60 overflow-hidden clay-texture">
+          <div className="bg-gradient-to-br from-white via-[#F9F7F2]/50 to-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-lg border border-[#EDD8B4]/40 overflow-hidden">
             <div
-              className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-[#F9F7F2]/50 transition-all duration-300"
+              className="flex items-center justify-between p-6 lg:p-8 cursor-pointer hover:bg-[#F9F7F2]/70 transition-all duration-300 group"
               onClick={() => toggleSection('addressBook')}
             >
               <div className="flex items-center gap-4 lg:gap-6">
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 shadow-lg border border-blue-200/50">
-                  <FaMapMarkerAlt className="text-2xl" />
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 shadow-md border border-blue-200/60 group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
+                  <FaMapMarkerAlt className="text-2xl lg:text-3xl" />
                 </div>
                 <div>
-                  <h2 className="text-xl lg:text-2xl font-bold text-[#442D1C] serif">Address Book</h2>
-                  <p className="text-sm text-[#8E5022] font-semibold uppercase tracking-[0.15em]">Shipping Details</p>
+                  <h2 className="text-xl lg:text-2xl font-bold text-[#442D1C] serif tracking-tight">Address Book</h2>
+                  <p className="text-xs lg:text-sm text-[#8E5022]/80 font-semibold uppercase tracking-[0.12em] mt-1">Shipping Details</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="text-sm text-[#8E5022] font-bold bg-[#EDD8B4]/50 px-3 py-1 rounded-full">
+                <div className="text-sm text-[#8E5022] font-bold bg-blue-50 px-4 py-2 rounded-full border border-blue-200/50">
                   {addresses.length} {addresses.length === 1 ? 'address' : 'addresses'}
                 </div>
-                {expandedSections.addressBook ? (
-                  <FaChevronUp className="text-[#8E5022] text-xl transition-transform duration-300" />
-                ) : (
-                  <FaChevronDown className="text-[#8E5022] text-xl transition-transform duration-300" />
-                )}
+                <div className="text-[#8E5022] text-xl transition-transform duration-300 group-hover:translate-x-1">
+                  {expandedSections.addressBook ? <FaChevronUp /> : <FaChevronDown />}
+                </div>
               </div>
             </div>
 
             {expandedSections.addressBook && (
-              <div className="px-6 lg:px-8 pb-6 lg:pb-8 border-t border-[#EDD8B4]/30">
+              <div className="px-6 lg:px-8 pb-6 lg:pb-8 border-t border-[#EDD8B4]/20">
                 {isEditingAddress ? (
                   <div className="space-y-4 mt-6">
                     <div className="space-y-2">
@@ -925,7 +918,7 @@ export default function ProfilePage() {
                         placeholder="e.g., Home, Work, Office"
                         value={addressForm.label}
                         onChange={(e) => setAddressForm({...addressForm, label: e.target.value})}
-                        className="w-full px-4 py-3 rounded-xl bg-[#F9F7F2] border-2 border-[#EDD8B4]/50 focus:border-[#8E5022] focus:outline-none transition-all duration-300 text-sm font-medium text-[#442D1C] placeholder-[#8E5022]/50"
+                        className="w-full px-4 py-3 rounded-xl bg-[#F9F7F2] border-2 border-[#EDD8B4]/50 focus:border-[#8E5022] focus:outline-none transition-all duration-300 text-sm font-medium text-[#442D1C] placeholder-[#8E5022]/50 focus:ring-2 focus:ring-[#8E5022]/10"
                       />
                     </div>
                     <div className="space-y-2">
@@ -935,7 +928,7 @@ export default function ProfilePage() {
                         placeholder="Full street address"
                         value={addressForm.street}
                         onChange={(e) => setAddressForm({...addressForm, street: e.target.value})}
-                        className="w-full px-4 py-3 rounded-xl bg-[#F9F7F2] border-2 border-[#EDD8B4]/50 focus:border-[#8E5022] focus:outline-none transition-all duration-300 text-sm font-medium text-[#442D1C] placeholder-[#8E5022]/50"
+                        className="w-full px-4 py-3 rounded-xl bg-[#F9F7F2] border-2 border-[#EDD8B4]/50 focus:border-[#8E5022] focus:outline-none transition-all duration-300 text-sm font-medium text-[#442D1C] placeholder-[#8E5022]/50 focus:ring-2 focus:ring-[#8E5022]/10"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
@@ -946,7 +939,7 @@ export default function ProfilePage() {
                           placeholder="City"
                           value={addressForm.city}
                           onChange={(e) => setAddressForm({...addressForm, city: e.target.value})}
-                          className="w-full px-4 py-3 rounded-xl bg-[#F9F7F2] border-2 border-[#EDD8B4]/50 focus:border-[#8E5022] focus:outline-none transition-all duration-300 text-sm font-medium text-[#442D1C] placeholder-[#8E5022]/50"
+                          className="w-full px-4 py-3 rounded-xl bg-[#F9F7F2] border-2 border-[#EDD8B4]/50 focus:border-[#8E5022] focus:outline-none transition-all duration-300 text-sm font-medium text-[#442D1C] placeholder-[#8E5022]/50 focus:ring-2 focus:ring-[#8E5022]/10"
                         />
                       </div>
                       <div className="space-y-2">
@@ -956,7 +949,7 @@ export default function ProfilePage() {
                           placeholder="State"
                           value={addressForm.state}
                           onChange={(e) => setAddressForm({...addressForm, state: e.target.value})}
-                          className="w-full px-4 py-3 rounded-xl bg-[#F9F7F2] border-2 border-[#EDD8B4]/50 focus:border-[#8E5022] focus:outline-none transition-all duration-300 text-sm font-medium text-[#442D1C] placeholder-[#8E5022]/50"
+                          className="w-full px-4 py-3 rounded-xl bg-[#F9F7F2] border-2 border-[#EDD8B4]/50 focus:border-[#8E5022] focus:outline-none transition-all duration-300 text-sm font-medium text-[#442D1C] placeholder-[#8E5022]/50 focus:ring-2 focus:ring-[#8E5022]/10"
                         />
                       </div>
                     </div>
@@ -968,7 +961,7 @@ export default function ProfilePage() {
                           placeholder="Pincode"
                           value={addressForm.zip}
                           onChange={(e) => setAddressForm({...addressForm, zip: e.target.value})}
-                          className="w-full px-4 py-3 rounded-xl bg-[#F9F7F2] border-2 border-[#EDD8B4]/50 focus:border-[#8E5022] focus:outline-none transition-all duration-300 text-sm font-medium text-[#442D1C] placeholder-[#8E5022]/50"
+                          className="w-full px-4 py-3 rounded-xl bg-[#F9F7F2] border-2 border-[#EDD8B4]/50 focus:border-[#8E5022] focus:outline-none transition-all duration-300 text-sm font-medium text-[#442D1C] placeholder-[#8E5022]/50 focus:ring-2 focus:ring-[#8E5022]/10"
                         />
                       </div>
                       <div className="space-y-2">
@@ -978,12 +971,12 @@ export default function ProfilePage() {
                           placeholder="+91 XXXXX XXXXX"
                           value={addressForm.phone}
                           onChange={(e) => setAddressForm({...addressForm, phone: e.target.value})}
-                          className="w-full px-4 py-3 rounded-xl bg-[#F9F7F2] border-2 border-[#EDD8B4]/50 focus:border-[#8E5022] focus:outline-none transition-all duration-300 text-sm font-medium text-[#442D1C] placeholder-[#8E5022]/50"
+                          className="w-full px-4 py-3 rounded-xl bg-[#F9F7F2] border-2 border-[#EDD8B4]/50 focus:border-[#8E5022] focus:outline-none transition-all duration-300 text-sm font-medium text-[#442D1C] placeholder-[#8E5022]/50 focus:ring-2 focus:ring-[#8E5022]/10"
                         />
                       </div>
                     </div>
                     <div className="flex gap-3 pt-4">
-                      <button onClick={handleSaveAddress} disabled={isSavingAddress} className="flex-1 bg-gradient-to-r from-[#8E5022] to-[#C85428] text-white py-3 rounded-xl text-sm font-bold hover:from-[#652810] hover:to-[#8E5022] hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                      <button onClick={handleSaveAddress} disabled={isSavingAddress} className="flex-1 bg-gradient-to-r from-[#8E5022] to-[#C85428] text-white py-3 rounded-xl text-sm font-bold hover:from-[#652810] hover:to-[#8E5022] hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50">
                         {isSavingAddress ? "Saving..." : editingAddressId ? "Update Address" : "Save Address"}
                       </button>
                       <button onClick={() => {
@@ -997,18 +990,18 @@ export default function ProfilePage() {
                           zip: "",
                           phone: userProfile?.phone || ""
                         });
-                      }} className="px-6 py-3 rounded-xl bg-[#F9F7F2] border-2 border-[#EDD8B4] text-[#8E5022] text-sm font-bold hover:bg-[#EDD8B4]/30 transition-all duration-300">Cancel</button>
+                      }} className="px-6 py-3 rounded-xl bg-slate-100 border-2 border-slate-200 text-slate-700 text-sm font-bold hover:bg-slate-200 transition-all duration-300">Cancel</button>
                     </div>
                   </div>
                 ) : (
                   <div className="mt-6">
                     {addresses.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-16 text-[#8E5022]/60">
-                        <div className="p-8 rounded-full bg-[#EDD8B4]/30 mb-6">
-                          <FaMapMarkerAlt className="text-5xl opacity-40" />
+                      <div className="flex flex-col items-center justify-center py-16 text-[#8E5022]/50">
+                        <div className="p-8 rounded-full bg-blue-100/30 mb-6">
+                          <FaMapMarkerAlt className="text-5xl opacity-30" />
                         </div>
-                        <div className="text-sm font-semibold mb-2">No addresses saved</div>
-                        <p className="text-xs text-center opacity-70 mb-6">Add your shipping addresses for faster checkout</p>
+                        <div className="text-base font-semibold mb-2 text-[#442D1C]">No addresses saved</div>
+                        <p className="text-sm text-center opacity-70 mb-6 max-w-xs">Add your shipping addresses for faster and easier checkout</p>
                         <button
                           onClick={() => {
                             setEditingAddressId(null);
@@ -1030,21 +1023,21 @@ export default function ProfilePage() {
                     ) : (
                       <div className="space-y-4">
                         {addresses.map((address) => (
-                          <div key={address._id} className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] to-[#EDD8B4]/20 border-2 border-[#EDD8B4]/40 hover:border-blue-300/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative group overflow-hidden">
+                          <div key={address._id} className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] via-white to-[#EDD8B4]/10 border border-[#EDD8B4]/40 hover:border-blue-300/60 hover:shadow-xl hover:-translate-y-1 hover:bg-gradient-to-br hover:from-blue-50/30 hover:via-white hover:to-[#EDD8B4]/20 transition-all duration-300 relative group overflow-hidden">
                             {/* Subtle background pattern */}
-                            <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/5 rounded-bl-xl"></div>
+                            <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/5 rounded-bl-2xl group-hover:bg-blue-500/10 transition-colors duration-300"></div>
 
                             <div className="flex items-start justify-between mb-4 relative z-10">
                               <div className="flex items-center gap-3">
                                 <span className="font-bold text-[#442D1C] text-base">{address.label}</span>
                                 {address.isDefault && (
-                                  <span className="px-3 py-1 bg-gradient-to-r from-[#8E5022] to-[#C85428] text-white text-xs rounded-full font-bold shadow-md">DEFAULT</span>
+                                  <span className="px-3 py-1 bg-gradient-to-r from-[#8E5022] to-[#C85428] text-white text-xs rounded-full font-bold shadow-md">✓ DEFAULT</span>
                                 )}
                               </div>
-                              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 <button
                                   onClick={() => handleEditAddress(address)}
-                                  className="p-2 text-[#8E5022] hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 hover:scale-110"
+                                  className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-300 hover:scale-110"
                                   title="Edit address"
                                 >
                                   <FaPen className="text-sm" />
@@ -1052,10 +1045,10 @@ export default function ProfilePage() {
                                 {!address.isDefault && (
                                   <button
                                     onClick={() => handleDeleteAddress(address._id)}
-                                    className="p-2 text-[#8E5022] hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 hover:scale-110"
+                                    className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-300 hover:scale-110"
                                     title="Delete address"
                                   >
-                                    ×
+                                    ✕
                                   </button>
                                 )}
                               </div>
