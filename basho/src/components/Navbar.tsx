@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { FiSearch, FiShoppingBag, FiMenu, FiX, FiPhone } from "react-icons/fi";
 import { FaInstagram } from "react-icons/fa";
-import { MdAccountCircle, MdHistory, MdFavoriteBorder, MdSettings, MdLogout } from "react-icons/md";
-import { useSession } from "next-auth/react";
+import { MdAccountCircle, MdHistory, MdFavoriteBorder, MdSettings, MdLogout, MdAdminPanelSettings, MdHome, MdInfo, MdLocalShipping, MdSchool, MdEdit, MdRateReview, MdPhotoLibrary, MdBusiness } from "react-icons/md";
+import { useSession, signOut } from "next-auth/react";
 import "./Navbar.css";
 
 
@@ -15,6 +15,8 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartItemCount, setCartItemCount] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isMobile, setIsMobile] = useState(true);
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -47,6 +49,22 @@ export default function Navbar() {
           console.error("Error parsing localStorage cart data:", error);
           setCartItemCount(0);
         }
+      }
+
+      // Check if user is admin
+      if (session?.user?.email) {
+        try {
+          const adminResponse = await fetch('/api/admin/admins?check=true');
+          if (adminResponse.ok) {
+            const adminData = await adminResponse.json();
+            setIsAdmin(!!adminData.isAdmin);
+          }
+        } catch (error) {
+          console.error("Error checking admin status:", error);
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
       }
     };
 
@@ -85,8 +103,19 @@ export default function Navbar() {
       setIsScrolled(window.scrollY > 10);
     };
 
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    // Set initial mobile state
+    handleResize();
+
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   return (
@@ -109,14 +138,16 @@ export default function Navbar() {
   <div className="nav-links left-links">
   <Link href="/">Home</Link>
   <Link href="/about">About</Link>
-  <Link href="/gallery">Gallery</Link>
+  <Link href="/custom-order">Custom order</Link>
 </div>
 
 <div className="nav-logo">
-  <img
-    src="/images/basho-logo.png"
-    alt="Basho by Shivangi"
-  />
+  <Link href="/">
+    <img
+      src="/images/basho-logo.png"
+      alt="Basho by Shivangi"
+    />
+  </Link>
 </div>
 
 
@@ -160,44 +191,94 @@ export default function Navbar() {
 
     {menuOpen && (
       <div className="dropdown-menu">
-        <Link href="/profile" className="menu-item">
-          <MdAccountCircle /> Profile
-        </Link>
-        <Link href="/orders" className="menu-item">
-          <MdHistory /> Order History
-        </Link>
-        <Link href="/wishlist" className="menu-item">
-          <MdFavoriteBorder /> Wishlist
-        </Link>
-        <Link href="/settings" className="menu-item">
-          <MdSettings /> Settings
-        </Link>
-        <hr className="menu-divider" />
-        <Link href="/" className="menu-item">
-          Home
-        </Link>
-        <Link href="/about" className="menu-item">
-          About
-        </Link>
-        <Link href="/gallery" className="menu-item">
-          Gallery
-        </Link>
-        <Link href="/products" className="menu-item">
-          Products
-        </Link>
-        <Link href="/testimonial" className="menu-item">
-          Testimonials
-        </Link>
-        <Link href="/workshop" className="menu-item">
-          Workshop
-        </Link>
-        <hr className="menu-divider" />
-        <button className="menu-item logout" onClick={() => {
-          // Add logout logic here
-          setMenuOpen(false);
-        }}>
-          <MdLogout /> Logout
-        </button>
+        {/* Desktop View - Limited Menu */}
+        {!isMobile && (
+          <>
+            {session ? (
+              <Link href="/profile" className="menu-item" onClick={() => setMenuOpen(false)}>
+                <MdAccountCircle /> Profile
+              </Link>
+            ) : (
+              <Link href="/auth" className="menu-item" onClick={() => setMenuOpen(false)}>
+                <MdAccountCircle /> Login
+              </Link>
+            )}
+            <Link href="/corporate" className="menu-item" onClick={() => setMenuOpen(false)}>
+              <MdBusiness /> Corporate Inquiries
+            </Link>
+            <Link href="/gallery" className="menu-item" onClick={() => setMenuOpen(false)}>
+              <MdPhotoLibrary /> Gallery
+            </Link>
+            {isAdmin && (
+              <>
+                <hr className="menu-divider" />
+                <Link href="/admin/dashboard" className="menu-item" onClick={() => setMenuOpen(false)}>
+                  <MdAdminPanelSettings /> Admin Panel
+                </Link>
+              </>
+            )}
+            {session && (
+              <>
+                <hr className="menu-divider" />
+                <button className="menu-item logout" onClick={() => {
+                  setMenuOpen(false);
+                  signOut();
+                }}>
+                  <MdLogout /> Logout
+                </button>
+              </>
+            )}
+          </>
+        )}
+
+        {/* Mobile View - Full Menu */}
+        {isMobile && (
+          <>
+            <Link href="/" className="menu-item" onClick={() => setMenuOpen(false)}>
+              <MdHome /> Home
+            </Link>
+            <Link href="/about" className="menu-item" onClick={() => setMenuOpen(false)}>
+              <MdInfo /> About
+            </Link>
+            <Link href="/products" className="menu-item" onClick={() => setMenuOpen(false)}>
+              <MdLocalShipping /> Products
+            </Link>
+            <Link href="/workshop" className="menu-item" onClick={() => setMenuOpen(false)}>
+              <MdSchool /> Workshops
+            </Link>
+            <Link href="/custom-order" className="menu-item" onClick={() => setMenuOpen(false)}>
+              <MdEdit /> Custom order
+            </Link>
+            <Link href="/corporate" className="menu-item" onClick={() => setMenuOpen(false)}>
+              <MdBusiness /> Corporate Inquiries
+            </Link>
+            <Link href="/testimonial" className="menu-item" onClick={() => setMenuOpen(false)}>
+              <MdRateReview /> Testimonials
+            </Link>
+            <Link href="/gallery" className="menu-item" onClick={() => setMenuOpen(false)}>
+              <MdPhotoLibrary /> Gallery
+            </Link>
+            {isAdmin && (
+              <>
+                <hr className="menu-divider" />
+                <Link href="/admin/dashboard" className="menu-item" onClick={() => setMenuOpen(false)}>
+                  <MdAdminPanelSettings /> Admin Panel
+                </Link>
+              </>
+            )}
+            {session && (
+              <>
+                <hr className="menu-divider" />
+                <button className="menu-item logout" onClick={() => {
+                  setMenuOpen(false);
+                  signOut();
+                }}>
+                  <MdLogout /> Logout
+                </button>
+              </>
+            )}
+          </>
+        )}
       </div>
     )}
 

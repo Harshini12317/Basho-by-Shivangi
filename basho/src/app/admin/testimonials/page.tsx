@@ -234,7 +234,7 @@ export default function AdminTestimonials() {
       <div className="mb-6">
         <nav className="flex gap-4">
           <a
-            href="/admin"
+            href="/admin/dashboard"
             className="text-slate-600 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium"
           >
             Dashboard
