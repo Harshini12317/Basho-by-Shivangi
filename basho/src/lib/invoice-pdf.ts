@@ -1,4 +1,4 @@
-import PDFDocument from "pdfkit/js/pdfkit.standalone";
+import PDFDocument from "pdfkit";
 
 /* ---------------- Types ---------------- */
 

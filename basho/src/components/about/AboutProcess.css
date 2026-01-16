@@ -1,5 +1,5 @@
 .process-section {
-  background: #faf6ef;
+  background: #f7eada;
   padding: 7rem 1.5rem;
 }
 
@@ -17,7 +17,7 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background: rgba(74, 47, 27, 0.25);
+  background: rgba(122, 86, 59, 0.25);
 }
 
 /* Each step */
@@ -38,15 +38,15 @@
   margin-top: 0.4rem;
 
   /* Initial state — deep but muted */
-  background: rgba(75, 72, 66, 0.45);
+  background: rgba(122, 86, 59, 0.45);
 
  
   transition: background 0.4s ease, box-shadow 0.4s ease;
 }
 .process-item:hover .process-dot {
   /* On hover — brighter with glow */
-  background: #c85428;
-  box-shadow: 0 0 8px rgba(74, 24, 4, 0.6);
+  background: #da6d3d;
+  box-shadow: 0 0 8px rgba(160, 76, 40, 0.6);
 }
 
 
@@ -65,13 +65,13 @@
   font-size: 1.5rem;
   font-weight: 500;
   margin-bottom: 0.5rem;
-  color: #4a2f1b;
+  color: #5a3a22;
 }
 
 .process-card p {
   font-size: 1.02rem;
   line-height: 1.8;
-  color: #6b4a2f;
+  color: #7a563b;
 }
 
 /* 🔥 HANDMADE SHAKE ON HOVER */

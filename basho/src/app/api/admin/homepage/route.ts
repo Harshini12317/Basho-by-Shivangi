@@ -120,7 +120,15 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    sectionArray[index] = { ...sectionArray[index], ...updates };
+    // Preserve critical fields and merge updates
+    const originalItem = sectionArray[index];
+    sectionArray[index] = { 
+      ...originalItem,
+      ...updates,
+      imageUrl: originalItem.imageUrl, // Preserve imageUrl
+      publicId: originalItem.publicId, // Preserve publicId
+      _id: originalItem._id, // Preserve _id
+    };
     await content.save();
 
     console.log("Image updated successfully:", {

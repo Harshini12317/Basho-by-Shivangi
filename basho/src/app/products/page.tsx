@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useNotification, NotificationContainer } from "@/components/Notification";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaShoppingCart, FaFilter, FaSortAmountDownAlt } from "react-icons/fa";
 
 interface Product {
   _id: string;
@@ -111,7 +111,13 @@ export default function ProductListing() {
     try {
       const response = await fetch("/api/categories");
       const data = await response.json();
-      setCategories(data.map((cat: any) => cat.name));
+      if (!response.ok) {
+        console.error("Categories API returned error:", data);
+        setCategories([]);
+        return;
+      }
+      const list = Array.isArray(data) ? data : [];
+      setCategories(list.map((cat: any) => cat.name).filter(Boolean));
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -247,7 +253,7 @@ export default function ProductListing() {
   }, [selectedCategory, sortBy, debouncedSearchQuery]);
 
   return (
-    <div className="min-h-screen py-8 sm:py-12" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
+    <div className="page-bg min-h-screen py-8 sm:py-12" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
@@ -259,18 +265,19 @@ export default function ProductListing() {
 
         {/* Filters Section */}
         <div className="mb-8 sm:mb-12">
-          <div className="bg-white/90 elegant-rounded-xl shadow-lg border-2 border-[#EDD8B4] p-4 sm:p-6">
+          <div className="filters bg-white/90 elegant-rounded-xl border-2 border-[#EDD8B4] p-4 sm:p-6">
             <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 items-center justify-center">
               {/* Category Filter */}
               <div className="flex flex-col sm:flex-row items-center gap-2">
-                <label htmlFor="category" className="text-[#442D1C] font-semibold text-sm sm:text-base">
-                  Category:
+                <label htmlFor="category" className="flex items-center gap-2 text-[#442D1C] font-semibold text-base sm:text-lg">
+                  <FaFilter className="text-[#8E5022]" />
+                  <span>Category</span>
                 </label>
                 <select
                   id="category"
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="bg-[#EDD8B4]/30 border border-[#8E5022]/30 rounded-lg px-3 py-2 text-[#442D1C] focus:outline-none focus:ring-2 focus:ring-[#8E5022]/50 focus:border-[#8E5022] transition-all duration-300"
+                  className="bg-[#EDD8B4]/30 border border-[#8E5022]/30 rounded-lg px-3 py-2 text-[#442D1C] text-sm sm:text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-[#8E5022]/50 focus:border-[#8E5022] transition-all duration-300"
                 >
                   <option value="all">All Categories</option>
                   {categories.map((category) => (
@@ -283,24 +290,25 @@ export default function ProductListing() {
 
               {/* Sort Filter */}
               <div className="flex flex-col sm:flex-row items-center gap-2">
-                <label htmlFor="sort" className="text-[#442D1C] font-semibold text-sm sm:text-base">
-                  Sort by:
+                <label htmlFor="sort" className="flex items-center gap-2 text-[#442D1C] font-semibold text-base sm:text-lg">
+                  <FaSortAmountDownAlt className="text-[#8E5022]" />
+                  <span>Sort by</span>
                 </label>
                 <select
                   id="sort"
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-[#EDD8B4]/30 border border-[#8E5022]/30 rounded-lg px-3 py-2 text-[#442D1C] focus:outline-none focus:ring-2 focus:ring-[#8E5022]/50 focus:border-[#8E5022] transition-all duration-300"
+                  className="bg-[#EDD8B4]/30 border border-[#8E5022]/30 rounded-lg px-3 py-2 text-[#442D1C] text-sm sm:text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-[#8E5022]/50 focus:border-[#8E5022] transition-all duration-300"
                 >
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
+                  <option value="newest">New Arrivals</option>
+                  <option value="oldest">Early Creations</option>
                   <option value="price-low">Price: Low to High</option>
                   <option value="price-high">Price: High to Low</option>
                 </select>
               </div>
 
               {/* Search Input */}
-              <div className="flex flex-col sm:flex-row items-center gap-2 w-full lg:w-auto">
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
                 <div className="relative w-full sm:w-auto">
                   <input
                     id="search"
@@ -308,7 +316,7 @@ export default function ProductListing() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search products by name..."
-                    className="bg-[#EDD8B4]/30 border border-[#8E5022]/30 rounded-lg pr-10 pl-3 py-2 text-[#442D1C] focus:outline-none focus:ring-2 focus:ring-[#8E5022]/50 focus:border-[#8E5022] transition-all duration-300 w-full sm:w-64"
+                    className="bg-[#EDD8B4]/30 border border-[#8E5022]/30 rounded-lg pr-10 pl-3 py-2 text-[#442D1C] focus:outline-none focus:ring-2 focus:ring-[#8E5022]/50 focus:border-[#8E5022] transition-all duration-300 w-full sm:w-80 lg:w-96"
                   />
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#442D1C]">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -316,6 +324,18 @@ export default function ProductListing() {
                     </svg>
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedCategory("all");
+                    setSortBy("newest");
+                    setSearchQuery("");
+                    setDebouncedSearchQuery("");
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-[#8E5022] border border-[#8E5022]/40 rounded-full hover:bg-[#EDD8B4]/40 transition-colors"
+                >
+                  Clear filters
+                </button>
               </div>
             </div>
           </div>
@@ -327,58 +347,64 @@ export default function ProductListing() {
             <div className="text-[#442D1C] text-xl">Loading products...</div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-8 items-stretch">
             {products.map((p) => (
-                <Link href={`/products/${p.slug}`} key={p._id}>
-                  <div className="group bg-white/90 elegant-rounded-xl shadow-lg border-2 border-[#EDD8B4] overflow-hidden hover:shadow-xl transition-all duration-300 hover-lift">
+                <Link href={`/products/${p.slug}`} key={p._id} className="block h-full">
+                  <div className="group h-full flex flex-col card-depth elegant-rounded-xl border-2 border-[#EDD8B4] overflow-hidden transition-all duration-300">
                     {/* Image container with hover effect */}
-                    <div className="relative overflow-hidden">
+                    <div className="relative image-frame">
                       <img
                         src={p.images?.[0] || '/images/placeholder.png'}
-                        className="w-full h-40 sm:h-48 object-cover transition-opacity duration-500 group-hover:opacity-0"
+                        className="w-full h-40 sm:h-48 rounded-[14px] object-cover transition-opacity transition-transform duration-500 group-hover:opacity-0 group-hover:scale-105"
                         alt={p.title}
                       />
                       <img
                         src={p.images?.[1] || p.images?.[0] || '/images/placeholder.png'}
-                        className="absolute top-0 left-0 w-full h-40 sm:h-48 object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                        className="absolute top-0 left-0 w-full h-40 sm:h-48 rounded-[14px] object-cover opacity-0 transition-opacity transition-transform duration-500 group-hover:opacity-100 group-hover:scale-105"
                         alt={p.title}
                       />
+                      <div className="absolute top-3 right-3 z-10">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleWishlist(p);
+                          }}
+                          title={isInWishlist(p) ? "Remove from Wishlist" : "Add to Wishlist"}
+                          aria-label={isInWishlist(p) ? "Remove from Wishlist" : "Add to Wishlist"}
+                          className="wishlist-pill rounded-full p-2"
+                        >
+                          {isInWishlist(p) ? (
+                            <FaHeart className="text-red-500 text-lg" />
+                          ) : (
+                            <FaRegHeart className="text-[#8E5022] text-lg" />
+                          )}
+                        </button>
+                      </div>
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
 
                     {/* Content */}
-                    <div className="p-3 sm:p-4 bg-gradient-to-br from-white to-[#EDD8B4]/30 relative">
-                      <h2 className="font-bold text-base sm:text-lg text-[#442D1C] mb-2 leading-tight serif">
+                    <div className="flex flex-1 flex-col p-3 sm:p-4 bg-gradient-to-br from-white to-[#EDD8B4]/30 relative">
+                      <h2 className="product-title font-bold text-lg sm:text-xl text-[#442D1C] mb-1 leading-tight serif">
                         {p.title}
                       </h2>
-                      <p className="text-[#652810] mb-1 font-medium italic text-xs sm:text-sm">{p.material}</p>
-                      <p className="text-[#8E5022] mb-3 font-medium text-xs sm:text-sm">{p.category?.name}</p>
+                      <p className="meta-text text-xs sm:text-sm text-[#6B4A2F]/80 mb-3">
+                        Handmade{p.material ? ` • ${p.material}` : ""}{p.category?.name ? ` • ${p.category.name}` : ""}
+                      </p>
                       <div className="flex items-center justify-between mb-3">
-                        <p className="text-lg sm:text-xl font-bold text-[#8E5022]">₹{p.price}</p>
-                        {/* Favorite Heart Icon */}
-                        <div
-                          onClick={(e) => {
-                            e.preventDefault();
-                            toggleWishlist(p);
-                          }}
-                          className="cursor-pointer transition-all duration-300 hover:scale-110"
-                        >
-                          {isInWishlist(p) ? (
-                            <FaHeart className="text-red-500 text-xl transition-colors duration-300" />
-                          ) : (
-                            <FaRegHeart className="text-gray-400 text-xl transition-colors duration-300 hover:text-red-400" />
-                          )}
-                        </div>
+                        <p className="text-xl sm:text-2xl font-bold text-black">₹{p.price}</p>
                       </div>
-                      {/* Add to Cart Button */}
                       <button
                         onClick={(e) => {
                           e.preventDefault();
                           addToCart(p);
                         }}
-                        className="w-full bg-gradient-to-r from-[#8E5022] to-[#C85428] hover:from-[#652810] hover:to-[#8E5022] text-white py-2 px-4 elegant-rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
+                        className="add-to-cart mt-auto w-full inline-flex items-center justify-center gap-2 bg-[#B35A2A] hover:bg-[#8E451C] text-white py-2 px-6 rounded-full font-semibold text-sm transition-all duration-300"
                       >
-                        Add to Cart
+                        <FaShoppingCart className="text-sm" />
+                        <span>Add to Cart</span>
                       </button>
                     </div>
                   </div>
@@ -397,19 +423,29 @@ export default function ProductListing() {
         )}
       </div>
 
-      {/* Floating Custom Order Element */}
+      {/* Floating Custom Order Concierge Card */}
       <div className="fixed bottom-6 right-6 z-50">
-        <div className="bg-white/95 backdrop-blur-sm elegant-rounded-2xl shadow-xl border-2 border-[#EDD8B4]/60 p-4 max-w-xs animate-pulse hover:animate-none transition-all duration-300 hover:shadow-2xl hover:border-[#8E5022]/40">
-          <p className="text-[#442D1C] text-sm font-medium mb-3 leading-relaxed">
-            {randomMessage}
-          </p>
-          <Link
-            href="/custom-order"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#8E5022] to-[#C85428] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:from-[#652810] hover:to-[#8E5022] hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
-          >
-            <span>Order Custom</span>
-            <span className="text-xs">→</span>
-          </Link>
+        <div className="concierge-card bg-white/96 backdrop-blur-sm max-w-xs p-4 sm:p-5 lift-hover">
+          <div className="flex items-start gap-3">
+            <div className="accent-circle flex items-center justify-center flex-shrink-0 mt-1">
+              <span className="text-lg">✨</span>
+            </div>
+            <div>
+              <p className="text-[#442D1C] text-sm font-semibold mb-1">
+                ✨ Want it made just for you?
+              </p>
+              <p className="text-[#6B4A2F] text-xs sm:text-sm mb-3 leading-relaxed">
+                Choose size, shape, or glaze — handcrafted to your taste.
+              </p>
+              <Link
+                href="/custom-order"
+                className="btn-glow inline-flex items-center gap-2 bg-[#B35A2A] hover:bg-[#8E451C] text-white px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300"
+              >
+                <span>Create Your Piece</span>
+                <span className="text-xs">→</span>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
       <NotificationContainer notifications={notifications} removeNotification={removeNotification} />

@@ -498,7 +498,7 @@ export default function ProfilePage() {
                 <div className="absolute -bottom-2 -right-2 w-7 h-7 bg-emerald-400 rounded-full border-3 border-white shadow-lg animate-pulse"></div>
               </div>
               <div className="flex-1">
-                <div className="text-[0.65rem] font-bold uppercase tracking-[0.25em] text-[#8E5022]/80 mb-2.5 serif letter-spacing-wide">Welcome to Your Dashboard</div>
+                <div className="text-[0.65rem] font-bold uppercase tracking-[0.25em] text-[#8E5022]/80 mb-2.5 serif letter-spacing-wide">My Account</div>
                 <h1 className="text-3xl lg:text-5xl xl:text-5xl font-serif font-bold text-[#442D1C] mb-3 leading-tight tracking-tight">{userName}</h1>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                   <p className="text-[#652810] font-semibold flex items-center gap-2 text-sm">
@@ -523,14 +523,14 @@ export default function ProfilePage() {
                 className="group flex items-center justify-center gap-2 px-5 lg:px-7 py-3 lg:py-3.5 rounded-xl lg:rounded-full bg-gradient-to-r from-[#8E5022] to-[#C85428] text-white shadow-lg hover:shadow-2xl hover:from-[#652810] hover:to-[#8E5022] hover:-translate-y-1 transition-all duration-300 border border-[#EDD8B4]/40 font-bold text-sm"
               >
                 <FaShoppingBag className="text-base" />
-                <span>Continue Shopping</span>
+                <span>Shop Products</span>
               </Link>
             </div>
           </div>
         </div>
 
-        {/* Horizontal Sections */}
-        <div className="space-y-4 lg:space-y-6">
+        {/* Dashboard Sections */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {/* Wishlist Section */}
           <div className="bg-gradient-to-br from-white via-[#F9F7F2]/50 to-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-lg border border-[#EDD8B4]/40 overflow-hidden">
             <div
@@ -550,9 +550,6 @@ export default function ProfilePage() {
                 <div className="text-sm text-[#8E5022] font-bold bg-red-50 px-4 py-2 rounded-full border border-red-200/50">
                   {wishlistItems.length} {wishlistItems.length === 1 ? 'item' : 'items'}
                 </div>
-                <div className="text-[#8E5022] text-xl transition-transform duration-300 group-hover:translate-x-1">
-                  {expandedSections.wishlist ? <FaChevronUp /> : <FaChevronDown />}
-                </div>
               </div>
             </div>
 
@@ -567,7 +564,7 @@ export default function ProfilePage() {
                     <p className="text-sm text-center opacity-70 max-w-xs">Items you love will appear here. Start adding your favorite pieces!</p>
                   </div>
                 ) : (
-                  <div className="space-y-4 mt-6">
+                  <div className="space-y-4 mt-6 max-h-80 overflow-y-auto pr-1">
                     {wishlistItems.map((item) => (
                       <Link key={item.productSlug} href={`/products/${item.productSlug}`} className="block">
                         <div className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] via-white to-[#EDD8B4]/10 border border-[#EDD8B4]/40 hover:border-red-300/60 hover:shadow-xl hover:-translate-y-1 hover:bg-gradient-to-br hover:from-red-50/30 hover:via-white hover:to-[#EDD8B4]/20 transition-all duration-300 group cursor-pointer relative overflow-hidden">
@@ -621,16 +618,13 @@ export default function ProfilePage() {
                   <FaShoppingBag className="text-2xl lg:text-3xl" />
                 </div>
                 <div>
-                  <h2 className="text-xl lg:text-2xl font-bold text-[#442D1C] serif tracking-tight">Product Orders</h2>
-                  <p className="text-xs lg:text-sm text-[#8E5022]/80 font-semibold uppercase tracking-[0.12em] mt-1">Your Purchases</p>
+                  <h2 className="text-xl lg:text-2xl font-bold text-[#442D1C] serif tracking-tight">Orders</h2>
+                  <p className="text-xs lg:text-sm text-[#8E5022]/80 font-semibold uppercase tracking-[0.12em] mt-1">Products</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
                 <div className="text-sm text-[#8E5022] font-bold bg-orange-50 px-4 py-2 rounded-full border border-orange-200/50">
                   {productOrders.length} {productOrders.length === 1 ? 'item' : 'items'}
-                </div>
-                <div className="text-[#8E5022] text-xl transition-transform duration-300 group-hover:translate-x-1">
-                  {expandedSections.orders ? <FaChevronUp /> : <FaChevronDown />}
                 </div>
               </div>
             </div>
@@ -642,11 +636,11 @@ export default function ProfilePage() {
                     <div className="p-8 rounded-full bg-orange-100/30 mb-6">
                       <FaShoppingBag className="text-5xl opacity-30" />
                     </div>
-                    <div className="text-base font-semibold mb-2 text-[#442D1C]">No orders yet</div>
-                    <p className="text-sm text-center opacity-70 max-w-xs">Your purchased items will appear here</p>
+                    <div className="text-base font-semibold mb-2 text-[#442D1C]">No records yet</div>
+                    <p className="text-sm text-center opacity-70 max-w-xs">Your purchased items will appear here.</p>
                   </div>
                 ) : (
-                  <div className="space-y-4 mt-6">
+                  <div className="space-y-4 mt-6 max-h-80 overflow-y-auto pr-1">
                     {productOrders.map((o) => (
                       o.type === 'custom-order' ? (
                         <div key={o.id} className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] via-white to-[#EDD8B4]/10 border border-[#EDD8B4]/40 hover:border-orange-300/60 hover:shadow-xl hover:-translate-y-1 hover:bg-gradient-to-br hover:from-orange-50/30 hover:via-white hover:to-[#EDD8B4]/20 transition-all duration-300 group cursor-pointer relative overflow-hidden">
@@ -737,9 +731,6 @@ export default function ProfilePage() {
                 <div className="text-sm text-[#8E5022] font-bold bg-teal-50 px-4 py-2 rounded-full border border-teal-200/50">
                   {registrations.length} {registrations.length === 1 ? 'item' : 'items'}
                 </div>
-                <div className="text-[#8E5022] text-xl transition-transform duration-300 group-hover:translate-x-1">
-                  {expandedSections.workshops ? <FaChevronUp /> : <FaChevronDown />}
-                </div>
               </div>
             </div>
 
@@ -750,11 +741,11 @@ export default function ProfilePage() {
                     <div className="p-8 rounded-full bg-teal-100/30 mb-6">
                       <FaCalendarAlt className="text-5xl opacity-30" />
                     </div>
-                    <div className="text-base font-semibold mb-2 text-[#442D1C]">No workshop registrations</div>
-                    <p className="text-sm text-center opacity-70 max-w-xs">Your workshop bookings will appear here</p>
+                    <div className="text-base font-semibold mb-2 text-[#442D1C]">No records yet</div>
+                    <p className="text-sm text-center opacity-70 max-w-xs">Your workshop bookings will appear here.</p>
                   </div>
                 ) : (
-                  <div className="space-y-4 mt-6">
+                  <div className="space-y-4 mt-6 max-h-80 overflow-y-auto pr-1">
                     {registrations.map((r) => (
                       <div key={r._id} className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] via-white to-[#EDD8B4]/10 border border-[#EDD8B4]/40 hover:border-teal-300/60 hover:shadow-xl hover:-translate-y-1 hover:bg-gradient-to-br hover:from-teal-50/30 hover:via-white hover:to-[#EDD8B4]/20 transition-all duration-300 group relative overflow-hidden">
                         {/* Subtle background pattern */}
@@ -794,16 +785,13 @@ export default function ProfilePage() {
                   <FaPaintBrush className="text-2xl lg:text-3xl" />
                 </div>
                 <div>
-                  <h2 className="text-xl lg:text-2xl font-bold text-[#442D1C] serif tracking-tight">Custom Orders</h2>
-                  <p className="text-xs lg:text-sm text-[#8E5022]/80 font-semibold uppercase tracking-[0.12em] mt-1">Bespoke Creations</p>
+                  <h2 className="text-xl lg:text-2xl font-bold text-[#442D1C] serif tracking-tight">Custom</h2>
+                  <p className="text-xs lg:text-sm text-[#8E5022]/80 font-semibold uppercase tracking-[0.12em] mt-1">Requests</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
                 <div className="text-sm text-[#8E5022] font-bold bg-purple-50 px-4 py-2 rounded-full border border-purple-200/50">
                   {customOrders.length} {customOrders.length === 1 ? 'item' : 'items'}
-                </div>
-                <div className="text-[#8E5022] text-xl transition-transform duration-300 group-hover:translate-x-1">
-                  {expandedSections.customOrders ? <FaChevronUp /> : <FaChevronDown />}
                 </div>
               </div>
             </div>
@@ -815,11 +803,11 @@ export default function ProfilePage() {
                     <div className="p-8 rounded-full bg-purple-100/30 mb-6">
                       <FaPaintBrush className="text-5xl opacity-30" />
                     </div>
-                    <div className="text-base font-semibold mb-2 text-[#442D1C]">No custom orders</div>
-                    <p className="text-sm text-center opacity-70 max-w-xs">Your bespoke pottery requests will appear here</p>
+                    <div className="text-base font-semibold mb-2 text-[#442D1C]">No records yet</div>
+                    <p className="text-sm text-center opacity-70 max-w-xs">Your bespoke pottery requests will appear here.</p>
                   </div>
                 ) : (
-                  <div className="space-y-4 mt-6">
+                  <div className="space-y-4 mt-6 max-h-80 overflow-y-auto pr-1">
                     {customOrders.map((co) => (
                       <div key={co._id} className="p-5 rounded-2xl bg-gradient-to-br from-[#F9F7F2] via-white to-[#EDD8B4]/10 border border-[#EDD8B4]/40 hover:border-purple-300/60 hover:shadow-xl hover:-translate-y-1 hover:bg-gradient-to-br hover:from-purple-50/30 hover:via-white hover:to-[#EDD8B4]/20 transition-all duration-300 relative overflow-hidden group">
                         {/* Subtle background pattern */}

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useNotification, NotificationContainer } from "@/components/Notification";
 
@@ -17,6 +18,7 @@ interface Product {
 }
 
 export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+  const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
   const [slug, setSlug] = useState<string>("");
@@ -208,17 +210,32 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   };
 
   return (
-    <div className="min-h-screen py-16">
+    <div className="min-h-screen py-16" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Single Product Card */}
-        <div className="bg-white/90 backdrop-blur-sm elegant-rounded-xl shadow-2xl border-2 border-[#EDD8B4] overflow-hidden clay-texture">
+        <div className="bg-white/90 backdrop-blur-sm elegant-rounded-xl shadow-2xl border-2 border-[#EDD8B4] overflow-hidden clay-texture relative">
+          <button
+            onClick={() => router.back()}
+            className="absolute top-2 right-2 w-12 h-12 rounded-full bg-white shadow-xl border border-[#EDD8B4] flex items-center justify-center text-[#442D1C] text-2xl hover:bg-[#F3E6D6] transition-all hover:-translate-y-[1px] active:scale-[0.96] z-10"
+            aria-label="Close"
+          >
+            ×
+          </button>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
             {/* Image Section */}
             <div className="relative p-8 lg:p-12">
-              <div className="relative overflow-hidden bg-[#EDD8B4]/30 backdrop-blur-sm shadow-xl hover:scale-105 transition-transform duration-500 elegant-rounded-xl">
+              <div
+                className="relative overflow-hidden backdrop-blur-sm shadow-xl transition-transform duration-500 elegant-rounded-xl"
+                style={{
+                  boxShadow: "0 10px 30px rgba(90,58,40,0.12)",
+                  backgroundImage: "url(/images/i2.jpg)",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              >
                 <img
                   src={product.images?.[selectedImage] || '/images/placeholder.png'}
-                  className="w-full h-80 lg:h-96 object-cover transition-all duration-700 hover:scale-105"
+                  className="w-full h-80 lg:h-96 object-cover transition-all duration-700 hover:scale-[1.02]"
                   alt={product.title}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
@@ -233,10 +250,10 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-20 h-20 elegant-rounded-lg overflow-hidden border-3 transition-all duration-300 transform hover:scale-110 shadow-md ${
+                    className={`flex-shrink-0 w-20 h-20 elegant-rounded-lg overflow-hidden border-2 transition-all duration-300 transform hover:scale-[1.04] shadow-md ${
                       selectedImage === index
-                        ? "border-[#8E5022] shadow-lg"
-                        : "border-[#EDD8B4] hover:border-[#C85428]"
+                        ? "border-[#B85C2E] shadow-lg"
+                        : "border-[#EDD8B4] hover:border-[#C85428] opacity-60 hover:opacity-100"
                     }`}
                   >
                     <img
@@ -258,24 +275,23 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                     {product.title}
                   </h1>
                   <button
-                    key={isInWishlist ? 'filled' : 'empty'}
                     onClick={toggleWishlist}
-                    className={`p-3 rounded-full transition-all duration-300 ${
-                      isInWishlist
-                        ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                        : 'bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-red-400'
-                    }`}
-                    title={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+                    className="mt-4 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-colors duration-300"
+                    style={{ boxShadow: '0 6px 16px rgba(0,0,0,0.12)' }}
                   >
-                    {isInWishlist ? <FaHeart className="text-xl text-red-600" /> : <FaRegHeart className="text-xl text-gray-400" />}
+                    {isInWishlist ? (
+                      <FaHeart className="text-[#E86A5E] text-xl" />
+                    ) : (
+                      <FaRegHeart className="text-[#5A3A28] text-xl" />
+                    )}
                   </button>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="text-[#652810] font-semibold text-base italic bg-[#EDD8B4]/50 px-3 py-1 elegant-rounded-lg">
+                  <span className="bg-[#F3E6D6] text-[#7A4A2E] rounded-full px-3 py-1 text-[12px] font-medium">
                     {product.material}
                   </span>
                 </div>
-                <div className="text-3xl font-bold text-[#8E5022]">₹{product.price}</div>
+                <div className="text-[22px] lg:text-[24px] font-semibold text-[#B85C2E]">₹{product.price}</div>
               </div>
 
               {/* Product Details */}
@@ -283,20 +299,20 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 {/* Description */}
                 <div>
                   <h3 className="text-lg font-semibold text-[#442D1C] mb-2 serif">The Story</h3>
-                  <p className="text-[#652810] leading-relaxed text-sm italic">{product.description}</p>
+                  <p className="text-[#5A3A28] leading-relaxed text-[14px]" style={{ fontFamily: 'Inter, sans-serif', lineHeight: '1.6' }}>{product.description}</p>
                 </div>
 
                 {/* Craft Details */}
                 <div>
                   <h3 className="text-lg font-semibold text-[#442D1C] mb-3 serif">Craft Details</h3>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-[#EDD8B4]/30 elegant-rounded-lg p-3">
-                      <div className="text-[#8E5022] font-semibold text-xs mb-1">Material</div>
-                      <div className="text-[#442D1C] font-bold text-sm">{product.material}</div>
+                    <div className="bg-[#FDF6EC] rounded-[14px] p-4 border border-[rgba(90,58,40,0.08)]">
+                      <div className="text-[#7A4A2E]/70 uppercase text-[12px] mb-1">Material</div>
+                      <div className="text-[#5A3A28] font-semibold text-[15px]">{product.material}</div>
                     </div>
-                    <div className="bg-[#EDD8B4]/30 elegant-rounded-lg p-3">
-                      <div className="text-[#8E5022] font-semibold text-xs mb-1">Weight</div>
-                      <div className="text-[#442D1C] font-bold text-sm">{product.weight} kg</div>
+                    <div className="bg-[#FDF6EC] rounded-[14px] p-4 border border-[rgba(90,58,40,0.08)]">
+                      <div className="text-[#7A4A2E]/70 uppercase text-[12px] mb-1">Weight</div>
+                      <div className="text-[#5A3A28] font-semibold text-[15px]">{product.weight} kg</div>
                     </div>
                   </div>
                 </div>
@@ -304,7 +320,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 {/* Care Instructions */}
                 <div>
                   <h3 className="text-lg font-semibold text-[#442D1C] mb-2 serif">Care Instructions</h3>
-                  <p className="text-[#652810] leading-relaxed italic text-sm">{product.care}</p>
+                  <p className="text-[#5A3A28] leading-relaxed text-[14px]" style={{ fontFamily: 'Inter, sans-serif', lineHeight: '1.6' }}>{product.care}</p>
                 </div>
               </div>
 
@@ -312,7 +328,8 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               <div className="pt-4">
                 <button
                   onClick={addToCheckout}
-                  className="w-full bg-gradient-to-r from-[#8E5022] to-[#C85428] hover:from-[#652810] hover:to-[#8E5022] text-white py-4 px-6 elegant-rounded-xl font-bold text-lg transition-all duration-500 transform hover:scale-105 shadow-xl hover:shadow-2xl organic-button hover-lift"
+                  className="w-full bg-gradient-to-r from-[#B85C2E] to-[#9E4A25] text-white px-4 font-semibold text-sm transition-all duration-300 transform hover:-translate-y-[1px] hover:shadow-lg hover:scale-105 active:scale-[0.98]"
+                  style={{ borderRadius: '14px', height: '56px', letterSpacing: '0.3px', boxShadow: '0 8px 20px rgba(184,92,46,0.3)' }}
                 >
                   Add to Cart - ₹{product.price}
                 </button>

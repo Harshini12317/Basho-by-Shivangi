@@ -53,7 +53,7 @@
   background:
     radial-gradient(circle at 10% 20%, rgba(232, 213, 183, 0.35), transparent 60%),
     radial-gradient(circle at 90% 80%, rgba(194, 106, 58, 0.16), transparent 55%),
-    url("/images/headerimage.jpg") center/cover no-repeat;
+    url("/images/i2.jpg") center/cover no-repeat;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -234,8 +234,8 @@
   width: 50%;
   height: 100%;
   background:
-    linear-gradient(145deg, rgba(29, 24, 19, 0.92), rgba(96, 59, 27, 0.92)),
-    url("/images/pottery-hero.png") center/cover no-repeat;
+    linear-gradient(145deg, rgba(81, 62, 44, 0.4), rgba(120, 82, 49, 0.92)),
+    url("/images/ww.png") center/cover no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
