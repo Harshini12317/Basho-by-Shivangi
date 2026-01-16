@@ -7,12 +7,54 @@ import "./GsapSlider.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
+interface SliderImage {
+  _id?: string;
+  imageUrl: string;
+  altText?: string;
+  title?: string;
+  description?: string;
+}
+
+const DEFAULT_SLIDER_IMAGES = [
+  { imageUrl: '/images/pottery-hero.png', altText: 'Slider Image 1' },
+  { imageUrl: '/images/p1.png', altText: 'Slider Image 2' },
+  { imageUrl: '/images/common.png', altText: 'Slider Image 3' },
+  { imageUrl: '/images/p2.jpg', altText: 'Slider Image 4' },
+  { imageUrl: '/images/common3.png', altText: 'Slider Image 5' },
+  { imageUrl: '/images/p3.jpg', altText: 'Slider Image 6' },
+  { imageUrl: '/images/product1.png', altText: 'Slider Image 7' },
+  { imageUrl: '/images/p4.jpg', altText: 'Slider Image 8' },
+  { imageUrl: '/images/product2.png', altText: 'Slider Image 9' },
+];
+
 export default function GsapSlider() {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
   const [typedText, setTypedText] = useState("");
+  const [sliderImages, setSliderImages] = useState<SliderImage[]>(DEFAULT_SLIDER_IMAGES);
   const phrases = ["Welcome to Basho,where artistry meets tradition.", "Each piece is handcrafted with passion and care.", "Discover timeless pottery that speaks to the soul.", "We celebrate the beauty of imperfection in clay.", "Custom creations made exclusively for you.", "Experience the joy of handmade pottery.", "Crafted by skilled hands, inspired by nature.", "Transform your space with bespoke ceramics.", "Where tradition meets contemporary design.", "Every piece tells a unique story.", "Bringing pottery into your everyday moments.", "Creating heirlooms meant to be cherished forever."];
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
+
+  useEffect(() => {
+    // Fetch home page content to get dynamic images
+    const fetchContent = async () => {
+      try {
+        const response = await fetch('/api/admin/homepage');
+        const data = await response.json();
+        
+        if (data.gsapSlider && data.gsapSlider.length > 0) {
+          const activeImages = data.gsapSlider
+            .filter((img: any) => img.isActive)
+            .sort((a: any, b: any) => a.order - b.order);
+          setSliderImages(activeImages);
+        }
+      } catch (error) {
+        console.error('Error fetching home page content:', error);
+      }
+    };
+
+    fetchContent();
+  }, []);
 
   useEffect(() => {
     if (!wrapperRef.current) return;
@@ -138,7 +180,7 @@ export default function GsapSlider() {
             <span className="typewriter-cursor">|</span>
           </div>
 
-          {[...Array(9)].map((_, i) => (
+          {sliderImages.map((image, i) => (
             <div
               key={i}
               ref={(el) => {
@@ -147,8 +189,8 @@ export default function GsapSlider() {
               className="gsap-slider-card"
             >
               <img
-                src="/images/pottery-hero.png"
-                alt="Pottery"
+                src={image.imageUrl}
+                alt={image.altText || "Slider Image"}
               />
             </div>
           ))}

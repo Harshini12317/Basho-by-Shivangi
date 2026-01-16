@@ -161,6 +161,17 @@ export default function AdminDashboard() {
       ),
       color: 'bg-emerald-500',
     },
+    {
+      title: 'Home Page Management',
+      description: 'Manage hero slideshow, GSAP slider, and features section images',
+      href: '/admin/homepage',
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-4m0 0l4 4m-4-4v4" />
+        </svg>
+      ),
+      color: 'bg-rose-500',
+    },
   ];
 
   return (

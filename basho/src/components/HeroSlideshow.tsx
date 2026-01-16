@@ -3,30 +3,56 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
-const SLIDESHOW_IMAGES = [
-  '/images/product1.png',
-  '/images/p1.png',
-  '/images/p2.jpg',
-  '/images/p3.jpg',
-  '/images/p4.jpg',
-  '/images/pottery-hero.png',
-  '/images/common.png',
-  '/images/common3.png',
+const DEFAULT_SLIDESHOW_IMAGES = [
+  { imageUrl: '/images/pottery-hero.png', altText: 'Hero Slideshow Image 1' },
+  { imageUrl: '/images/p1.png', altText: 'Hero Slideshow Image 2' },
+  { imageUrl: '/images/p2.jpg', altText: 'Hero Slideshow Image 3' },
+  { imageUrl: '/images/p3.jpg', altText: 'Hero Slideshow Image 4' },
+  { imageUrl: '/images/p4.jpg', altText: 'Hero Slideshow Image 5' },
+  { imageUrl: '/images/common.png', altText: 'Hero Slideshow Image 6' },
+  { imageUrl: '/images/common3.png', altText: 'Hero Slideshow Image 7' },
 ];
 
+interface SlideImage {
+  imageUrl: string;
+  altText?: string;
+}
+
 export default function HeroSlideshow() {
+  const [slideImages, setSlideImages] = useState<SlideImage[]>(DEFAULT_SLIDESHOW_IMAGES);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
+
+  useEffect(() => {
+    // Fetch home page content to get dynamic images
+    const fetchContent = async () => {
+      try {
+        const response = await fetch('/api/admin/homepage');
+        const data = await response.json();
+        
+        if (data.heroSlideshow && data.heroSlideshow.length > 0) {
+          const activeImages = data.heroSlideshow
+            .filter((img: any) => img.isActive)
+            .sort((a: any, b: any) => a.order - b.order);
+          setSlideImages(activeImages);
+        }
+      } catch (error) {
+        console.error('Error fetching home page content:', error);
+      }
+    };
+
+    fetchContent();
+  }, []);
 
   useEffect(() => {
     if (!isAutoPlay) return;
 
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % SLIDESHOW_IMAGES.length);
+      setCurrentSlide((prev) => (prev + 1) % slideImages.length);
     }, 5000); // Change slide every 5 seconds
 
     return () => clearInterval(interval);
-  }, [isAutoPlay]);
+  }, [isAutoPlay, slideImages.length]);
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
@@ -34,12 +60,12 @@ export default function HeroSlideshow() {
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % SLIDESHOW_IMAGES.length);
+    setCurrentSlide((prev) => (prev + 1) % slideImages.length);
     setIsAutoPlay(false);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + SLIDESHOW_IMAGES.length) % SLIDESHOW_IMAGES.length);
+    setCurrentSlide((prev) => (prev - 1 + slideImages.length) % slideImages.length);
     setIsAutoPlay(false);
   };
 
@@ -48,7 +74,7 @@ export default function HeroSlideshow() {
       {/* Main Slideshow Container */}
       <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl">
         {/* Slides */}
-        {SLIDESHOW_IMAGES.map((image, index) => (
+        {slideImages.map((image, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
@@ -56,8 +82,8 @@ export default function HeroSlideshow() {
             }`}
           >
             <img
-              src={image}
-              alt={`Slide ${index + 1}`}
+              src={image.imageUrl}
+              alt={image.altText || `Slide ${index + 1}`}
               className="w-full h-full object-cover"
               onError={(e) => {
                 e.currentTarget.src = '/images/product1.png';
@@ -92,7 +118,7 @@ export default function HeroSlideshow() {
 
         {/* Dot Indicators */}
         <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-20">
-          {SLIDESHOW_IMAGES.map((_, index) => (
+          {slideImages.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
