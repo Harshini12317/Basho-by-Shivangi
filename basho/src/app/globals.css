@@ -191,13 +191,13 @@ h1, h2, h3, h4, h5, h6 {
 /* Navbar/Section title enhancements */
 .nav-title {
   font-family: var(--font-playfair, 'Playfair Display'), serif;
-  font-size: clamp(2.6rem, 5.2vw, 3.8rem);
+  font-size: 2.2rem;
   letter-spacing: 1px;
   color: #ffffff;
 }
 
 .nav-subtitle {
-  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  font-size: 0.85rem;
   color: #fff1f4;
 }
 
