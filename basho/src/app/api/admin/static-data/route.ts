@@ -29,6 +29,7 @@ export async function GET() {
           },
         },
         faqs: [],
+        experiences: [],
         hsnCode: '',
       });
       // Save without validation initially

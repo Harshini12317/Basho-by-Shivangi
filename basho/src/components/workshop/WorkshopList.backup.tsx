@@ -9,16 +9,6 @@ interface Experience {
   description: string;
 }
 
-interface Event {
-  _id: string;
-  title: string;
-  description: string;
-  location: string;
-  images: string[];
-  type: string;
-  isPublished: boolean;
-}
-
 interface Workshop {
   _id: string;
   slug: string;
@@ -71,7 +61,6 @@ type PopupItem = {
 export default function WorkshopList({ workshops: initialWorkshops }: { workshops?: DBWorkshop[] }) {
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [experiences, setExperiences] = useState<Experience[]>([]);
-  const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -101,21 +90,8 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
       }
     };
 
-    const fetchEvents = async () => {
-      try {
-        const response = await fetch('/api/events');
-        if (response.ok) {
-          const data = await response.json();
-          setEvents(data.filter((e: Event) => e.isPublished));
-        }
-      } catch (error) {
-        console.error('Failed to fetch events:', error);
-      }
-    };
-
     fetchWorkshops();
     fetchExperiences();
-    fetchEvents();
   }, []);
 
   // Use fetched workshops if available, otherwise use initial props or empty array
@@ -157,59 +133,45 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
   const studentScrollerRef = useRef<HTMLDivElement>(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  const [reg, setReg] = useState({ name: '', mobile: '', date: '' });
+  const [reg, setReg] = useState({ name: '', email: '' });
   const [regStatus, setRegStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [popup, setPopup] = useState<PopupItem | null>(null);
   const [showPopup, setShowPopup] = useState(false);
 
-  const openBookingModal = (eventId: string) => {
-    setSelectedEventId(eventId);
+  const openModal = (slug: string) => {
+    setSelectedSlug(slug);
     setShowModal(true);
     setRegStatus('idle');
   };
-
-  const closeBookingModal = () => {
+  const closeModal = () => {
     setShowModal(false);
-    setSelectedEventId(null);
-    setReg({ name: '', mobile: '', date: '' });
+    setSelectedSlug(null);
+    setReg({ name: '', email: '' });
   };
-
-  const submitBooking = async () => {
-    if (!selectedEventId || !reg.name || !reg.mobile || !reg.date) {
+  const submitRegistration = async () => {
+    if (!selectedSlug || !reg.name || !reg.email) {
       setRegStatus('error');
       return;
     }
-
-    setRegStatus('loading');
     try {
-      const response = await fetch('/api/admin/event-bookings', {
+      setRegStatus('loading');
+      const res = await fetch('/api/workshop/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          eventId: selectedEventId,
-          customerName: reg.name,
-          customerPhone: reg.mobile,
-          bookingDate: reg.date,
-          numberOfGuests: 1,
-          status: 'pending',
-        }),
+        body: JSON.stringify({ workshopSlug: selectedSlug, name: reg.name, email: reg.email }),
       });
-
-      if (response.ok) {
-        setRegStatus('success');
-        setTimeout(() => {
-          closeBookingModal();
-        }, 2000);
-      } else {
+      if (!res.ok) {
         setRegStatus('error');
+        return;
       }
-    } catch (error) {
-      console.error('Booking failed:', error);
+      setRegStatus('success');
+      setTimeout(() => {
+        closeModal();
+      }, 900);
+    } catch {
       setRegStatus('error');
     }
   };
-
   const shouldShowByFrequency = (p: PopupItem) => {
     const key = `popup_${p.name}_seen`;
     if (p.frequency === 'always') return true;
@@ -455,129 +417,103 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
             </div>
           </div>
           
-          {experiences.length > 0 || events.length > 0 ? (
-            <>
-              {experiences.map((experience, index) => (
-                <div key={`exp-${index}`} className="grid md:grid-cols-2 items-center gap-8 mb-16">
-                  <div className="flex justify-center md:justify-start group cursor-pointer bg-white rounded-2xl p-2 ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">
-                    <img src={experience.image} alt={experience.title} className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
-                  </div>
-                  <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
-                    <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">{experience.title}</div>
-                    <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
-                    <p className="leading-relaxed max-w-md md:max-w-lg">
-                      {experience.description}
-                    </p>
-                    <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Book Now</Link>
-                    <button onClick={() => openModal(experience.title.toLowerCase().replace(/\s+/g, '-'))} className="inline-block mt-3 ml-2 bg-white text-slate-900 px-4 py-2 rounded-full ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">Register Interest</button>
-                  </div>
-                </div>
-              ))}
-              {events.map((event, index) => (
-                <div key={`event-${event._id}`} className="grid md:grid-cols-2 items-center gap-8 mb-16">
-                  <div className="flex justify-center md:justify-start group cursor-pointer bg-white rounded-2xl p-2 ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">
-                    {event.images.length > 0 ? (
-                      <img src={event.images[0]} alt={event.title} className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
-                    ) : (
-                      <div className="w-[360px] md:w-[480px] h-[300px] bg-gray-200 rounded-xl flex items-center justify-center">
-                        <p className="text-gray-500">No image</p>
-                      </div>
-                    )}
-                  </div>
-                  <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
-                    <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">{event.title}</div>
-                    <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
-                    {event.locationLink ? (
-                      <p className="text-sm text-slate-600 mb-2">📍 <a href={event.locationLink} target="_blank" rel="noopener noreferrer" className="text-[#E76F51] hover:underline">{event.location}</a></p>
-                    ) : (
-                      <p className="text-sm text-slate-600 mb-2">📍 {event.location}</p>
-                    )}
-                    <p className="leading-relaxed max-w-md md:max-w-lg mb-4">
-                      {event.description}
-                    </p>
-                    <button onClick={() => openBookingModal(event._id)} className="inline-block bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Book Now</button>
-                  </div>
-                </div>
-              ))}
-            </>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-slate-500 text-lg">No items available at the moment.</p>
-              <p className="text-slate-400 text-sm mt-2">Check back soon!</p>
+          <div className="grid md:grid-cols-2 items-center gap-8 mb-16">
+            <div className="flex justify-center md:justify-start group cursor-pointer bg-white rounded-2xl p-2 ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">
+              <img src="/images/ev1.png" alt="" className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
             </div>
-          )}
+            <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
+              <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">Date Night: Crafting Memories</div>
+              <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
+              <p className="leading-relaxed max-w-md md:max-w-lg">
+                Spend a romantic evening in our serene studio, connecting through the tactile experience of shaping raw earth together on the pottery wheel. It’s a mindful escape for couples.
+              </p>
+              <div className="flex gap-2 flex-wrap mt-4">
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Couples</span>
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Guided</span>
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">All Levels</span>
+              </div>
+              <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Book Date Night</Link>
+              <button onClick={() => openModal('date-night')} className="inline-block mt-3 ml-2 bg-white text-slate-900 px-4 py-2 rounded-full ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">Register Interest</button>
+            </div>
+          </div>
 
-          {/* Booking Modal */}
-          {showModal && selectedEventId && (
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+          <div className="grid md:grid-cols-2 items-center gap-8 mb-16">
+            <div className="flex justify-center md:justify-start group cursor-pointer bg-white rounded-2xl p-2 ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">
+              <img src="/images/e3.png" alt="" className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
+            </div>
+            <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
+              <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">Birthday Bash: Creative Celebrations</div>
+              <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
+              <p className="leading-relaxed max-w-md md:max-w-lg">
+                Our Birthday Blast Workshop is the ultimate creative party where guests trade traditional gifts for a hands-on adventure in clay. Under the guidance of our expert instructors, your group will dive into the mess and magic of the pottery wheel, crafting their very own &quot;Earthen Legacy&quot; pieces from scratch.
+              </p>
+              <div className="flex gap-2 flex-wrap mt-4">
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Group Fun</span>
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Instructor‑Led</span>
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">All Ages</span>
+              </div>
+              <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Plan A Birthday Bash</Link>
+              <button onClick={() => openModal('birthday-bash')} className="inline-block mt-3 ml-2 bg-white text-slate-900 px-4 py-2 rounded-full ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">Register Interest</button>
+            </div>
+          </div>
+          
+          <div className="grid md:grid-cols-2 items-center gap-8 mb-16">
+            <div className="flex justify-center md:justify-start group cursor-pointer bg-white rounded-2xl p-2 ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">
+              <img src="/images/e5.png" alt="" className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
+            </div>
+            <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
+              <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">Team Building: Hands‑On Harmony</div>
+              <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
+              <p className="leading-relaxed max-w-md md:max-w-lg">
+                Escape the conventional office setting and immerse your team in a dynamic pottery workshop designed to foster genuine connection and collaborative spirit. Our &quot;Hands‑On Harmony&quot; session encourages communication, problem‑solving, and creative thinking as colleagues learn to shape clay together.
+              </p>
+              <div className="flex gap-2 flex-wrap mt-4">
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Team Bonding</span>
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Communication</span>
+                <span className="px-2 py-1 text-[11px] bg-white rounded-full ring-1 ring-[#E2C48D]">Creative Thinking</span>
+              </div>
+              <Link href="/contact" className="inline-block mt-4 bg-[#E76F51] text-white px-4 py-2 rounded-full shadow-md hover:bg-[#D35400] transition-colors">Book Team Session</Link>
+              <button onClick={() => openModal('team-building')} className="inline-block mt-3 ml-2 bg-white text-slate-900 px-4 py-2 rounded-full ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">Register Interest</button>
+            </div>
+          </div>
+
+          {showModal && (
+            <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/30">
               <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-lg ring-1 ring-[#E2C48D]">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-slate-900">Book This Event</h3>
-                  <button onClick={closeBookingModal} className="text-slate-600 hover:text-slate-900">✕</button>
+                  <h3 className="text-lg font-semibold text-slate-900">Register Interest</h3>
+                  <button onClick={closeModal} className="text-slate-600 hover:text-slate-900">✕</button>
                 </div>
-
-                {regStatus === 'success' ? (
-                  <div className="text-center py-8">
-                    <div className="text-4xl mb-3">✓</div>
-                    <p className="text-slate-900 font-semibold">Booking Confirmed!</p>
-                    <p className="text-slate-600 text-sm mt-2">We'll contact you soon to confirm details.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
-                      <input
-                        type="text"
-                        required
-                        value={reg.name}
-                        onChange={(e) => setReg({ ...reg, name: e.target.value })}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#E2C48D]"
-                        placeholder="Your Full Name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Mobile *</label>
-                      <input
-                        type="tel"
-                        required
-                        value={reg.mobile}
-                        onChange={(e) => setReg({ ...reg, mobile: e.target.value })}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#E2C48D]"
-                        placeholder="Your Mobile Number"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Preferred Date *</label>
-                      <input
-                        type="date"
-                        required
-                        value={reg.date}
-                        onChange={(e) => setReg({ ...reg, date: e.target.value })}
-                        min={new Date().toISOString().split('T')[0]}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#E2C48D]"
-                      />
-                    </div>
-                    {regStatus === 'error' && (
-                      <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-sm">
-                        Please fill all fields correctly
-                      </div>
-                    )}
-                    <div className="flex gap-2 pt-3">
-                      <button
-                        onClick={closeBookingModal}
-                        className="flex-1 px-4 py-2 rounded-lg border border-slate-300 text-slate-900 hover:bg-slate-50"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={submitBooking}
-                        disabled={regStatus === 'loading'}
-                        className="flex-1 px-4 py-2 rounded-lg bg-[#E76F51] text-white hover:bg-[#D35400] disabled:opacity-50 transition-colors"
-                      >
-                        {regStatus === 'loading' ? 'Booking...' : 'Submit Booking'}
-                      </button>
-                    </div>
-                  </div>
+                <div className="space-y-3">
+                  <input
+                    className="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-[#E2C48D]"
+                    placeholder="Your Name"
+                    value={reg.name}
+                    onChange={(e) => setReg((r) => ({ ...r, name: e.target.value }))}
+                  />
+                  <input
+                    className="w-full px-3 py-2 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-[#E2C48D]"
+                    placeholder="Email"
+                    value={reg.email}
+                    onChange={(e) => setReg((r) => ({ ...r, email: e.target.value }))}
+                  />
+                </div>
+                <div className="mt-4 flex items-center gap-3">
+                  <button
+                    onClick={submitRegistration}
+                    className="px-4 py-2 rounded-full bg-[#E76F51] text-white shadow-md hover:bg-[#D35400]"
+                  >
+                    {regStatus === 'loading' ? 'Submitting...' : 'Submit'}
+                  </button>
+                  <button onClick={closeModal} className="px-4 py-2 rounded-full bg-white ring-1 ring-[#E2C48D] text-slate-900">
+                    Cancel
+                  </button>
+                </div>
+                {regStatus === 'error' && (
+                  <div className="mt-3 text-sm text-red-600">Please fill all fields correctly.</div>
+                )}
+                {regStatus === 'success' && (
+                  <div className="mt-3 text-sm text-green-600">Registered! We will contact you soon.</div>
                 )}
               </div>
             </div>

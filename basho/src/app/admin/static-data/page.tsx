@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from 'react';
 
+interface Experience {
+  image: string;
+  title: string;
+  description: string;
+}
+
 interface StaticData {
   _id: string;
   studioLocation: {
@@ -25,6 +31,7 @@ interface StaticData {
     question: string;
     answer: string;
   }>;
+  experiences: Array<Experience>;
   hsnCode: string;
 }
 
@@ -37,6 +44,7 @@ export default function StaticDataPage() {
   const [editingStudio, setEditingStudio] = useState(false);
   const [editingContact, setEditingContact] = useState(false);
   const [editingFAQs, setEditingFAQs] = useState(false);
+  const [editingExperiences, setEditingExperiences] = useState(false);
   const [editingHSN, setEditingHSN] = useState(false);
 
   // Form data for each section
@@ -58,6 +66,7 @@ export default function StaticDataPage() {
     },
   });
   const [faqsForm, setFaqsForm] = useState<StaticData['faqs']>([]);
+  const [experiencesForm, setExperiencesForm] = useState<StaticData['experiences']>([]);
   const [hsnForm, setHsnForm] = useState<string>('');
 
   useEffect(() => {
@@ -74,6 +83,7 @@ export default function StaticDataPage() {
         setStudioForm(data.studioLocation);
         setContactForm(data.contactInfo);
         setFaqsForm(data.faqs);
+        setExperiencesForm(data.experiences || []);
         setHsnForm(data.hsnCode || '');
       }
     } catch (error) {
@@ -83,7 +93,7 @@ export default function StaticDataPage() {
     }
   };
 
-  const updateSection = async (section: 'studioLocation' | 'contactInfo' | 'faqs' | 'hsnCode') => {
+  const updateSection = async (section: 'studioLocation' | 'contactInfo' | 'faqs' | 'experiences' | 'hsnCode') => {
     if (!staticData) return;
 
     setSaving(true);
@@ -97,6 +107,8 @@ export default function StaticDataPage() {
         updateData.contactInfo = contactForm;
       } else if (section === 'faqs') {
         updateData.faqs = faqsForm;
+      } else if (section === 'experiences') {
+        updateData.experiences = experiencesForm;
       } else if (section === 'hsnCode') {
         updateData.hsnCode = hsnForm;
       }
@@ -116,12 +128,14 @@ export default function StaticDataPage() {
         if (section === 'studioLocation') setStudioForm(updatedData.studioLocation);
         if (section === 'contactInfo') setContactForm(updatedData.contactInfo);
         if (section === 'faqs') setFaqsForm(updatedData.faqs);
+        if (section === 'experiences') setExperiencesForm(updatedData.experiences);
         if (section === 'hsnCode') setHsnForm(updatedData.hsnCode || '');
 
         // Exit edit mode
         if (section === 'studioLocation') setEditingStudio(false);
         if (section === 'contactInfo') setEditingContact(false);
         if (section === 'faqs') setEditingFAQs(false);
+        if (section === 'experiences') setEditingExperiences(false);
         if (section === 'hsnCode') setEditingHSN(false);
       }
     } catch (error) {
@@ -131,14 +145,15 @@ export default function StaticDataPage() {
     }
   };
 
-  const startEditing = (section: 'studio' | 'contact' | 'faqs' | 'hsn') => {
+  const startEditing = (section: 'studio' | 'contact' | 'faqs' | 'experiences' | 'hsn') => {
     if (section === 'studio') setEditingStudio(true);
     if (section === 'contact') setEditingContact(true);
     if (section === 'faqs') setEditingFAQs(true);
+    if (section === 'experiences') setEditingExperiences(true);
     if (section === 'hsn') setEditingHSN(true);
   };
 
-  const cancelEditing = (section: 'studio' | 'contact' | 'faqs' | 'hsn') => {
+  const cancelEditing = (section: 'studio' | 'contact' | 'faqs' | 'experiences' | 'hsn') => {
     if (!staticData) return;
 
     // Reset form data to current static data
@@ -153,6 +168,10 @@ export default function StaticDataPage() {
     if (section === 'faqs') {
       setFaqsForm(staticData.faqs);
       setEditingFAQs(false);
+    }
+    if (section === 'experiences') {
+      setExperiencesForm(staticData.experiences);
+      setEditingExperiences(false);
     }
     if (section === 'hsn') {
       setHsnForm(staticData.hsnCode || '');
@@ -172,6 +191,20 @@ export default function StaticDataPage() {
 
   const removeFAQ = (index: number) => {
     setFaqsForm(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const addExperience = () => {
+    setExperiencesForm(prev => [...prev, { image: '', title: '', description: '' }]);
+  };
+
+  const updateExperience = (index: number, field: keyof Experience, value: string) => {
+    setExperiencesForm(prev => prev.map((exp, i) =>
+      i === index ? { ...exp, [field]: value } : exp
+    ));
+  };
+
+  const removeExperience = (index: number) => {
+    setExperiencesForm(prev => prev.filter((_, i) => i !== index));
   };
 
   if (loading) {
@@ -495,6 +528,113 @@ export default function StaticDataPage() {
                 className="w-full py-2 px-4 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors"
               >
                 + Add FAQ
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Experiences Management Card */}
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-slate-900">Experiences Management</h2>
+            {!editingExperiences ? (
+              <button
+                onClick={() => startEditing('experiences')}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Edit
+              </button>
+            ) : (
+              <div className="space-x-2">
+                <button
+                  onClick={() => updateSection('experiences')}
+                  disabled={saving}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {saving ? 'Saving...' : 'Save'}
+                </button>
+                <button
+                  onClick={() => cancelEditing('experiences')}
+                  disabled={saving}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
+
+          {!editingExperiences ? (
+            <div className="space-y-4">
+              {staticData?.experiences && staticData.experiences.length > 0 ? (
+                staticData.experiences.map((exp, index) => (
+                  <div key={index} className="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                    {exp.image && (
+                      <img src={exp.image} alt={exp.title} className="w-full h-40 object-cover rounded-md mb-3" />
+                    )}
+                    <h3 className="font-medium text-slate-900">{exp.title}</h3>
+                    <p className="text-slate-600 mt-1 text-sm">{exp.description}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-slate-500">No experiences added yet.</p>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {experiencesForm.map((exp, index) => (
+                <div key={index} className="border border-slate-200 rounded-md p-4 bg-slate-50">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-sm font-medium text-slate-700">Experience {index + 1}</span>
+                    <button
+                      onClick={() => removeExperience(index)}
+                      className="text-red-600 hover:text-red-800 text-sm"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Image URL</label>
+                      <input
+                        type="url"
+                        value={exp.image}
+                        onChange={(e) => updateExperience(index, 'image', e.target.value)}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter image URL"
+                      />
+                      {exp.image && (
+                        <img src={exp.image} alt="Preview" className="mt-2 w-full h-32 object-cover rounded-md" />
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
+                      <input
+                        type="text"
+                        value={exp.title}
+                        onChange={(e) => updateExperience(index, 'title', e.target.value)}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter experience title"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                      <textarea
+                        value={exp.description}
+                        onChange={(e) => updateExperience(index, 'description', e.target.value)}
+                        rows={3}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter experience description"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <button
+                onClick={addExperience}
+                className="w-full py-2 px-4 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                + Add Experience
               </button>
             </div>
           )}
