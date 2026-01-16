@@ -2,7 +2,7 @@
    FEATURES SECTION (TIGHTER)
 ================================ */
 .features-section {
-  background: var(--bg-primary);
+  background: transparent;
   padding: 110px 0; /* ⬅ reduced from 180 */
 }
 

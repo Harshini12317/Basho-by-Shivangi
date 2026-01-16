@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import "./GsapSlider.css";
@@ -10,6 +10,9 @@ gsap.registerPlugin(ScrollTrigger);
 export default function GsapSlider() {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
+  const [typedText, setTypedText] = useState("");
+  const phrases = ["Welcome to Basho,where artistry meets tradition.", "Each piece is handcrafted with passion and care.", "Discover timeless pottery that speaks to the soul.", "We celebrate the beauty of imperfection in clay.", "Custom creations made exclusively for you.", "Experience the joy of handmade pottery.", "Crafted by skilled hands, inspired by nature.", "Transform your space with bespoke ceramics.", "Where tradition meets contemporary design.", "Every piece tells a unique story.", "Bringing pottery into your everyday moments.", "Creating heirlooms meant to be cherished forever."];
+  const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
 
   useEffect(() => {
     if (!wrapperRef.current) return;
@@ -17,6 +20,25 @@ export default function GsapSlider() {
     const wrapper = wrapperRef.current;
     const cards = cardsRef.current;
     const total = cards.length;
+
+    /* Typewriter effect */
+    let index = 0;
+    const fullText = phrases[currentPhraseIndex];
+    
+    const typeWriter = () => {
+      if (index < fullText.length) {
+        setTypedText(fullText.slice(0, index + 1));
+        index++;
+        setTimeout(typeWriter, 150);
+      } else {
+        // When complete, wait 1.5 seconds then move to next phrase
+        setTimeout(() => {
+          index = 0;
+          setCurrentPhraseIndex((prev) => (prev + 1) % phrases.length);
+        }, 1500);
+      }
+    };
+    typeWriter();
 
     /* ---------------- STATE ---------------- */
     const state = {
@@ -111,7 +133,10 @@ export default function GsapSlider() {
     <section className="gsap-slider-section">
       <div className="gsap-slider-grid">
         <div ref={wrapperRef} className="gsap-slider-circle">
-          <div className="gsap-slider-text">Collection</div>
+          <div className="gsap-slider-text">
+            {typedText}
+            <span className="typewriter-cursor">|</span>
+          </div>
 
           {[...Array(9)].map((_, i) => (
             <div

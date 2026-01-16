@@ -1,8 +1,10 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { Suspense } from 'react';
 import { FiArrowRight } from 'react-icons/fi';
+import HeroSlideshow from '@/components/HeroSlideshow';
 
 const GsapSlider = dynamic(() => import('@/components/GsapSlider'), {
   loading: () => (
@@ -22,34 +24,47 @@ export default function Home() {
   return (
     <>
       <section
-        className="hero hero-submerged relative min-h-[70vh]"
+        className="hero hero-submerged relative min-h-screen w-full flex items-center justify-center overflow-hidden"
         style={{
           backgroundImage:
-            'linear-gradient(180deg, rgba(255,255,255,0.96), rgba(237,216,180,0.22)), url("/images/pottery-hero.png")',
+            'linear-gradient(135deg, rgba(255,255,255,0.92), rgba(237,216,180,0.18)), url("/images/i2.jpg")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
         }}
       >
-        <div className="mx-auto max-w-7xl px-10 pt-8">
-         <div className="min-h-[60vh] grid grid-cols-1 lg:grid-cols-2 items-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/5 pointer-events-none"></div>
+        
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 py-16 lg:py-24 w-full relative z-10">
+         <div className="min-h-[60vh] grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-16">
 
-           <div className="hero-content max-w-xl ml-auto text-left lg:text-right">
+           <HeroSlideshow />
 
-              <p className="hero-badge">FLAT 25% DISCOUNT</p>
-              <h1 className="text-5xl font-medium leading-tight text-[var(--text-primary)]">
-                Multipurpose Ceramic<br />Dotted Kitchen
+           <div className="hero-content max-w-xl mx-auto lg:ml-0 lg:mr-auto text-center lg:text-left order-2 lg:order-2">
+
+              <p className="hero-badge inline-block mb-4 sm:mb-6 hover:scale-105 transition-transform duration-300">FLAT 25% DISCOUNT</p>
+              
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold leading-tight text-[var(--text-primary)] mb-6 sm:mb-8">
+                Multipurpose Ceramic<br className="hidden sm:block" />Dotted Kitchen
               </h1>
-              <p className="mt-6 text-lg leading-relaxed text-[var(--text-muted)]">
+              
+              <p className="mt-6 text-base sm:text-lg leading-relaxed text-[var(--text-muted)] max-w-md mx-auto lg:mx-0 mb-8 sm:mb-10">
                 Calm, balanced tableware designed for modern homes. Crafted with food-safe glazes and artisanal care.
               </p>
-              <div className="mt-10 flex gap-4 justify-end">
-                <button className="hero-cta inline-flex items-center rounded-full px-8 py-4 text-base font-medium text-white">
-                  Get Started
-                  <FiArrowRight style={{ marginLeft: 8 }} />
-                </button>
-                <button className="inline-flex items-center rounded-full px-8 py-4 text-base font-medium border border-[rgba(42,31,23,0.12)] text-[var(--text-primary)] bg-white">
-                  Browse
-                </button>
+              
+              <div className="mt-10 sm:mt-12 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Link href="/auth">
+                  <button className="hero-cta inline-flex items-center justify-center rounded-full px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 active:scale-95 whitespace-nowrap group w-full sm:w-auto">
+                    Get Started
+                    <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                  </button>
+                </Link>
+                
+                <Link href="/products">
+                  <button className="inline-flex items-center justify-center rounded-full px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold border-2 border-[rgba(42,31,23,0.15)] text-[var(--text-primary)] bg-white/85 backdrop-blur-sm hover:bg-white hover:border-[rgba(42,31,23,0.25)] shadow-md hover:shadow-lg transition-all duration-300 active:scale-95 whitespace-nowrap w-full sm:w-auto">
+                    Browse
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
