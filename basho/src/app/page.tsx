@@ -21,8 +21,7 @@ const FeaturesSection = dynamic(() => import('@/components/FeaturesSection'), {
 export default function Home() {
   return (
     <>
-      {/* ================= HERO SECTION (UNCHANGED) ================= */}
-      <section className="relative min-h-screen">
+      <section className="hero relative min-h-screen">
         <div className="mx-auto max-w-7xl px-10 pt-8">
           <div className="grid grid-cols-1 items-center gap-24 lg:grid-cols-2">
             
@@ -41,7 +40,7 @@ export default function Home() {
 
               <div className="mt-10 flex flex-wrap gap-4">
                 <button
-                  className="
+                  className="hero-cta
                     inline-flex items-center
                     rounded-full
                     bg-[var(--accent-clay)]
@@ -55,10 +54,16 @@ export default function Home() {
                   Explore Collection
                 </button>
               </div>
+
+              <div className="trust-strip">
+                <span>✔ Handmade</span>
+                <span>✔ Food-safe glazes</span>
+                <span>✔ Crafted in India</span>
+              </div>
             </div>
 
             {/* RIGHT — 3D POT */}
-            <div className="flex justify-center lg:justify-end">
+            <div className="hero-image flex justify-center lg:justify-end">
               <Suspense fallback={<div className="h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-lg animate-pulse" />}>
                 <HeroPot />
               </Suspense>
@@ -66,6 +71,7 @@ export default function Home() {
 
           </div>
         </div>
+        <div className="scroll-hint">Scroll</div>
       </section>
 
       {/* ================= GSAP PRODUCT SLIDER ================= */}
