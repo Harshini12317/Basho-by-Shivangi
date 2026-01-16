@@ -184,6 +184,25 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
 }
 
+/* Navbar/Section title enhancements */
+.nav-title {
+  font-family: var(--font-playfair, 'Playfair Display'), serif;
+  font-size: clamp(2.6rem, 5.2vw, 3.8rem);
+  letter-spacing: 1px;
+  color: #ffffff;
+}
+
+.nav-subtitle {
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  color: #fff1f4;
+}
+
+.workshop-hero {
+  background-image:
+    radial-gradient(80% 60% at 50% 0%, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.0) 60%),
+    linear-gradient(180deg, #E9A8B9 0%, #E8B79C 65%, #D59E7A 100%);
+}
+
 /* ------------------------------
    Minimal Scrollbar
 -------------------------------- */

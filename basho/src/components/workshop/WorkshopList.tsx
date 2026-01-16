@@ -243,27 +243,26 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
       )}
       <div className="max-w-6xl mx-auto bg-white rounded-2xl sm:rounded-3xl lg:rounded-[40px] p-4 sm:p-8 md:p-12 lg:p-16 shadow-sm">
         <div className="-mx-4 sm:-mx-8 md:-mx-12 lg:-mx-16 -mt-4 sm:-mt-8 md:-mt-12 lg:-mt-16 mb-8 sm:mb-12">
-          <div className="overflow-hidden rounded-t-2xl sm:rounded-t-3xl lg:rounded-t-[40px] bg-[#D8A7B1] text-white text-center py-6 sm:py-8">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold px-4">Pottery Workshop</h2>
-          </div>
-        </div>
-
-        <div className="sticky top-0 z-20 -mx-4 sm:-mx-8 md:-mx-12 lg:-mx-16 bg-white/80 backdrop-blur border-b border-[#EDD8B4]">
-          <div className="max-w-6xl mx-auto px-4 sm:px-8 md:px-12 lg:px-16">
-            <div className="flex items-center gap-2 sm:gap-3 py-2 sm:py-3">
-              <a href="#workshops" className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-full bg-[#FFF8F2] ring-1 ring-[#E2C48D] text-slate-900 hover:bg-white transition-colors">Workshops</a>
-              <a href="#events" className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-full bg-[#FFF8F2] ring-1 ring-[#E2C48D] text-slate-900 hover:bg-white transition-colors">Events</a>
+          <div className="overflow-hidden rounded-t-2xl sm:rounded-t-3xl lg:rounded-t-[40px] workshop-hero text-white text-center py-8 sm:py-10">
+            <div className="space-y-2 sm:space-y-3">
+              <h1 className="nav-title px-4">Discover the Art of Clay</h1>
+              <p className="nav-subtitle">Hands‑on pottery workshops for beginners & creators</p>
+              <div className="mt-3 flex justify-center gap-3">
+                <a href="#workshops" className="px-4 py-2 rounded-full bg-[#8E5022] text-white shadow-md hover:bg-[#652810] transition-colors">Workshops</a>
+                <a href="/contact" className="px-4 py-2 rounded-full bg-white text-[#3d2b1f] ring-1 ring-[#EDD8B4] hover:bg-[#fffaf3] transition-colors">Experience</a>
+              </div>
             </div>
           </div>
         </div>
+
         
-        
+
         {/* Workshop Grid */}
         <div id="workshops" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-24 scroll-mt-24">
           {loading ? (
             // Loading skeleton
             Array.from({ length: 6 }).map((_, idx) => (
-              <div key={idx} className="bg-[#F9F9F9] rounded-2xl overflow-hidden shadow-sm animate-pulse">
+              <div key={idx} className="bg-[#FFF8F2] rounded-2xl overflow-hidden shadow-sm animate-pulse">
                 <div className="aspect-square bg-gray-200"></div>
                 <div className="p-5">
                   <div className="h-5 bg-gray-200 rounded mb-2"></div>
@@ -276,23 +275,15 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
           ) : displayList.length > 0 ? (
             displayList.map((ws, idx) => (
               <Link key={`${ws.slug}-${idx}`} href={`/workshop/${ws.slug}`} className="group cursor-pointer">
-                <div className="bg-[#F9F9F9] rounded-2xl overflow-hidden shadow-sm transition-all hover:shadow-lg">
+                <div className="bg-[#FFF8F2] rounded-2xl overflow-hidden shadow-sm transition-all hover:shadow-lg ring-1 ring-[#E2C48D]">
                   <div className="relative aspect-square">
                     <img src={resolveImgSrc(ws.img)} alt={ws.title} className="w-full h-full object-cover" />
-                    {/* Removed the level badge completely */}
-                    {typeof ws.spotsLeft === 'number' && (
-                      <div
-                        className={`absolute bottom-3 left-3 bg-[#E74C3C] text-white text-[10px] px-2 py-1 rounded-full ${ws.spotsLeft <= 3 ? 'animate-pulse ring-2 ring-white shadow-md' : ''}`}
-                      >
-                        Only {ws.spotsLeft} spots left
-                      </div>
-                    )}
                   </div>
                   <div className="p-4 sm:p-5">
-                    <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-1 line-clamp-2">{ws.title}</h3>
-                    <p className="text-slate-400 text-xs mb-3 line-clamp-1">{ws.description}</p>
-                    <div className="flex items-center gap-2 text-slate-500 text-xs mb-3 sm:mb-4">
-                      <span>🗓 {ws.date}</span>
+                    <h3 className="text-base sm:text-lg font-bold serif text-[#3d2b1f] mb-1 line-clamp-2">{ws.title}</h3>
+                    <p className="text-[#6b5a4c] text-xs mb-3 line-clamp-1">{ws.description}</p>
+                    <div className="flex items-center gap-2 text-[#6b5a4c] text-xs mb-3 sm:mb-4">
+                      <span>🗓 {ws.date}</span>{ws.level ? <span>• {ws.level}</span> : null}
                     </div>
                     <div className="flex items-baseline gap-1">
                       <span className="text-base sm:text-lg font-bold">₹{ws.price}</span>
