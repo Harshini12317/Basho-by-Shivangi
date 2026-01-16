@@ -48,6 +48,12 @@ export default async function RootLayout({
 
       <body
         className={`${inter.variable} ${playfair.variable} antialiased min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]`}
+        style={{
+          backgroundImage: 'url("/images/i2.jpg")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
+        }}
       >
         <SessionProviderWrapper session={session}>
           <NavbarWrapper />

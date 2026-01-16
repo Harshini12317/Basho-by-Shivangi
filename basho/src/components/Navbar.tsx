@@ -1,6 +1,6 @@
 "use client";
 
-
+import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { FiSearch, FiShoppingBag, FiMenu, FiX, FiPhone } from "react-icons/fi";
@@ -84,8 +84,8 @@ export default function Navbar() {
 
   useEffect(() => {
     // Only check admin status when session changes
-    if (session?.user?.email) {
-      const checkAdminStatus = async () => {
+    const checkAdminStatus = async () => {
+      if (session?.user?.email) {
         try {
           const adminResponse = await fetch('/api/admin/admins?check=true');
           if (adminResponse.ok) {
@@ -98,11 +98,11 @@ export default function Navbar() {
           console.error("Error checking admin status:", error);
           setIsAdmin(false);
         }
-      };
-      checkAdminStatus();
-    } else {
-      setIsAdmin(false);
-    }
+      } else {
+        setIsAdmin(false);
+      }
+    };
+    checkAdminStatus();
   }, [session?.user?.email]);
 
   useEffect(() => {
@@ -150,9 +150,11 @@ export default function Navbar() {
 
 <div className="nav-logo">
   <Link href="/">
-    <img
+    <Image
       src="/images/basho-logo.png"
       alt="Basho by Shivangi"
+      width={100}
+      height={60}
     />
   </Link>
 </div>

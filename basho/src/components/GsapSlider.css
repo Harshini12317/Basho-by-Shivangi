@@ -6,6 +6,7 @@
   min-height: 160vh;          /* ⬅ MORE SPACE */
   width: 100%;
   background: var(--bg-primary);
+  background-color:#f7eada;
   padding: 160px 0;           /* ⬅ TOP & BOTTOM SAFETY */
   overflow: visible;
 }
@@ -35,18 +36,22 @@
 .gsap-slider-text {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  font-family: serif;
-  font-size: clamp(1.6rem, 4vw, 4.5rem);
-
-  letter-spacing: 0.14em;
+  font-family: 'Brush Script MT', 'Lucida Calligraphy', cursive;
+  font-size: clamp(1.4rem, 3.5vw, 4.5rem);
+  font-weight: 500;
+  letter-spacing: 0.08em;
   color: var(--text-primary);
   text-align: center;
+  font-style: italic;
 
   pointer-events: none;
   z-index: 2;
+  text-shadow: 0 2px 8px rgba(42, 31, 23, 0.08);
+  white-space: nowrap;
 }
 
 /* ===============================

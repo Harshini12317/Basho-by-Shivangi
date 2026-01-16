@@ -26,6 +26,7 @@ export default function WorkshopDetailPage() {
   const { slug } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [workshop, setWorkshop] = useState<Workshop | null>(null);
+  const [faqs, setFaqs] = useState<Array<{ question: string; answer: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const slugStr = slug?.toString() || '';
@@ -47,8 +48,21 @@ export default function WorkshopDetailPage() {
       }
     };
 
+    const fetchFAQs = async () => {
+      try {
+        const response = await fetch('/api/admin/static-data');
+        if (response.ok) {
+          const data = await response.json();
+          setFaqs(data.faqs || []);
+        }
+      } catch (error) {
+        console.error('Error fetching FAQs:', error);
+      }
+    };
+
     if (slugStr) {
       fetchWorkshop();
+      fetchFAQs();
     }
   }, [slugStr]);
 
@@ -305,26 +319,18 @@ export default function WorkshopDetailPage() {
                   </div>
                 </div>
                 <div className="space-y-3 text-slate-700">
-                  <div>
-                    <p className="font-medium">Is this workshop suitable for absolute beginners?</p>
-                    <p>Yes. While we offer intermediate tips, the curriculum ensures anyone can create a finished piece.</p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Are the materials safe for daily use?</p>
-                    <p>Yes. We use high‑fire clay and non‑toxic, lead‑free glazes for food and microwave safety.</p>
-                  </div>
-                  <div>
-                    <p className="font-medium">What happens if I cannot attend?</p>
-                    <p>We require 48 hours’ notice for cancellations to offer a partial refund or rescheduling.</p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Can I bring my own botanical elements to imprint?</p>
-                    <p>Yes. We provide local flora, and you are welcome to bring leaves or flowers from your garden.</p>
-                  </div>
-                  <div>
-                    <p className="font-medium">Is there a contact for specific queries?</p>
-                    <p>Reach out to contact@bashoatelier.in for assistance.</p>
-                  </div>
+                  {faqs && faqs.length > 0 ? (
+                    faqs.map((faq, index) => (
+                      <div key={index}>
+                        <p className="font-medium">{faq.question}</p>
+                        <p>{faq.answer}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-slate-500 italic">
+                      <p>No FAQs available at the moment.</p>
+                    </div>
+                  )}
                 </div>
                 <img src="/images/common3.png" alt="" className="absolute right-4 bottom-4 w-20 opacity-10 pointer-events-none select-none" />
               </div>
