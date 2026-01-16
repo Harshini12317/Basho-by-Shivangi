@@ -9,8 +9,12 @@ export function middleware(request: NextRequest) {
     response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
   }
 
-  // Add caching for API responses
-  if (request.nextUrl.pathname.startsWith('/api/')) {
+  // NO CACHING for admin API endpoints - they need to always fetch fresh data
+  if (request.nextUrl.pathname.startsWith('/api/admin/')) {
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  }
+  // Add minimal caching for public API responses
+  else if (request.nextUrl.pathname.startsWith('/api/')) {
     response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
   }
 
