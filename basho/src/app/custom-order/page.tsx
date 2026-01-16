@@ -111,7 +111,7 @@ export default function CustomOrderPage() {
   };
 
   return (
-    <div className="min-h-screen py-16 grain-texture">
+    <div className="min-h-screen py-16" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {status === "loading" ? (
           <div className="flex justify-center items-center min-h-[50vh]">

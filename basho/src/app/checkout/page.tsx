@@ -404,7 +404,7 @@ export default function CheckoutPage() {
 
   if (checkoutItems.length === 0) {
     return (
-      <div className="min-h-screen py-16 grain-texture">
+      <div className="min-h-screen py-16" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold text-[#442D1C] mb-8 text-center">Checkout</h1>
           <div className="bg-white/90 elegant-rounded-2xl p-8 shadow-lg border-2 border-[#EDD8B4] clay-morphism">

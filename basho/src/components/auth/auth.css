@@ -50,11 +50,15 @@
 }
 .auth-page {
   min-height: 100vh;
-  background: #faf7f2;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(232, 213, 183, 0.35), transparent 60%),
+    radial-gradient(circle at 90% 80%, rgba(194, 106, 58, 0.16), transparent 55%),
+    url("/images/headerimage.jpg") center/cover no-repeat;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
+  margin-top: -80px;
 }
 
 /* BACKGROUND */
@@ -76,49 +80,53 @@
   left: 24px;
   width: 44px;
   height: 44px;
-  border-radius: 50%;
-  border: 1px solid #d6c8b8;
-  background: #ffffff;
+  border-radius: 999px;
+  border: 1px solid rgba(42, 31, 23, 0.12);
+  background: rgba(255, 255, 255, 0.9);
   cursor: pointer;
   z-index: 3;
-
-  display: flex;              /* 👇 THIS */
-  align-items: center;        /* 👇 */
-  justify-content: center;    /* 👇 */
-
-  padding: 0;                 /* 👇 important */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  backdrop-filter: blur(12px);
 }
 
 .close-btn:hover {
-  background: #f4efe9;
-  transform: scale(1.05);
+  background: rgba(244, 237, 228, 0.98);
+  transform: translateY(-1px) scale(1.03);
 }
 
 
 
 /* CONTAINER */
 .auth-container {
-  width: 900px;
-  height: 480px;
-  background: white;
-  border-radius: 18px;
-  box-shadow: 0 30px 60px rgba(0,0,0,.1);
+  width: 960px;
+  max-width: 95vw;
+  height: 520px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(237, 216, 180, 0.55));
+  border-radius: 24px;
+  box-shadow:
+    0 34px 70px rgba(42, 31, 23, 0.18),
+    0 18px 30px rgba(42, 31, 23, 0.12);
   overflow: hidden;
   position: relative;
   z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 /* FORM */
 .form-panel {
   width: 50%;
   height: 100%;
-  padding: 50px;
+  padding: 56px 52px;
   position: absolute;
   top: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 14px;
+  backdrop-filter: blur(12px);
 }
 
 .login { left: 0; }
@@ -128,8 +136,9 @@
 .auth-container.active .signup { transform: translateX(0); }
 
 .form-panel h2 {
-  font-family: serif;
-  font-size: 2.3rem;
+  font-size: 2.4rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.5rem;
 }
 
 .input-icon {
@@ -142,20 +151,36 @@
 
 .form-panel input {
   padding: 12px 12px 12px 42px;
-  width: 260px;
-  border-radius: 10px;
-  border: 1px solid #e6ddd2;
-  background: #faf7f2;
+  width: 280px;
+  max-width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(42, 31, 23, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 0.94rem;
 }
 
 /* BUTTONS */
 .form-panel button {
-  padding: 12px 24px;
+  padding: 12px 28px;
   border-radius: 999px;
   border: none;
-  background: #3b2f2f;
-  color: white;
+  background: linear-gradient(135deg, #c26a3a, #8e5022);
+  color: #fff;
   cursor: pointer;
+  min-width: 220px;
+  font-weight: 500;
+  box-shadow:
+    0 14px 30px rgba(68, 45, 28, 0.28),
+    0 4px 10px rgba(68, 45, 28, 0.15);
+  transform-origin: center;
+  transition: transform 0.25s var(--ease-soft), box-shadow 0.25s var(--ease-soft);
+}
+
+.form-panel button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 18px 40px rgba(68, 45, 28, 0.32),
+    0 6px 16px rgba(68, 45, 28, 0.18);
 }
 
 /* GOOGLE BUTTON */
@@ -165,14 +190,41 @@
   gap: 10px;
   padding: 12px 18px;
   border-radius: 12px;
-  background: white;
-  border: 1px solid #e6ddd2;
-  box-shadow: 0 10px 25px rgba(0,0,0,.12);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(42, 31, 23, 0.06);
+  box-shadow:
+    0 16px 32px rgba(42, 31, 23, 0.14),
+    0 4px 10px rgba(42, 31, 23, 0.08);
   transition: all .3s ease;
 }
 
 .social-btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.01);
+}
+
+.social-btn span {
+  font-size: 0.92rem;
+}
+
+.or-separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  margin: 0.75rem 0;
+  font-size: 0.8rem;
+  color: #8b7764;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.or-separator::before,
+.or-separator::after {
+  content: "";
+  flex: 1 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.18), transparent);
+  max-width: 80px;
 }
 
 /* OVERLAY */
@@ -181,12 +233,41 @@
   right: 0;
   width: 50%;
   height: 100%;
-  background: #f4efe9;
+  background:
+    linear-gradient(145deg, rgba(29, 24, 19, 0.92), rgba(96, 59, 27, 0.92)),
+    url("/images/pottery-hero.png") center/cover no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 14px;
+  padding: 0 3rem;
+  color: #fef7ee;
+  text-align: center;
+}
+
+.overlay-panel h2 {
+  font-size: 2.2rem;
+}
+
+.overlay-panel p {
+  max-width: 260px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  opacity: 0.94;
+}
+
+.overlay-panel button {
+  background: transparent;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 238, 224, 0.7);
+  color: #fef7ee;
+  min-width: 210px;
+  box-shadow: none;
+}
+
+.overlay-panel button:hover {
+  background: rgba(255, 238, 224, 0.12);
 }
 
 .auth-container.active .overlay-panel {
@@ -278,6 +359,70 @@
 
 .verification-close:hover {
   opacity: 0.7;
+}
+
+.form-panel p {
+  font-size: 0.9rem;
+  color: #7a6652;
+  margin-top: 0.6rem;
+}
+
+.form-panel .link {
+  color: #c26a3a;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.form-panel .link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .auth-container {
+    height: auto;
+    min-height: 540px;
+  }
+
+  .form-panel {
+    position: relative;
+    width: 100%;
+    left: 0;
+    transform: translateX(0) !important;
+  }
+
+  .overlay-panel {
+    display: none;
+  }
+
+  .login,
+  .signup {
+    position: relative;
+  }
+
+  .auth-container.active .login,
+  .auth-container.active .signup {
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .auth-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 1rem;
+    border-radius: 18px;
+  }
+
+  .form-panel {
+    padding: 40px 28px 32px;
+  }
+
+  .close-btn {
+    top: 16px;
+    left: 16px;
+    width: 40px;
+    height: 40px;
+  }
 }
 
 

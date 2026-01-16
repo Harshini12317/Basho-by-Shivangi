@@ -106,7 +106,7 @@ export default function CustomersPage() {
             <p className="text-slate-600 mt-2">Total Customers: {customers.length}</p>
           </div>
           <Link
-            href="/admin"
+            href="/admin/dashboard"
             className="flex items-center gap-2 px-4 py-2 bg-[#8E5022] text-white rounded-lg hover:bg-[#6B3D1A] transition"
           >
             <FaArrowLeft className="w-4 h-4" />

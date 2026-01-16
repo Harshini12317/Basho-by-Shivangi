@@ -10,7 +10,7 @@
   right: 0;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(42, 31, 23, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   z-index: 1000;
   transition: all 0.3s ease;
 }
@@ -83,10 +83,26 @@
   font-size: 1.05rem;
   color: #3a2a1d;
   opacity: 0.85;
+  position: relative;
 }
 
 .nav-links a:hover {
   opacity: 1;
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 0;
+  height: 2px;
+  background: #c76b3f;
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after {
+  width: 100%;
 }
 
 /* Hide nav-links on mobile, show only in hamburger menu */
@@ -269,7 +285,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1.25rem;
+  padding: 0.5rem 1.25rem;
   color: #3a2a1d;
   text-decoration: none;
   font-size: 0.95rem;
@@ -295,7 +311,7 @@
   height: 1px;
   border: none;
   background: rgba(42, 31, 23, 0.1);
-  margin: 0.5rem 0;
+  margin: 0.25rem 0;
 }
 
 .menu-item.logout {

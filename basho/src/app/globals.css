@@ -254,3 +254,199 @@ h1, h2, h3, h4, h5, h6 {
     ),
     var(--bg-primary);
 }
+
+
+/* ===============================
+   HERO SECTION – POLISHED (SAFE)
+================================ */
+
+.hero {
+  position: relative;
+}
+
+/* Divider — desktop only */
+.hero::after { content: none; }
+
+/* Typography polish */
+.hero h1 {
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+.hero p {
+  max-width: 460px;
+}
+
+/* CTA refinement (no layout change) */
+.hero-cta {
+  background: linear-gradient(135deg, #c76b3f, #b55a32);
+  box-shadow: 0 18px 40px rgba(181, 90, 50, 0.35);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-cta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 28px 60px rgba(181, 90, 50, 0.45);
+}
+
+/* Submerged hero background variant */
+.hero-submerged {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(237,216,180,0.22)),
+    url("/images/common1.png") center/cover no-repeat;
+}
+
+.hero-content {
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(42,31,23,0.06);
+  border-radius: 18px;
+  padding: 1.8rem 2rem;
+}
+
+.hero-badge {
+  display: inline-block;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: #8b6a52;
+  background: rgba(237,216,180,0.35);
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(42,31,23,0.08);
+  margin-bottom: 0.75rem;
+}
+/* ===============================
+   HERO IMAGE (STATIC PRODUCT)
+================================ */
+
+.hero-static-image {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+
+  border-radius: 26px;
+
+  box-shadow:
+    0 35px 70px rgba(0, 0, 0, 0.16),
+    0 12px 26px rgba(0, 0, 0, 0.12);
+
+  transform: rotate(-1deg);
+  transition: transform 0.6s ease, box-shadow 0.6s ease;
+}
+
+.hero-static-image:hover {
+  transform: rotate(0deg) scale(1.02);
+  box-shadow:
+    0 45px 90px rgba(0, 0, 0, 0.2),
+    0 20px 40px rgba(0, 0, 0, 0.14);
+}
+
+/* Trust strip stays as-is */
+.trust-strip {
+  display: flex;
+  gap: 32px;
+  margin-top: 32px;
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+/* Scroll hint stays subtle */
+.scroll-hint {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+  opacity: 0.5;
+}
+
+/* ===============================
+   RESPONSIVE SAFETY (HERO ONLY)
+================================ */
+
+@media (max-width: 1024px) {
+  .hero::after {
+    display: none;
+  }
+
+  .trust-strip {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-static-image {
+    max-width: 90%;
+    transform: none;
+  }
+
+  .scroll-hint {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .trust-strip {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+/* ===============================
+   CONTACT STRIP BELOW HERO
+================================ */
+.contact-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  align-items: center;
+  max-width: 1000px;
+  margin: 40px auto 60px;
+  padding: 18px 24px;
+  background: #ffffff;
+  border: 1px solid rgba(42,31,23,0.08);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(42,31,23,0.08);
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #2a1f17;
+}
+
+.contact-item svg {
+  font-size: 24px;
+  color: #c26a3a;
+}
+
+.contact-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-label {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.contact-value {
+  font-size: 0.98rem;
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .contact-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Prevent slider overlap */
+section {
+  position: relative;
+}
+
+.hero {
+  overflow: hidden;
+}
