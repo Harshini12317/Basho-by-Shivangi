@@ -20,6 +20,22 @@ interface WorkshopItem {
   createdAt: string;
 }
 
+interface CustomOrderItem {
+  _id: string;
+  title: string;
+  totalPrice: number;
+  status: string;
+  createdAt: string;
+}
+
+interface EventBookingItem {
+  _id: string;
+  eventTitle: string;
+  bookingDate: string;
+  status: string;
+  createdAt: string;
+}
+
 interface Order {
   _id: string;
   items: ProductItem[];
@@ -37,11 +53,17 @@ interface Customer {
   createdAt: string;
   totalOrders: number;
   totalWorkshops: number;
+  totalCustomOrders: number;
+  totalEventBookings: number;
   productSpending: number;
   workshopSpending: number;
+  customOrderSpending: number;
+  eventSpending: number;
   totalSpending: number;
   orders: Order[];
   workshops: WorkshopItem[];
+  customOrders: CustomOrderItem[];
+  eventBookings: EventBookingItem[];
 }
 
 export default function CustomersPage() {
@@ -169,7 +191,7 @@ export default function CustomersPage() {
                   <div className="flex gap-6 mr-4 hidden sm:flex">
                     <div className="text-center">
                       <p className="text-2xl font-bold text-[#8E5022]">
-                        {customer.totalOrders + customer.totalWorkshops}
+                        {customer.totalOrders + customer.totalWorkshops + customer.totalCustomOrders + customer.totalEventBookings}
                       </p>
                       <p className="text-xs text-slate-600">Total Activity</p>
                     </div>
@@ -206,6 +228,18 @@ export default function CustomersPage() {
                         </p>
                       </div>
                       <div className="bg-white p-4 rounded-lg">
+                        <p className="text-sm text-slate-600">Custom Orders</p>
+                        <p className="text-2xl font-bold text-[#8E5022]">
+                          {customer.totalCustomOrders}
+                        </p>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg">
+                        <p className="text-sm text-slate-600">Event Bookings</p>
+                        <p className="text-2xl font-bold text-[#8E5022]">
+                          {customer.totalEventBookings}
+                        </p>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg">
                         <p className="text-sm text-slate-600">Product Spending</p>
                         <p className="text-lg font-bold text-[#8E5022]">
                           {formatCurrency(customer.productSpending)}
@@ -215,6 +249,18 @@ export default function CustomersPage() {
                         <p className="text-sm text-slate-600">Workshop Spending</p>
                         <p className="text-lg font-bold text-[#8E5022]">
                           {formatCurrency(customer.workshopSpending)}
+                        </p>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg">
+                        <p className="text-sm text-slate-600">Custom Spending</p>
+                        <p className="text-lg font-bold text-[#8E5022]">
+                          {formatCurrency(customer.customOrderSpending)}
+                        </p>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg">
+                        <p className="text-sm text-slate-600">Event Spending</p>
+                        <p className="text-lg font-bold text-[#8E5022]">
+                          {formatCurrency(customer.eventSpending)}
                         </p>
                       </div>
                     </div>
@@ -262,7 +308,7 @@ export default function CustomersPage() {
 
                     {/* Workshop Registrations */}
                     {customer.workshops.length > 0 && (
-                      <div>
+                      <div className="mb-6">
                         <h4 className="text-lg font-semibold text-[#442D1C] mb-3">
                           Workshop Registrations ({customer.workshops.length})
                         </h4>
@@ -294,9 +340,83 @@ export default function CustomersPage() {
                       </div>
                     )}
 
-                    {customer.orders.length === 0 && customer.workshops.length === 0 && (
+                    {/* Custom Orders */}
+                    {customer.customOrders.length > 0 && (
+                      <div className="mb-6">
+                        <h4 className="text-lg font-semibold text-[#442D1C] mb-3">
+                          Custom Orders ({customer.customOrders.length})
+                        </h4>
+                        <div className="space-y-3 max-h-64 overflow-y-auto">
+                          {customer.customOrders.map((customOrder) => (
+                            <div
+                              key={customOrder._id}
+                              className="bg-white p-3 rounded-lg border border-[#EDD8B4]"
+                            >
+                              <div className="flex justify-between items-start mb-2">
+                                <span className="font-semibold text-slate-900">
+                                  {customOrder.title}
+                                </span>
+                                <span className={`text-xs px-2 py-1 rounded-full ${
+                                  customOrder.status === 'completed'
+                                    ? 'bg-green-100 text-green-800'
+                                    : customOrder.status === 'in-progress'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : 'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                  {customOrder.status}
+                                </span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-slate-600">{formatDate(customOrder.createdAt)}</span>
+                                <span className="font-semibold text-[#8E5022]">
+                                  {formatCurrency(customOrder.totalPrice)}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Event Bookings */}
+                    {customer.eventBookings.length > 0 && (
+                      <div className="mb-6">
+                        <h4 className="text-lg font-semibold text-[#442D1C] mb-3">
+                          Event Bookings ({customer.eventBookings.length})
+                        </h4>
+                        <div className="space-y-3 max-h-64 overflow-y-auto">
+                          {customer.eventBookings.map((booking) => (
+                            <div
+                              key={booking._id}
+                              className="bg-white p-3 rounded-lg border border-[#EDD8B4]"
+                            >
+                              <div className="flex justify-between items-start mb-2">
+                                <span className="font-semibold text-slate-900">
+                                  {booking.eventTitle}
+                                </span>
+                                <span className={`text-xs px-2 py-1 rounded-full ${
+                                  booking.status === 'confirmed'
+                                    ? 'bg-green-100 text-green-800'
+                                    : booking.status === 'pending'
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : 'bg-red-100 text-red-800'
+                                }`}>
+                                  {booking.status}
+                                </span>
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-slate-600">{formatDate(booking.bookingDate)}</span>
+                                <span className="text-slate-600">Booked: {formatDate(booking.createdAt)}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {customer.orders.length === 0 && customer.workshops.length === 0 && customer.customOrders.length === 0 && customer.eventBookings.length === 0 && (
                       <div className="text-center text-slate-600 py-4">
-                        No orders or workshop registrations yet
+                        No orders, workshop registrations, custom orders, or event bookings yet
                       </div>
                     )}
                   </div>

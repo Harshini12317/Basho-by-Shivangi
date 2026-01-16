@@ -18,7 +18,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
-    let body = await request.json();
+    const body = await request.json();
     
     // Ensure date fields have valid values
     if (!body.date) {
