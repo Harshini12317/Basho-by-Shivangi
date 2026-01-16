@@ -1,7 +1,7 @@
 .about-hero {
   position: relative;
   height: 100vh;
-  background: #faf6ef;
+  background: #f7eada;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -26,7 +26,7 @@
   font-size: clamp(3.5rem, 8vw, 6rem);
   font-weight: 500;
   line-height: 0.95;
-  color: #4a2f1b;
+  color: #5a3a22;
 }
 
 .hero-h2 {
@@ -35,7 +35,7 @@
   font-weight: 400;
   max-width: 38rem;
   margin-inline: auto;
-  color: #6b4a2f;
+  color: #7a563b;
   line-height: 1.4;
 }
 

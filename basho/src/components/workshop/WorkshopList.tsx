@@ -176,6 +176,12 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
     setReg({ name: '', mobile: '', date: '' });
   };
 
+  const openModal = (slug: string) => {
+    setSelectedSlug(slug);
+    setShowModal(true);
+    setRegStatus('idle');
+  };
+
   const submitBooking = async () => {
     if (!selectedEventId || !reg.name || !reg.mobile || !reg.date) {
       setRegStatus('error');

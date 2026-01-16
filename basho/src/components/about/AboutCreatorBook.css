@@ -2,7 +2,7 @@
 
 .book-stage {
   height: 100vh;
-  background: #faf6ef;
+  background: #f7eada;
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -33,7 +33,7 @@
   position: relative;
   width: 42vw;
   height: 72vh;
-  background: #fffaf2;
+  background: #fef9f1;
   overflow: hidden;
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.05);
 }
@@ -52,8 +52,8 @@
   padding: 3rem;
   background: linear-gradient(
     to top,
-    rgba(255, 250, 242, 0.95),
-    rgba(255, 250, 242, 0.75),
+    rgba(247, 234, 218, 0.95),
+    rgba(247, 234, 218, 0.75),
     transparent
   );
   opacity: 0;
@@ -72,7 +72,7 @@
 .page-content h2 {
   margin: 0;
   font-size: 2.4rem;
-  color: #3f2616;
+  color: #4a2f1b;
 }
 
 .page-content span {
@@ -81,7 +81,7 @@
   font-size: 0.75rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #7a563b;
+  color: #9a7a5a;
 }
 
 .page-content p {
@@ -89,7 +89,7 @@
   max-width: 70%;
   font-size: 1rem;
   line-height: 1.8;
-  color: #5a3a22;
+  color: #6a5a42;
 }
 
 .page-content.right p {

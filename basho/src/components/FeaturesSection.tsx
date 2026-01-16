@@ -50,9 +50,11 @@ export default function FeaturesSection() {
         
         if (data.featuresSection && data.featuresSection.length > 0) {
           const activeFeatures = data.featuresSection
-            .filter((item: any) => item.isActive)
+            .filter((item: any) => item.isActive !== false)
             .sort((a: any, b: any) => a.order - b.order);
-          setFeatures(activeFeatures);
+          if (activeFeatures.length > 0) {
+            setFeatures(activeFeatures);
+          }
         }
       } catch (error) {
         console.error('Error fetching home page content:', error);
