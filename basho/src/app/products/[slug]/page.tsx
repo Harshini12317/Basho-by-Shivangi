@@ -210,7 +210,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   };
 
   return (
-    <div className="min-h-screen py-16" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
+    <div className="min-h-screen py-16 bg-cover bg-center bg-fixed" style={{backgroundImage: 'url(/images/i2.jpg)'}}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Single Product Card */}
         <div className="bg-white/90 backdrop-blur-sm elegant-rounded-xl shadow-2xl border-2 border-[#EDD8B4] overflow-hidden clay-texture relative">
@@ -235,7 +235,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               >
                 <img
                   src={product.images?.[selectedImage] || '/images/placeholder.png'}
-                  className="w-full h-80 lg:h-96 object-cover transition-all duration-700 hover:scale-[1.02]"
+                  className="w-full h-72 sm:h-80 lg:h-[56vh] object-contain lg:object-cover transition-all duration-700"
                   alt={product.title}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>

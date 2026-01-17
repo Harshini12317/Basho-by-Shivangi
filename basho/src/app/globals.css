@@ -160,6 +160,64 @@ body {
     51%, 100% { opacity: 0; }
   }
 }
+@layer utilities {
+  .custom-form-card {
+    background: linear-gradient(180deg, #fffdfa, #fef7ee);
+    border-radius: 24px;
+    padding: 48px 56px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
+    border: 1px solid #f0e1cf;
+  }
+  .form-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: #3b2416;
+  }
+  .form-label {
+    font-weight: 600;
+    color: #4a2f1c;
+    margin-bottom: 6px;
+  }
+  .helper-text {
+    color: #9c6b43;
+    font-size: 14px;
+  }
+  .form-input, .form-textarea {
+    border-radius: 14px;
+    border: 1px solid #eadac6;
+    padding: 14px 16px;
+    font-size: 15px;
+    background: #fffefa;
+    transition: all 0.25s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+  }
+  .form-input:focus, .form-textarea:focus {
+    outline: none;
+    border-color: #c47a4a;
+    box-shadow: 0 0 0 3px rgba(196,122,74,0.15);
+    background: #ffffff;
+  }
+  .user-info-box {
+    background: linear-gradient(135deg, #fff4e6, #fbe8d2);
+    border: 1px dashed #e3b98d;
+    border-radius: 16px;
+    padding: 16px 20px;
+    color: #6b3f1f;
+  }
+  .corner-icon {
+    background: #fff;
+    border-radius: 50%;
+    padding: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    animation: float 6s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+}
 
 :root {
   --background: #ffffff;

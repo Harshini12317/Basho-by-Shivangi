@@ -97,14 +97,14 @@ export default function WorkshopDetailPage() {
 
         {/* Header banner */}
         <div
-          className="relative py-6 sm:py-10 md:py-14 overflow-hidden text-[#F9E8E4]"
+          className="relative py-6 sm:py-10 md:py-14 overflow-hidden text-[#F9E8E4] flex items-center justify-center min-h-[200px]"
           style={{
             backgroundImage: 'linear-gradient(180deg, #7E2A2A 0%, #6A2424 100%)',
           }}
         >
 
           <div className="max-w-6xl mx-auto text-center px-4">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+            <div className="flex flex-col items-center justify-center gap-2 sm:gap-3">
               <img
                 src="/images/headerimage.png"
                 alt=""
