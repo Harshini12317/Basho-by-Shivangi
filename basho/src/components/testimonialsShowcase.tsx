@@ -80,8 +80,35 @@ export default function TestimonialsShowcase() {
   const nextPhotoSlide = () => setActivePhotoSlide((prev) => (prev + 1) % photoTestimonials.length);
   const prevPhotoSlide = () => setActivePhotoSlide((prev) => (prev - 1 + photoTestimonials.length) % photoTestimonials.length);
 
-  const nextTextSlide = () => setActiveTextSlide((prev) => (prev + 1) % textTestimonials.length);
-  const prevTextSlide = () => setActiveTextSlide((prev) => (prev - 1 + textTestimonials.length) % textTestimonials.length);
+  const getSlidesPerView = () => {
+    if (typeof window === 'undefined') return 3;
+    const w = window.innerWidth;
+    if (w < 768) return 1;
+    if (w < 1024) return 2;
+    return 3;
+  };
+
+  const scrollTextCarouselTo = (index: number) => {
+    const container = textScrollContainerRef.current;
+    if (!container) return;
+    const perView = getSlidesPerView();
+    const slideWidth = container.offsetWidth / perView;
+    container.scrollTo({ left: Math.max(0, index * slideWidth), behavior: 'smooth' });
+  };
+
+  const nextTextSlide = () => {
+    if (textTestimonials.length === 0) return;
+    const next = (activeTextSlide + 1) % textTestimonials.length;
+    setActiveTextSlide(next);
+    scrollTextCarouselTo(next);
+  };
+
+  const prevTextSlide = () => {
+    if (textTestimonials.length === 0) return;
+    const prev = (activeTextSlide - 1 + textTestimonials.length) % textTestimonials.length;
+    setActiveTextSlide(prev);
+    scrollTextCarouselTo(prev);
+  };
 
   useEffect(() => {
     if (session?.user?.email) {
@@ -102,6 +129,23 @@ export default function TestimonialsShowcase() {
 
     return () => clearInterval(interval);
   }, [photoTestimonials.length]);
+
+  // Keep text carousel aligned when window resizes or active index changes
+  useEffect(() => {
+    scrollTextCarouselTo(activeTextSlide);
+  }, [activeTextSlide]);
+
+  useEffect(() => {
+    const onResize = () => scrollTextCarouselTo(activeTextSlide);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', onResize);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', onResize);
+      }
+    };
+  }, [activeTextSlide]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

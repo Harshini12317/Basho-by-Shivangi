@@ -80,6 +80,9 @@ export default function CorporatePage() {
         <div className="corp-hero-bg"></div>
         <div className="container mx-auto px-6 relative z-10 py-20 md:py-32">
           <div className="max-w-4xl mx-auto text-center">
+            <div className="flex justify-center mb-6">
+              <img src="/images/peak-removebg-preview (1).png" alt="Brand symbol" className="w-32 h-32 md:w-40 md:h-40 object-contain" />
+            </div>
             <h1 className="corp-title-3d">Corporate Artistry</h1>
             <p className="corp-subtitle-premium">Handcrafted excellence for your brand&apos;s most meaningful connections. Timeless pottery for modern enterprises.</p>
             <div className="mt-12 flex flex-wrap justify-center gap-6">
@@ -100,62 +103,54 @@ export default function CorporatePage() {
         </div>
       </section>
 
-      <section className="py-24 bg-white reveal-section">
-        <div className="container mx-auto px-6 text-center">
-          <span className="text-accent-clay uppercase tracking-widest text-sm font-semibold mb-4 block">OUR EXPERTISE</span>
-          <h2 className="text-5xl font-playfair text-[#3d2b1f] mb-4">Collaboration Models</h2>
-          <div className="w-20 h-1 bg-[#ffd789] mx-auto mb-16"></div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto">
-            {/* Wholesale & Retail */}
-            <div className="bg-white p-10 rounded-3xl shadow-sm border border-gray-50 flex flex-col items-center text-center hover:shadow-xl transition-shadow duration-300">
-              <div className="w-16 h-16 bg-[#fdfaf6] rounded-2xl flex items-center justify-center text-[#3d2b1f] text-3xl mb-8">
-                <FiPackage />
-              </div>
-              <h3 className="text-2xl font-playfair text-[#3d2b1f] mb-4">Wholesale & Retail</h3>
-              <p className="text-gray-600 leading-relaxed mb-8">
-                Stock our collections in your store — trade pricing, seasonal drops, and private-label options.
-              </p>
-              <button 
-                onClick={() => document.getElementById('inquiry')?.scrollIntoView({ behavior: 'smooth' })}
-                className="text-[#3d2b1f] font-bold flex items-center gap-2 hover:gap-3 transition-all"
-              >
-                Learn More <FiChevronRight />
-              </button>
+      <section className="py-24 reveal-section corp-continued-bg">
+        <div className="container mx-auto px-6">
+          <div className="rounded-[36px] bg-white/80 px-6 md:px-12 py-16 relative">
+            <div className="text-center">
+              <span className="text-accent-clay uppercase tracking-widest text-sm font-semibold mb-4 block">OUR EXPERTISE</span>
+              <h2 className="text-5xl font-playfair text-[#3d2b1f]">Collaboration Models</h2>
+              <div className="w-20 h-1 bg-[#ffd789] mx-auto mt-4 mb-12"></div>
             </div>
 
-            {/* Corporate Gifting */}
-            <div className="bg-white p-10 rounded-3xl shadow-sm border border-gray-50 flex flex-col items-center text-center hover:shadow-xl transition-shadow duration-300">
-              <div className="w-16 h-16 bg-[#fdfaf6] rounded-2xl flex items-center justify-center text-[#3d2b1f] text-3xl mb-8">
-                <FiGift />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto items-stretch">
+              {/* Wholesale & Retail */}
+              <div className="rounded-[28px] p-3 bg-[#C46A2B]/35 shadow-[0_14px_40px_rgba(0,0,0,0.08)] corp-card-shell h-full flex">
+                <div className="bg-white p-10 rounded-[24px] flex flex-col items-center text-center h-full w-full">
+                  <div className="w-16 h-16 bg-[#FBF6EF] rounded-2xl flex items-center justify-center text-[#4A2C1D] text-3xl mb-8">
+                    <FiPackage />
+                  </div>
+                  <h3 className="text-2xl font-playfair text-[#3d2b1f] mb-4">Wholesale & Retail</h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    Stock our collections in your store — trade pricing, seasonal drops, and private-label options.
+                  </p>
+                </div>
               </div>
-              <h3 className="text-2xl font-playfair text-[#3d2b1f] mb-4">Corporate Gifting</h3>
-              <p className="text-gray-600 leading-relaxed mb-8">
-                Curated gift sets with branding and custom packaging for events, clients, and employees.
-              </p>
-              <button 
-                onClick={() => document.getElementById('inquiry')?.scrollIntoView({ behavior: 'smooth' })}
-                className="text-[#3d2b1f] font-bold flex items-center gap-2 hover:gap-3 transition-all"
-              >
-                Learn More <FiChevronRight />
-              </button>
-            </div>
 
-            {/* Press & Collaborations */}
-            <div className="bg-white p-10 rounded-3xl shadow-sm border border-gray-50 flex flex-col items-center text-center hover:shadow-xl transition-shadow duration-300">
-              <div className="w-16 h-16 bg-[#fdfaf6] rounded-2xl flex items-center justify-center text-[#3d2b1f] text-3xl mb-8">
-                <FiBriefcase />
+              {/* Corporate Gifting */}
+              <div className="rounded-[28px] p-3 bg-[#C46A2B]/35 shadow-[0_14px_40px_rgba(0,0,0,0.08)] corp-card-shell h-full flex">
+                <div className="bg-white p-10 rounded-[24px] flex flex-col items-center text-center h-full w-full">
+                  <div className="w-16 h-16 bg-[#FBF6EF] rounded-2xl flex items-center justify-center text-[#4A2C1D] text-3xl mb-8">
+                    <FiGift />
+                  </div>
+                  <h3 className="text-2xl font-playfair text-[#3d2b1f] mb-4">Corporate Gifting</h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    Curated gift sets with branding and custom packaging for events, clients, and employees.
+                  </p>
+                </div>
               </div>
-              <h3 className="text-2xl font-playfair text-[#3d2b1f] mb-4">Press & Collaborations</h3>
-              <p className="text-gray-600 leading-relaxed mb-8">
-                Creative partnerships, photoshoots and editorial support — tell us your needs and deadlines.
-              </p>
-              <button 
-                onClick={() => document.getElementById('inquiry')?.scrollIntoView({ behavior: 'smooth' })}
-                className="text-[#3d2b1f] font-bold flex items-center gap-2 hover:gap-3 transition-all"
-              >
-                Learn More <FiChevronRight />
-              </button>
+
+              {/* Press & Collaborations */}
+              <div className="rounded-[28px] p-3 bg-[#C46A2B]/35 shadow-[0_14px_40px_rgba(0,0,0,0.08)] corp-card-shell h-full flex">
+                <div className="bg-white p-10 rounded-[24px] flex flex-col items-center text-center h-full w-full">
+                  <div className="w-16 h-16 bg-[#FBF6EF] rounded-2xl flex items-center justify-center text-[#4A2C1D] text-3xl mb-8">
+                    <FiBriefcase />
+                  </div>
+                  <h3 className="text-2xl font-playfair text-[#3d2b1f] mb-4">Press & Collaborations</h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    Creative partnerships, photoshoots and editorial support — tell us your needs and deadlines.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -212,9 +207,10 @@ export default function CorporatePage() {
         </div>
       </section>
 
-      <section id="process" className="corp-process reveal-section">
+      <section id="process" className="corp-process reveal-section corp-continued-bg">
         <div className="container mx-auto px-6 max-w-7xl">
-          <h2 className="section-title-premium text-center mb-16">How it works</h2>
+          <h2 className="section-title-premium text-center">Our Process</h2>
+          <div className="w-20 h-1 bg-[#ffd789] mx-auto mt-4 mb-12"></div>
           
           <div className="process-container">
             {/* Steps List (Vertical) */}

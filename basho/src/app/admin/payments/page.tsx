@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 
+export const dynamic = 'force-dynamic';
+
 // Mock payment data - in a real app, this would come from a payments collection
 interface Payment {
   id: string;

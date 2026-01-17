@@ -162,7 +162,7 @@ export default function Navbar() {
 
     <div className="nav-links right-links">
       <Link href="/products">Products</Link>
-      <Link href="/testimonial">Testimonials</Link>
+      <Link href="/corporate">Corporate Inquiries</Link>
       <Link href="/workshop">Workshop</Link>
     </div>
 
@@ -212,8 +212,8 @@ export default function Navbar() {
                 <MdAccountCircle /> Login
               </Link>
             )}
-            <Link href="/corporate" className="menu-item" onClick={() => setMenuOpen(false)}>
-              <MdBusiness /> Corporate Inquiries
+            <Link href="/testimonial" className="menu-item" onClick={() => setMenuOpen(false)}>
+              <MdRateReview /> Testimonials
             </Link>
             <Link href="/gallery" className="menu-item" onClick={() => setMenuOpen(false)}>
               <MdPhotoLibrary /> Gallery
@@ -258,11 +258,11 @@ export default function Navbar() {
             <Link href="/custom-order" className="menu-item" onClick={() => setMenuOpen(false)}>
               <MdEdit /> Custom order
             </Link>
-            <Link href="/corporate" className="menu-item" onClick={() => setMenuOpen(false)}>
-              <MdBusiness /> Corporate Inquiries
-            </Link>
             <Link href="/testimonial" className="menu-item" onClick={() => setMenuOpen(false)}>
               <MdRateReview /> Testimonials
+            </Link>
+            <Link href="/corporate" className="menu-item" onClick={() => setMenuOpen(false)}>
+              <MdBusiness /> Corporate Inquiries
             </Link>
             <Link href="/gallery" className="menu-item" onClick={() => setMenuOpen(false)}>
               <MdPhotoLibrary /> Gallery

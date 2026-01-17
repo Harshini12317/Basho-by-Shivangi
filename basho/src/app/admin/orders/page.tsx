@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 
+export const dynamic = 'force-dynamic';
+
 interface Order {
   _id: string;
   userId: string;

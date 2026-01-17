@@ -485,28 +485,28 @@ export default function ProfilePage() {
     <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 font-sans" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
       <div className="max-w-7xl mx-auto">
         {/* Profile Header */}
-        <div className="bg-gradient-to-br from-white via-[#F9F7F2] to-white/95 backdrop-blur-sm elegant-rounded-3xl shadow-2xl border border-[#EDD8B4]/40 p-6 sm:p-8 lg:p-12 mb-8 lg:mb-12 relative overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-[#FFF8F0]/30 to-transparent rounded-bl-full -mr-32 -mt-24 opacity-40"></div>
-          <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-[#F0E6D2]/20 to-transparent rounded-tr-full -ml-20 -mb-20 opacity-30"></div>
-          <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-[#8E5022]/3 rounded-full opacity-20"></div>
+        <div className="bg-white elegant-rounded-3xl shadow-2xl border border-[#EAD2B8]/40 p-6 sm:p-8 lg:p-12 mb-8 lg:mb-12 relative">
 
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 lg:gap-8 relative z-10">
             <div className="flex items-center gap-4 lg:gap-8">
-              <div className="w-24 h-24 lg:w-28 lg:h-28 rounded-full bg-gradient-to-br from-[#8E5022] via-[#A0612E] to-[#C85428] border-4 border-[#EDD8B4]/80 flex items-center justify-center text-white shadow-2xl relative flex-shrink-0">
-                <FaUser className="text-4xl lg:text-5xl opacity-95" />
-                <div className="absolute -bottom-2 -right-2 w-7 h-7 bg-emerald-400 rounded-full border-3 border-white shadow-lg animate-pulse"></div>
+              <div className="w-24 h-24 lg:w-28 lg:h-28 flex items-center justify-center relative flex-shrink-0">
+                <img
+                  src="/images/flower.jpg"
+                  alt="Brand flower icon"
+                  className="w-full h-full object-contain"
+                />
+                <div className="absolute -bottom-2 -right-2 w-7 h-7 bg-[#9DB8A0] rounded-full border-3 border-[#FBF6EF] shadow-lg"></div>
               </div>
               <div className="flex-1">
-                <div className="text-[0.65rem] font-bold uppercase tracking-[0.25em] text-[#8E5022]/80 mb-2.5 serif letter-spacing-wide">My Account</div>
-                <h1 className="text-3xl lg:text-5xl xl:text-5xl font-serif font-bold text-[#442D1C] mb-3 leading-tight tracking-tight">{userName}</h1>
+                <div className="text-[0.65rem] font-bold uppercase tracking-[0.25em] text-[#C46A2B]/80 mb-2.5 serif letter-spacing-wide">MY ACCOUNT</div>
+                <h1 className="text-3xl lg:text-5xl xl:text-5xl font-serif font-bold text-[#4A2C1D] mb-3 leading-tight tracking-tight">{userName}</h1>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                  <p className="text-[#652810] font-semibold flex items-center gap-2 text-sm">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <p className="text-[#6B3F2B] font-semibold flex items-center gap-2 text-sm">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#9DB8A0] animate-pulse"></span>
                     <span className="font-mono">{userEmail}</span>
                   </p>
-                  <div className="hidden sm:block text-[#EDD8B4]">•</div>
-                  <p className="text-[#8E5022]/80 text-sm font-medium">Member since {new Date().getFullYear()}</p>
+                  <div className="hidden sm:block text-[#EAD2B8]">•</div>
+                  <p className="text-[#C46A2B]/80 text-sm font-medium">Member since {new Date().getFullYear()}</p>
                 </div>
               </div>
             </div>
@@ -514,13 +514,13 @@ export default function ProfilePage() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 lg:gap-4">
               <button
                 onClick={() => signOut()}
-                className="group flex items-center justify-center gap-2 px-5 lg:px-7 py-3 lg:py-3.5 rounded-xl lg:rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 shadow-md hover:shadow-lg transition-all duration-300 border border-slate-200/60 font-bold text-sm"
+                className="group flex items-center justify-center gap-2 px-5 lg:px-7 py-3 lg:py-3.5 rounded-xl lg:rounded-full bg-[#F1E3D3] hover:bg-[#EAD2B8] text-[#6B3F2B] shadow-md hover:shadow-lg transition-all duration-300 border border-[#EAD2B8]/60 font-bold text-sm"
               >
                 <span>Sign Out</span>
               </button>
               <Link
                 href="/products"
-                className="group flex items-center justify-center gap-2 px-5 lg:px-7 py-3 lg:py-3.5 rounded-xl lg:rounded-full bg-gradient-to-r from-[#8E5022] to-[#C85428] text-white shadow-lg hover:shadow-2xl hover:from-[#652810] hover:to-[#8E5022] hover:-translate-y-1 transition-all duration-300 border border-[#EDD8B4]/40 font-bold text-sm"
+                className="group flex items-center justify-center gap-2 px-5 lg:px-7 py-3 lg:py-3.5 rounded-xl lg:rounded-full bg-gradient-to-r from-[#C46A2B] to-[#B85C2E] text-[#FBF6EF] shadow-lg hover:shadow-2xl hover:from-[#B85C2E] hover:to-[#C46A2B] hover:-translate-y-1 transition-all duration-300 border border-[#EAD2B8]/40 font-bold text-sm"
               >
                 <FaShoppingBag className="text-base" />
                 <span>Shop Products</span>
