@@ -1,0 +1,84 @@
+.artisanship-section {
+  background: linear-gradient(135deg, rgba(247, 234, 218, 0.5), rgba(255, 255, 255, 0.92));
+  padding: 4rem 2rem;
+}
+
+.artisan-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.artisan-content h2 {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 700;
+  color: var(--c-2, #5a3a22);
+  font-family: var(--font-playfair, serif);
+  margin-bottom: 2rem;
+  line-height: 1.3;
+}
+
+.artisan-feature {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(42, 31, 23, 0.08);
+}
+
+.artisan-feature:last-child {
+  border-bottom: none;
+}
+
+.artisan-feature h3 {
+  font-size: 1.1rem;
+  color: var(--c-2, #5a3a22);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.artisan-feature p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--c-4, #7a563b);
+  margin: 0;
+}
+
+.artisan-image {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.artisan-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+@media (max-width: 1024px) {
+  .artisan-wrapper {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .artisanship-section {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .artisan-content h2 {
+    font-size: 1.6rem;
+  }
+
+  .artisan-feature h3 {
+    font-size: 1rem;
+  }
+
+  .artisan-feature p {
+    font-size: 0.9rem;
+  }
+}

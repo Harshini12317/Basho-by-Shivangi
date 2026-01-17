@@ -4,6 +4,7 @@ import CustomOrder from "@/models/CustomOrder";
 import { v2 as cloudinary } from "cloudinary";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { sendCustomOrderRequestEmail } from "@/lib/email";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -151,6 +152,19 @@ export async function POST(request: Request) {
       notes: notes || "",
       status: "requested",
     });
+
+    // Send confirmation emails to both customer and admin
+    try {
+      await sendCustomOrderRequestEmail(
+        name,
+        email,
+        description,
+        created._id.toString()
+      );
+    } catch (emailError) {
+      console.error("Error sending custom order request email:", emailError);
+      // Continue despite email error - order is already created
+    }
 
     return NextResponse.json(created, { status: 201 });
   } catch (err: any) {

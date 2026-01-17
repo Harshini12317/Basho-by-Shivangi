@@ -1,0 +1,91 @@
+.japanese-culture-section {
+  background: linear-gradient(135deg, rgba(247, 234, 218, 0.4), rgba(255, 255, 255, 0.92));
+  padding: 4rem 2rem;
+}
+
+.culture-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.japanese-culture-section h2 {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 700;
+  color: var(--c-2, #5a3a22);
+  font-family: var(--font-playfair, serif);
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.philosophy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.philosophy-item {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2rem 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(42, 31, 23, 0.08);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.philosophy-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  border-color: rgba(218, 109, 61, 0.2);
+}
+
+.philosophy-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--c-3, #da6d3d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.philosophy-item h3 {
+  font-size: 1.2rem;
+  color: var(--c-2, #5a3a22);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-playfair, serif);
+}
+
+.philosophy-item p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--c-4, #7a563b);
+}
+
+@media (max-width: 768px) {
+  .japanese-culture-section {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .philosophy-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .philosophy-item {
+    padding: 1.5rem 1rem;
+  }
+
+  .philosophy-icon {
+    font-size: 2rem;
+  }
+
+  .philosophy-item h3 {
+    font-size: 1rem;
+  }
+
+  .philosophy-item p {
+    font-size: 0.85rem;
+  }
+}
+

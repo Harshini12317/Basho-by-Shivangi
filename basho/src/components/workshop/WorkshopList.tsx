@@ -38,6 +38,13 @@ interface Workshop {
   updatedAt: string;
 }
 
+interface GalleryItem {
+  _id: string;
+  title: string;
+  image: string;
+  category: string;
+}
+
 const studentImages = ['img13.png', 'img34.png', 'img12.png', 'img31.png', 'img25.png', 'img32.png', 'img5.png', 'img15.png', 'img33.png', 'img27.png', 'img3.png', 'img2.png'];
 
 // Props coming from server page (optional, will map to the static shape)
@@ -73,6 +80,7 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
+  const [workshopGalleryImages, setWorkshopGalleryImages] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -114,9 +122,24 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
       }
     };
 
+    const fetchWorkshopGallery = async () => {
+      try {
+        const response = await fetch('/api/gallery');
+        if (response.ok) {
+          const data = await response.json();
+          // Filter only workshop category images
+          const workshopImages = data.filter((item: GalleryItem) => item.category === 'workshop');
+          setWorkshopGalleryImages(workshopImages);
+        }
+      } catch (error) {
+        console.error('Failed to fetch workshop gallery images:', error);
+      }
+    };
+
     fetchWorkshops();
     fetchExperiences();
     fetchEvents();
+    fetchWorkshopGallery();
   }, []);
 
   // Use fetched workshops if available, otherwise use initial props or empty array
@@ -419,12 +442,12 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
             of dedication, creativity, and craftsmanship.
           </p>
           <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2" ref={studentScrollerRef}>
-            {studentImages.map((img, idx) => (
+            {(workshopGalleryImages.length > 0 ? workshopGalleryImages : studentImages.map(img => ({ _id: img, image: resolveImgSrc(img), title: 'Student work', category: 'workshop' }))).map((item, idx) => (
               <div
                 key={idx}
                 className="w-[300px] h-[300px] flex-none rounded-xl overflow-hidden flex items-center justify-center snap-start"
               >
-                <img src={resolveImgSrc(img)} className="w-full h-full object-cover" alt="Student work" />
+                <img src={typeof item === 'string' ? resolveImgSrc(item) : item.image} className="w-full h-full object-cover" alt={typeof item === 'string' ? 'Student work' : item.title} />
               </div>
             ))}
           </div>

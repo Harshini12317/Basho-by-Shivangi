@@ -1,6 +1,6 @@
 .process-section {
   background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245,238,232,0.6));
-  padding: 4rem 1.5rem;
+  padding: 2.5rem 1.5rem;
 }
 
 .process-timeline {
@@ -25,8 +25,8 @@
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 2rem;
-  margin-bottom: 4rem;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
 }
 
 /* Round symbol */
@@ -48,8 +48,8 @@
 /* Card */
 .process-card {
   background: rgba(255, 255, 255, 0.6);
-  padding: 1.6rem 1.8rem;
-  border-radius: 14px;
+  padding: 1.2rem 1.4rem;
+  border-radius: 12px;
   max-width: 520px;
   transition: transform 0.25s ease;
   transform-origin: center;
@@ -61,15 +61,15 @@
 
 /* TEXT */
 .process-card h4 {
-  font-size: 1.5rem;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
   color: #5a3a22;
 }
 
 .process-card p {
-  font-size: 1.02rem;
-  line-height: 1.8;
+  font-size: 0.9rem;
+  line-height: 1.6;
   color: #7a563b;
 }
 

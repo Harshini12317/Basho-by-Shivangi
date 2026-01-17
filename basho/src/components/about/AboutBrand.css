@@ -1,0 +1,67 @@
+.brand-section {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(247, 234, 218, 0.6));
+  padding: 4rem 2rem;
+}
+
+.brand-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.brand-image {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.brand-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.brand-content h2 {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 700;
+  color: var(--c-2, #5a3a22);
+  font-family: var(--font-playfair, serif);
+  margin-bottom: 1.5rem;
+  line-height: 1.3;
+}
+
+.brand-content p {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--c-4, #7a563b);
+  margin-bottom: 1.2rem;
+}
+
+.brand-content p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 1024px) {
+  .brand-wrapper {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .brand-section {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .brand-content h2 {
+    font-size: 1.6rem;
+  }
+
+  .brand-content p {
+    font-size: 0.95rem;
+  }
+}
