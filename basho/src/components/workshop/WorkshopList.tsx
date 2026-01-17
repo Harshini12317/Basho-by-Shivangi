@@ -338,7 +338,7 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
               <p className="nav-subtitle">Hands‑on pottery workshops for beginners & creators</p>
               <div className="mt-3 flex justify-center gap-3">
                 <a href="#workshops" className="px-4 py-2 rounded-full bg-[#8E5022] text-white shadow-md hover:bg-[#652810] transition-colors">Workshops</a>
-                <a href="/contact" className="px-4 py-2 rounded-full bg-white text-[#3d2b1f] ring-1 ring-[#EDD8B4] hover:bg-[#fffaf3] transition-colors">Experience</a>
+                <a href="#experiences" className="px-4 py-2 rounded-full bg-white text-[#3d2b1f] ring-1 ring-[#EDD8B4] hover:bg-[#fffaf3] transition-colors">Experience</a>
               </div>
             </div>
           </div>
@@ -485,8 +485,9 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
           </div>
           
           {experiences.length > 0 || events.length > 0 ? (
-            <>
-              {experiences.map((experience, index) => (
+            <div id="experiences" className="scroll-mt-24">
+              <>
+                {experiences.map((experience, index) => (
                 <div key={`exp-${index}`} className="grid md:grid-cols-2 items-center gap-8 mb-16">
                   <div className="flex justify-center md:justify-start group cursor-pointer bg-white rounded-2xl p-2 ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">
                     <img src={experience.image} alt={experience.title} className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
@@ -527,7 +528,8 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
                   </div>
                 </div>
               ))}
-            </>
+              </>
+            </div>
           ) : (
             <div className="text-center py-12">
               <p className="text-slate-500 text-lg">No items available at the moment.</p>
