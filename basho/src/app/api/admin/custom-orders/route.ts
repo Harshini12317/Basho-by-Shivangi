@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import CustomOrder from '@/models/CustomOrder';
+import { sendCustomOrderQuoteEmail } from '@/lib/email';
 
 export async function GET() {
   try {
@@ -36,6 +37,22 @@ export async function PUT(request: NextRequest) {
         { error: 'Order not found' },
         { status: 404 }
       );
+    }
+
+    // Send quote email if status is being changed to 'quoted'
+    if (status === 'quoted' && quotedPrice !== undefined) {
+      try {
+        await sendCustomOrderQuoteEmail(
+          order.name,
+          order.email,
+          order.description,
+          quotedPrice,
+          order._id.toString()
+        );
+      } catch (emailError) {
+        console.error("Error sending custom order quote email:", emailError);
+        // Continue despite email error - order is already updated
+      }
     }
 
     return NextResponse.json(order);
