@@ -1,16 +1,20 @@
 import AboutHero from "@/components/about/AboutHero";
-import AboutPhilosophy from "@/components/about/AboutPhilosophy";
+import AboutBrand from "@/components/about/AboutBrand";
+import AboutJapaneseCulture from "@/components/about/AboutJapaneseCulture";
+import AboutProducts from "@/components/about/AboutProducts";
 import AboutProcess from "@/components/about/AboutProcess";
-import AboutTeamSlider from "@/components/about/AboutTeamSlider";
+import AboutArtisanship from "@/components/about/AboutArtisanship";
 import StudioPage from "@/app/studio/page";
 
 export default function AboutPage() {
   return (
     <main>
       <AboutHero />
-      <AboutPhilosophy />
+      <AboutBrand />
+      <AboutJapaneseCulture />
+      <AboutProducts />
       <AboutProcess />
-      <AboutTeamSlider />
+      <AboutArtisanship />
       <StudioPage />
     </main>
   );

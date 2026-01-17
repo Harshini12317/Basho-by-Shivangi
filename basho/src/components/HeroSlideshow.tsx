@@ -70,9 +70,9 @@ export default function HeroSlideshow() {
   };
 
   return (
-    <div className="relative w-full h-full min-h-[400px] lg:min-h-[500px] flex items-center justify-center group order-1 lg:order-1">
+    <div className="hero-slideshow-shell relative w-full h-full min-h-[400px] lg:min-h-[500px] flex items-center justify-center group order-1 lg:order-1">
       {/* Main Slideshow Container */}
-      <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl">
+      <div className="hero-slideshow-card relative w-full h-full rounded-[32px] overflow-hidden">
         {/* Slides */}
         {slideImages.map((image, index) => (
           <div
@@ -91,6 +91,16 @@ export default function HeroSlideshow() {
             />
           </div>
         ))}
+
+        {/* Text overlay like "Kitchen Essentials" */}
+        <div className="absolute inset-x-0 bottom-0 z-20 p-6 sm:p-8 text-left text-white">
+          <h2 className="text-2xl sm:text-3xl font-semibold drop-shadow-lg">
+            Kitchen Essentials
+          </h2>
+          <p className="mt-1 text-sm sm:text-base opacity-90 drop-shadow">
+            Hand-thrown • Food-safe
+          </p>
+        </div>
 
         {/* Gradient Overlays */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/10 via-transparent to-black/10 pointer-events-none"></div>

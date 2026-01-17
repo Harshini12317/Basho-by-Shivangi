@@ -35,20 +35,26 @@ export default function Home() {
       >
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/5 pointer-events-none"></div>
         
-        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 py-16 lg:py-24 w-full relative z-10">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 py-10 lg:py-16 w-full relative z-10">
          <div className="min-h-[60vh] grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-16">
 
            <HeroSlideshow />
 
            <div className="hero-content max-w-xl mx-auto lg:ml-0 lg:mr-auto text-center lg:text-left order-2 lg:order-2">
 
-              <p className="hero-badge inline-block mb-4 sm:mb-6 hover:scale-105 transition-transform duration-300">FLAT 25% DISCOUNT</p>
+              <p className="hero-kicker text-sm sm:text-base font-medium tracking-[0.18em] uppercase text-[var(--accent-clay)] mb-2">
+                Thoughtfully shaped. Quietly powerful.
+              </p>
+
+              <p className="hero-badge inline-block mb-4 sm:mb-6 hover:scale-105 transition-transform duration-300">
+                FLAT 25% DISCOUNT
+              </p>
               
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold leading-tight text-[var(--text-primary)] mb-6 sm:mb-8">
+              <h1 className="hero-title text-4xl sm:text-5xl lg:text-6xl font-serif font-bold leading-tight text-[var(--text-primary)] mb-6 sm:mb-8">
                 Multipurpose Ceramic<br className="hidden sm:block" />Dotted Kitchen
               </h1>
               
-              <p className="mt-6 text-base sm:text-lg leading-relaxed text-[var(--text-muted)] max-w-md mx-auto lg:mx-0 mb-8 sm:mb-10">
+              <p className="hero-body mt-6 text-base sm:text-lg leading-relaxed text-[var(--text-muted)] max-w-md mx-auto lg:mx-0 mb-8 sm:mb-10">
                 Calm, balanced tableware designed for modern homes. Crafted with food-safe glazes and artisanal care.
               </p>
               
@@ -65,6 +71,12 @@ export default function Home() {
                     Browse
                   </button>
                 </Link>
+              </div>
+
+              <div className="trust-strip">
+                <span>Handmade in India</span>
+                <span>Food-safe glazes</span>
+                <span>Small-batch crafted</span>
               </div>
             </div>
           </div>
