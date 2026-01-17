@@ -1,7 +1,7 @@
 "use client"
 
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import "./gallery.css"
 
 type Category = "Products" | "Workshop" | "Studio" | "Others"
@@ -18,7 +18,7 @@ export default function GalleryPage() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<"All" | Category>("All")
   const [activeImage, setActiveImage] = useState<ImageItem | null>(null)
-  const [tick, setTick] = useState(0)
+  const carouselRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     fetchGallery()
@@ -84,13 +84,30 @@ export default function GalleryPage() {
         <p className="ms-hero-sub">A curated collection of pieces, moments from our studio, and highlights from our workshops.</p>
       </header>
 
-      <section className="ms-horizontal" aria-hidden>
-        <div className={`ms-horizontal-track animate-${tick % 2}`}>
-          {images.map((img, i) => (
-            <div key={img._id} className="ms-horizontal-item" onClick={() => setActiveImage(img)}>
-              <img src={img.src} alt={img.title} loading="lazy" />
-            </div>
-          ))}
+      <section className="ms-horizontal-carousel" aria-label="Continuous image carousel">
+        <div className="ms-carousel-wrapper">
+          <div className="ms-carousel-track">
+            {/* Original images */}
+            {images.map((img) => (
+              <div 
+                key={`carousel-${img._id}`} 
+                className="ms-carousel-item" 
+                onClick={() => setActiveImage(img)}
+              >
+                <img src={img.src} alt={img.title} loading="lazy" />
+              </div>
+            ))}
+            {/* Duplicate for seamless loop */}
+            {images.map((img) => (
+              <div 
+                key={`carousel-duplicate-${img._id}`} 
+                className="ms-carousel-item" 
+                onClick={() => setActiveImage(img)}
+              >
+                <img src={img.src} alt={img.title} loading="lazy" />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
