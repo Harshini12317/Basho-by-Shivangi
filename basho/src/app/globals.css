@@ -29,6 +29,10 @@
 html,
 body {
   background-color: var(--bg-primary);
+  background-image: url("/images/i2.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   color: var(--text-primary);
 }
 

@@ -1,28 +1,24 @@
-.philosophy-section {
-  position: relative;
+.team-slider-section {
   background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245,238,232,0.6));
   padding: 4rem 1.5rem;
-  overflow: visible;
 }
 
-.philosophy-container {
-  max-width: 1200px;
-  margin: 0 auto;
+.team-slider-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
 }
 
-.philosophy-container h2 {
+.team-slider-header h2 {
   font-size: clamp(2rem, 4vw, 2.6rem);
   font-weight: 700;
   color: var(--c-2);
   font-family: var(--font-playfair, serif);
-  text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 0;
   position: relative;
   display: inline-block;
-  width: 100%;
 }
 
-.philosophy-container h2::after {
+.team-slider-header h2::after {
   content: "";
   position: absolute;
   bottom: -12px;
@@ -34,28 +30,35 @@
   border-radius: 2px;
 }
 
-.philosophy-image {
+.founder-story-image {
   width: 100%;
-  height: auto;
+  max-width: 1000px;
+  height: 500px;
+  margin: 0 auto;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 12px 30px rgba(0,0,0,0.1);
-  margin-top: 1.5rem;
 }
 
-.philosophy-image img {
+.founder-story-image img {
   width: 100%;
-  height: auto;
-  display: block;
-  object-fit: contain;
+  height: 100%;
+  object-fit: cover;
 }
 
 @media (max-width: 768px) {
-  .philosophy-section {
-    padding: 3rem 1rem;
-  }
-
-  .philosophy-container h2 {
-    margin-bottom: 1.5rem;
+  .founder-story-image {
+    height: 350px;
   }
 }
+
+@media (max-width: 480px) {
+  .team-slider-section {
+    padding: 2rem 0.75rem;
+  }
+
+  .founder-story-image {
+    height: 250px;
+  }
+}
+

@@ -2,96 +2,128 @@
    FOOTER
 ================================ */
 .footer {
-  background: var(--bg-secondary);
-  padding: 100px 0 40px;
-  border-top: 1px solid var(--border-soft);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, #fafaf8 100%);
+  padding: 80px 0 40px;
+  border-top: 2px solid var(--c-3);
+  margin-top: 100px;
 }
 
 /* ===============================
    CONTAINER
 ================================ */
 .footer-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 64px;
+  padding: 0 40px;
 
   display: grid;
-  grid-template-columns: 1.2fr 1.5fr 1fr;
-  gap: 80px;
+  grid-template-columns: 1fr 2fr 1.2fr;
+  gap: 60px;
 }
 
 /* ===============================
-   BRAND
+   BRAND SECTION
 ================================ */
 .footer-brand h3 {
-  font-family: serif;
-  font-size: 2rem;
-  margin-bottom: 14px;
-  color: var(--text-primary);
+  font-family: var(--font-playfair, serif);
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  color: var(--c-2);
+  font-weight: 700;
 }
 
 .footer-brand p {
   font-size: 0.95rem;
-  line-height: 1.7;
-  color: var(--text-muted);
-  max-width: 260px;
+  line-height: 1.8;
+  color: var(--text-primary);
+  max-width: 280px;
+  margin-bottom: 16px;
+}
+
+.footer-tagline {
+  font-size: 0.85rem;
+  color: var(--c-3);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
 /* ===============================
-   LINKS
+   LINKS SECTION
 ================================ */
 .footer-links {
-  display: flex;
-  gap: 80px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
 }
 
-.footer-links div {
+.link-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
-.footer-links span {
-  font-size: 0.85rem;
-  letter-spacing: 0.12em;
+.link-group span {
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 8px;
+  color: var(--c-2);
+  font-weight: 700;
+  margin-bottom: 4px;
 }
 
-.footer-links a {
+.link-group a {
   text-decoration: none;
   font-size: 0.95rem;
   color: var(--text-primary);
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
+  padding-left: 0;
+  display: inline-block;
+  position: relative;
 }
 
-.footer-links a:hover {
-  opacity: 0.6;
+.link-group a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background: var(--c-3);
+  transition: width 0.3s ease;
+}
+
+.link-group a:hover::before {
+  width: 100%;
+}
+
+.link-group a:hover {
+  color: var(--c-3);
 }
 
 /* ===============================
-   NOTE / STUDIO
+   STUDIO SECTION
 ================================ */
-.footer-note {
-  font-family: serif;
-  font-size: 1.1rem;
-  line-height: 1.6;
-  color: var(--text-primary);
-}
-
 .footer-studio {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
 }
 
-.studio-info h4 {
-  font-size: 0.85rem;
-  letter-spacing: 0.12em;
+.studio-section {
+  padding: 20px;
+  border-left: 3px solid var(--c-3);
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+}
+
+.studio-section h4 {
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 8px;
+  color: var(--c-2);
+  font-weight: 700;
+  margin-bottom: 12px;
 }
 
 .studio-address {
@@ -101,77 +133,128 @@
   margin-bottom: 12px;
 }
 
-.studio-phone a {
+.studio-phone {
   text-decoration: none;
   font-size: 0.95rem;
   color: var(--text-primary);
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  display: inline-block;
 }
 
-.studio-phone a:hover {
-  opacity: 0.6;
+.studio-phone:hover {
+  color: var(--c-3);
 }
 
-.studio-socials {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.studio-socials span {
-  font-size: 0.85rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-muted);
+/* Social Links */
+.socials-section {
+  background: rgba(61, 43, 31, 0.03);
+  border-left-color: var(--c-2);
 }
 
 .social-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   text-decoration: none;
   font-size: 0.95rem;
   color: var(--text-primary);
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: transparent;
   width: fit-content;
 }
 
 .social-link:hover {
-  opacity: 0.6;
+  background: var(--c-3);
+  color: white;
+  transform: translateX(4px);
 }
 
 .social-link svg {
   flex-shrink: 0;
+  width: 20px;
+  height: 20px;
 }
 
 /* ===============================
    BOTTOM
 ================================ */
 .footer-bottom {
-  margin-top: 80px;
-  padding-top: 24px;
+  margin-top: 60px;
+  padding-top: 32px;
   border-top: 1px solid var(--border-soft);
 
   text-align: center;
   font-size: 0.85rem;
   color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.3);
+  padding: 24px;
+  border-radius: 4px;
 }
 
 /* ===============================
    RESPONSIVE
 ================================ */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .footer-container {
-    grid-template-columns: 1fr;
-    gap: 48px;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
     padding: 0 32px;
   }
 
   .footer-links {
-    gap: 48px;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 60px 0 30px;
   }
 
-  .footer-note {
-    font-size: 1rem;
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 0 20px;
+  }
+
+  .footer-brand h3 {
+    font-size: 2rem;
+  }
+
+  .footer-links {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+
+  .footer-studio {
+    gap: 24px;
+  }
+
+  .footer-bottom {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 0 16px;
+  }
+
+  .footer-brand h3 {
+    font-size: 1.8rem;
+  }
+
+  .footer-links {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .studio-section {
+    padding: 16px;
   }
 }

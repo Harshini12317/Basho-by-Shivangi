@@ -1,17 +1,16 @@
 .about-hero {
   position: relative;
-  height: 100vh;
-  background: #faf6ef;
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245,238,232,0.6));
+  padding: 5rem 0;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: auto;
 }
 
 .hero-bg {
-  object-fit: cover;
-  opacity: 0.18;
-  filter: grayscale(100%);
+  display: none;
 }
 
 .hero-content {
@@ -19,24 +18,42 @@
   z-index: 2;
   text-align: center;
   padding: 0 1rem;
-   transform: translateY(-7.5rem);
+  max-width: 950px;
+  transform: none;
 }
 
 .hero-h1 {
-  font-size: clamp(3.5rem, 8vw, 6rem);
-  font-weight: 500;
-  line-height: 0.95;
-  color: #4a2f1b;
+  font-size: clamp(2.8rem, 6vw, 4rem);
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--c-2);
+  font-family: var(--font-playfair, serif);
+  margin-bottom: 1.5rem;
+  letter-spacing: -1px;
+  position: relative;
+}
+
+.hero-h1::before {
+  content: "";
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--c-3), transparent);
+  border-radius: 2px;
 }
 
 .hero-h2 {
-  margin-top: 1rem;
-  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  margin-top: 2rem;
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
   font-weight: 400;
-  max-width: 38rem;
+  max-width: 700px;
   margin-inline: auto;
-  color: #6b4a2f;
-  line-height: 1.4;
+  color: #6b5a4c;
+  line-height: 1.7;
+  font-style: italic;
 }
 
 /* Required for SplitText */

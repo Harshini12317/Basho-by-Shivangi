@@ -4,6 +4,7 @@ export interface IEventBooking extends Document {
   eventId: mongoose.Types.ObjectId;
   customerName: string;
   customerPhone: string;
+  customerEmail?: string;
   bookingDate: Date;
   numberOfGuests?: number;
   specialRequests?: string;
@@ -20,6 +21,7 @@ const EventBookingSchema = new Schema<IEventBooking>(
     },
     customerName: { type: String, required: true },
     customerPhone: { type: String, required: true },
+    customerEmail: { type: String, required: false },
     bookingDate: { type: Date, required: true },
     numberOfGuests: { type: Number, default: 1 },
     specialRequests: String,

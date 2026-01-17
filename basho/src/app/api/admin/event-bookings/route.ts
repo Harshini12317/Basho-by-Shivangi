@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import EventBooking from '@/models/EventBooking';
 import Event from '@/models/Event';
+import { sendEventBookingEmail } from '@/lib/email';
 
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
     const { searchParams } = new URL(request.url);
-    const eventId = searchParams.get('eventId');
+    const eventId = searchParams.get('eventId') ;
 
     if (!eventId) {
       return NextResponse.json(
@@ -42,6 +43,22 @@ export async function POST(request: NextRequest) {
 
     const booking = new EventBooking(body);
     await booking.save();
+    
+    // Send confirmation emails (if customer email is available)
+    try {
+      if (body.customerEmail) {
+        await sendEventBookingEmail(
+          body.customerName,
+          body.customerEmail,
+          event.title,
+          body.bookingDate
+        );
+      }
+    } catch (emailError) {
+      console.error("Failed to send email:", emailError);
+      // Don't fail the booking if email fails
+    }
+    
     return NextResponse.json(booking, { status: 201 });
   } catch (error) {
     console.error('Failed to create booking:', error);
@@ -109,3 +126,4 @@ export async function DELETE(request: NextRequest) {
     );
   }
 }
+

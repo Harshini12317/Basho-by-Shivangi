@@ -159,7 +159,7 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
   const [showModal, setShowModal] = useState(false);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  const [reg, setReg] = useState({ name: '', mobile: '', date: '' });
+  const [reg, setReg] = useState({ name: '', email: '', mobile: '', date: '' });
   const [regStatus, setRegStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [popup, setPopup] = useState<PopupItem | null>(null);
   const [showPopup, setShowPopup] = useState(false);
@@ -173,11 +173,17 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
   const closeBookingModal = () => {
     setShowModal(false);
     setSelectedEventId(null);
-    setReg({ name: '', mobile: '', date: '' });
+    setReg({ name: '', email: '', mobile: '', date: '' });
+  };
+
+  const openModal = (slug: string) => {
+    setSelectedSlug(slug);
+    setShowModal(true);
+    setRegStatus('idle');
   };
 
   const submitBooking = async () => {
-    if (!selectedEventId || !reg.name || !reg.mobile || !reg.date) {
+    if (!selectedEventId || !reg.name || !reg.email || !reg.mobile || !reg.date) {
       setRegStatus('error');
       return;
     }
@@ -190,6 +196,7 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
         body: JSON.stringify({
           eventId: selectedEventId,
           customerName: reg.name,
+          customerEmail: reg.email,
           customerPhone: reg.mobile,
           bookingDate: reg.date,
           numberOfGuests: 1,
@@ -531,6 +538,17 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
                         onChange={(e) => setReg({ ...reg, name: e.target.value })}
                         className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#E2C48D]"
                         placeholder="Your Full Name"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Email *</label>
+                      <input
+                        type="email"
+                        required
+                        value={reg.email}
+                        onChange={(e) => setReg({ ...reg, email: e.target.value })}
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-[#E2C48D]"
+                        placeholder="your.email@example.com"
                       />
                     </div>
                     <div>
