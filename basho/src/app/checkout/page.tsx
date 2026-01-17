@@ -5,7 +5,7 @@ import { validateGST } from '@/lib/gst-validation';
 import { FaMinus, FaPlus, FaTrash, FaMapMarkerAlt } from 'react-icons/fa';
 
 interface CheckoutItem {
-  productSlug: string;
+  productSlug: string ;
   qty: number;
   price: number;
   weight: number;
