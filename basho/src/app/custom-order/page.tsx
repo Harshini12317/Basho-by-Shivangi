@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { FaFire, FaLeaf } from "react-icons/fa";
 
 export default function CustomOrderPage() {
   const { data: session, status } = useSession();
@@ -111,7 +112,10 @@ export default function CustomOrderPage() {
   };
 
   return (
-    <div className="min-h-screen py-16" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
+    <div
+      className="min-h-screen py-16 bg-cover bg-center bg-fixed"
+      style={{ backgroundImage: 'url(/images/i2.jpg)' }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {status === "loading" ? (
           <div className="flex justify-center items-center min-h-[50vh]">
@@ -321,7 +325,7 @@ export default function CustomOrderPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 2 + index * 0.1 }}
-                  className="card-soft elegant-rounded-2xl p-6 border border-[#8E5022]/20"
+                  className="bg-white elegant-rounded-2xl p-6 border border-[#8E5022]/20"
                 >
                   <div className="grid grid-cols-2 gap-3 mb-6">
                     {Array.from({ length: 2 }).map((_, imgIndex) => (
@@ -340,11 +344,11 @@ export default function CustomOrderPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 2 + orderIndex * 0.1 }}
                   whileHover={{ y: -5 }}
-                  className="card-soft elegant-rounded-2xl p-6 border border-[#8E5022]/20 hover:shadow-lg transition-shadow cursor-pointer"
+                  className="bg-white elegant-rounded-2xl p-6 border border-[#8E5022]/20 hover:shadow-lg transition-shadow cursor-pointer"
                 >
                   <div className="grid grid-cols-2 gap-3 mb-6">
                     {photo.images.slice(0, 2).map((image: string, index: number) => (
-                      <div key={index} className="relative">
+                      <div key={index} className="relative bg-white elegant-rounded-lg">
                         <motion.img
                           src={image}
                           whileHover={{ scale: 1.05 }}
@@ -399,59 +403,54 @@ export default function CustomOrderPage() {
               className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden relative"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative">
-                <img
-                  src={selectedOrder.images[selectedImageIndex]}
-                  alt={selectedOrder.title}
-                  className="w-full h-auto max-h-[60vh] object-contain"
-                />
-                
-                {/* Navigation arrows */}
-                {selectedOrder.images.length > 1 && (
-                  <>
-                    <button
-                      onClick={() => setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : selectedOrder.images.length - 1))}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-                    >
-                      ‹
-                    </button>
-                    <button
-                      onClick={() => setSelectedImageIndex((prev) => (prev < selectedOrder.images.length - 1 ? prev + 1 : 0))}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-                    >
-                      ›
-                    </button>
-                  </>
-                )}
-                
-                {/* Close button */}
-                <button
-                  onClick={() => setSelectedOrder(null)}
-                  className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-              
-              <div className="p-6">
-                <h3 className="text-2xl font-bold serif text-[#442D1C] mb-2">{selectedOrder.name}</h3>
-                <p className="text-[#652810]">{selectedOrder.description}</p>
-                
-                {/* Image indicators */}
-                {selectedOrder.images.length > 1 && (
-                  <div className="flex justify-center mt-4 space-x-2">
-                    {selectedOrder.images.map((_: string, index: number) => (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                <div className="relative p-4 bg-white">
+                  <img
+                    src={selectedOrder.images[selectedImageIndex]}
+                    alt={selectedOrder.title}
+                    className="w-full h-auto max-h-[60vh] object-contain"
+                  />
+                  {selectedOrder.images.length > 1 && (
+                    <>
                       <button
-                        key={index}
-                        onClick={() => setSelectedImageIndex(index)}
-                        className={`w-3 h-3 rounded-full transition-colors ${
-                          index === selectedImageIndex ? 'bg-[#8E5022]' : 'bg-gray-300'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                )}
+                        onClick={() => setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : selectedOrder.images.length - 1))}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                      >
+                        ‹
+                      </button>
+                      <button
+                        onClick={() => setSelectedImageIndex((prev) => (prev < selectedOrder.images.length - 1 ? prev + 1 : 0))}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                      >
+                        ›
+                      </button>
+                    </>
+                  )}
+                  {selectedOrder.images.length > 1 && (
+                    <div className="mt-4 flex justify-center space-x-2">
+                      {selectedOrder.images.map((_: string, index: number) => (
+                        <button
+                          key={index}
+                          onClick={() => setSelectedImageIndex(index)}
+                          className={`w-3 h-3 rounded-full transition-colors ${
+                            index === selectedImageIndex ? 'bg-[#8E5022]' : 'bg-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="p-6 overflow-y-auto">
+                  <h3 className="text-2xl font-bold serif text-[#442D1C] mb-2">{selectedOrder.name}</h3>
+                  <p className="text-[#652810]">{selectedOrder.description}</p>
+                </div>
               </div>
+              <button
+                onClick={() => setSelectedOrder(null)}
+                className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+              >
+                ✕
+              </button>
             </motion.div>
           </motion.div>
         )}
@@ -461,17 +460,23 @@ export default function CustomOrderPage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 2.5 }}
-          className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-4 sm:p-6 lg:p-10 shadow-xl border border-gray-100 relative overflow-hidden mx-4 sm:mx-0"
+          className="custom-form-card relative overflow-hidden mx-4 sm:mx-0"
         >
           {/* Decorative background elements */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#8E5022]/5 rounded-full -translate-y-16 translate-x-16"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#C85428]/5 rounded-full translate-y-12 -translate-x-12"></div>
+          <div className="absolute top-6 left-6 corner-icon flex items-center justify-center">
+            <FaFire className="text-red-600" />
+          </div>
+          <div className="absolute top-6 right-6 corner-icon flex items-center justify-center">
+            <FaLeaf className="text-green-600" />
+          </div>
 
           <motion.h2
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 2.7 }}
-            className="text-2xl sm:text-3xl lg:text-4xl font-bold serif text-[#442D1C] mb-6 sm:mb-8 lg:mb-10 text-center relative z-10"
+            className="form-title mb-6 sm:mb-8 lg:mb-10 text-center relative z-10"
           >
             Request Your Custom Piece
           </motion.h2>
@@ -481,11 +486,7 @@ export default function CustomOrderPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 2.8 }}
-            className={`border rounded-lg p-4 mb-6 text-center ${
-              status === "authenticated"
-                ? "bg-[#F9F7F2] border-[#EDD8B4]/50"
-                : "bg-red-50 border-red-200"
-            }`}
+            className="user-info-box mb-6 text-center"
           >
             {status === "authenticated" ? (
               <>
@@ -603,7 +604,7 @@ export default function CustomOrderPage() {
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ duration: 0.3, delay: index * 0.1 }}
-                      className="relative group"
+                      className="relative group bg-white rounded-xl"
                     >
                       <img
                         src={image}

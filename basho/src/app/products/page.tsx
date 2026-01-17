@@ -253,7 +253,7 @@ export default function ProductListing() {
   }, [selectedCategory, sortBy, debouncedSearchQuery]);
 
   return (
-    <div className="page-bg min-h-screen py-8 sm:py-12" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
+    <div className="page-bg min-h-screen py-8 sm:py-12 bg-cover bg-center bg-fixed" style={{backgroundImage: 'url(/images/i2.jpg)'}}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="text-center mb-8 sm:mb-12 lg:mb-16">
@@ -355,12 +355,12 @@ export default function ProductListing() {
                     <div className="relative image-frame">
                       <img
                         src={p.images?.[0] || '/images/placeholder.png'}
-                        className="w-full h-40 sm:h-48 rounded-[14px] object-cover transition-opacity transition-transform duration-500 group-hover:opacity-0 group-hover:scale-105"
+                        className="w-full h-40 sm:h-48 rounded-[14px] object-contain sm:object-cover bg-white transition-opacity transition-transform duration-500 group-hover:opacity-0 group-hover:scale-105"
                         alt={p.title}
                       />
                       <img
                         src={p.images?.[1] || p.images?.[0] || '/images/placeholder.png'}
-                        className="absolute top-0 left-0 w-full h-40 sm:h-48 rounded-[14px] object-cover opacity-0 transition-opacity transition-transform duration-500 group-hover:opacity-100 group-hover:scale-105"
+                        className="absolute top-0 left-0 w-full h-40 sm:h-48 rounded-[14px] object-contain sm:object-cover bg-white opacity-0 transition-opacity transition-transform duration-500 group-hover:opacity-100 group-hover:scale-105"
                         alt={p.title}
                       />
                       <div className="absolute top-3 right-3 z-10">
