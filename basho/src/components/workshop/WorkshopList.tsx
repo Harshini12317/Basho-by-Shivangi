@@ -279,7 +279,7 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
   }, []);
 
   return (
-    <div className="bg-[#F8F7F2] min-h-screen py-16 px-4 sm:px-8" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
+    <div className="bg-[#F8F7F2] min-h-screen py-16 px-4 sm:px-8 bg-cover bg-center bg-fixed" style={{backgroundImage: 'url(/images/i2.jpg)'}}>
       {popup && showPopup && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
           <div className="rounded-3xl bg-white shadow-2xl w-[92%] max-w-md overflow-hidden">
@@ -456,9 +456,7 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
                 <p className="mb-8 max-w-sm opacity-90">
                   Host a memorable creative gathering for birthdays, team building, or bridal showers.
                 </p>
-                <Link href="/contact" className="inline-block bg-[#E76F51] text-white px-8 py-3 rounded-full shadow-md hover:bg-[#D35400] transition-colors">
-                  Book Your Event
-                </Link>
+                
               </div>
             </div>
           </div>

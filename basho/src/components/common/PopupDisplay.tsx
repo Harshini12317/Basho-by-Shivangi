@@ -164,11 +164,15 @@ export default function PopupDisplay({ currentPage }: { currentPage: string }) {
 
   return (
     <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/70 animate-[overlayfade_.35s_ease]">
-      <div className="relative rounded-[22px] bg-white w-[62vw] max-w-3xl overflow-hidden" style={{ boxShadow: '0 16px 40px rgba(0,0,0,0.25), 0 40px 100px rgba(0,0,0,0.35)', animation: 'popup .35s ease' }}>
+      <div className="relative rounded-[22px] bg-white w-[92vw] sm:w-[80vw] md:w-[62vw] max-w-3xl overflow-hidden" style={{ boxShadow: '0 16px 40px rgba(0,0,0,0.25), 0 40px 100px rgba(0,0,0,0.35)', animation: 'popup .35s ease' }}>
         <button
-          onClick={() => {
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
             setShowPopup(false);
-            markSeen(popup);
+            setTimeout(() => {
+              if (popup) markSeen(popup);
+            }, 0);
           }}
           className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/85 backdrop-blur-md shadow-lg ring-2 ring-[#E2C48D] flex items-center justify-center text-[#6A2424] transition hover:scale-105 z-20"
           aria-label="Close"
@@ -176,16 +180,16 @@ export default function PopupDisplay({ currentPage }: { currentPage: string }) {
           <span className="text-2xl leading-none transition-transform hover:rotate-90">×</span>
         </button>
         {currentImg ? (
-          <div className="group relative w-full h-[46vh] md:h-[58vh] px-6 pt-6">
-            <div className="relative w-full h-full rounded-xl overflow-hidden ring-1 ring-[#E2C48D]/50 shadow-md bg-white/5">
-              <img src={currentImg} alt="" className="w-full h-full object-cover transition-transform duration-400 ease-out hover:scale-[1.04] animate-[imgfade_.4s_ease]" />
+          <div className="group relative w-full h-[46vh] sm:h-[54vh] md:h-[60vh] px-4 sm:px-6 pt-6">
+            <div className="relative w-full h-full rounded-xl overflow-hidden ring-1 ring-[#E2C48D]/50 shadow-md bg-white">
+              <img src={currentImg} alt="" className="w-full h-full object-contain transition-transform duration-400 ease-out hover:scale-[1.02] animate-[imgfade_.4s_ease]" />
               <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.0) 60%)' }} />
             </div>
             <div className="absolute bottom-4 right-8 px-2.5 py-1 rounded-full bg-black/40 text-white text-xs backdrop-blur-sm">
               {imgIndex + 1} / {images.length}
             </div>
             {images.length > 1 && (
-              <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4">
+              <div className="pointer-events-none absolute inset-y-0 left-0 right-0 flex items-center justify-between px-1 sm:px-3 md:px-4">
                 <button
                   onClick={() => setImgIndex((idx) => (idx - 1 + images.length) % images.length)}
                   className="pointer-events-auto w-9 h-9 rounded-full bg-white/85 backdrop-blur-md shadow-lg ring-2 ring-[#E2C48D] text-[#6A2424] flex items-center justify-center transition hover:scale-105 hover:bg-white"
