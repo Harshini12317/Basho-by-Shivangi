@@ -37,15 +37,28 @@
   width: 100%;
 }
 
+.ts-section-title::before {
+  content: '';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 3px;
+  background: var(--c-3);
+  opacity: 0.85;
+}
+
 .ts-section-title::after {
   content: '';
   position: absolute;
   bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
-  width: 50px;
-  height: 2px;
+  width: 64px;
+  height: 3px;
   background: var(--c-3);
+  opacity: 0.85;
 }
 
 /* Video Zigzag */
@@ -123,6 +136,7 @@
   justify-content: center;
   max-width: 850px;
   width: 100%;
+  overflow: hidden;
 }
 
 .ts-slider-wrapper {
@@ -140,12 +154,17 @@
   align-items: center;
   gap: 2rem;
   flex-grow: 1;
+  width: 100%;
 }
 
 .ts-slide-image-box {
   width: clamp(150px, 25vw, 280px);
   height: clamp(150px, 25vw, 280px);
   flex-shrink: 0;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ts-slide-image-box img {
@@ -203,16 +222,38 @@
     padding: 2rem 1rem;
     min-height: 520px;
     max-width: 95%;
+    overflow: hidden;
   }
   .ts-slider-wrapper {
     gap: 1rem;
   }
   .ts-slider-main {
     gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
   .ts-slide-image-box {
     width: clamp(140px, 42vw, 220px);
     height: clamp(140px, 42vw, 220px);
+    margin: 0 auto;
+    align-self: center;
+  }
+  .ts-slide-text-box{
+    padding: 1rem;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+  .ts-rating{
+    justify-content: center;
+  }
+  .ts-quote-text{
+    text-align: center;
+  }
+  .ts-author-info{
+    text-align: center;
   }
   .ts-nav-btn {
     width: 40px;
@@ -224,14 +265,32 @@
   .ts-slider-section {
     padding: 1.25rem 0.75rem;
     min-height: 440px;
+    overflow: hidden;
+  }
+  .ts-slider-main{
+    min-height: 320px;
+    justify-content: center;
   }
   .ts-slide-image-box {
     width: clamp(120px, 60vw, 200px);
     height: clamp(120px, 60vw, 200px);
+    margin: 0 auto;
   }
   .ts-slide-image-box img {
     object-fit: contain;
+    object-position: center;
     background: #fff;
+  }
+  .ts-slide-text-box{
+    padding: 0.75rem;
+    align-items: center;
+    text-align: center;
+  }
+  .ts-rating{
+    justify-content: center;
+  }
+  .ts-author-info{
+    text-align: center;
   }
   .ts-nav-btn {
     width: 38px;
@@ -668,8 +727,8 @@
 .ts-text-reviews-section {
   padding: 3rem 0;
   margin: 3rem 0;
-  border-top: 1px solid var(--muted);
-  border-bottom: 1px solid var(--muted);
+  border-top: 2px solid var(--c-3);
+  border-bottom: 2px solid var(--c-3);
 }
 
 .ts-text-carousel-wrapper {

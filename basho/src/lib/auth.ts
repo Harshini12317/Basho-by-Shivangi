@@ -21,6 +21,16 @@ export const authOptions: NextAuthOptions = {
     signIn: "/auth",
     error: "/auth",
   },
+  
+  logger: {
+    error(code: unknown, ...metadata: unknown[]) {
+      if (code === 'CLIENT_FETCH_ERROR') return;
+      console.error(code, ...metadata);
+    },
+    warn(code: unknown, ...metadata: unknown[]) {
+      console.warn(code, ...metadata);
+    },
+  } as any,
 
   session: {
     strategy: "jwt",
