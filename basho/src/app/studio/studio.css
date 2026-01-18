@@ -21,3 +21,17 @@
 .studio-btn{ display:inline-flex; align-items:center; justify-content:center; padding:.6rem 1rem; border-radius:10px; border:1px solid rgba(42,31,23,0.12); background:#fff; color:#3d2b1f; font-weight:700; box-shadow:0 6px 16px rgba(0,0,0,0.06) }
 .studio-btn.primary{ background:var(--text-primary); color:#fff; border-color:transparent }
 .studio-btn:hover{ transform:translateY(-2px); box-shadow:0 12px 28px rgba(0,0,0,0.1) }
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .studio-content{ padding-top:0.25rem; padding-bottom:1rem }
+  .studio-chip{ font-size:.875rem; padding:.4rem .8rem }
+  .studio-card{ padding:.85rem; border-radius:18px }
+  .studio-grid{ grid-template-columns: 1fr; gap:1rem }
+  .studio-map{ order:0; width:100% }
+  .studio-info{ order:1 }
+  .studio-map .map-embed{ padding-bottom:75%; min-height:280px; border-radius:12px }
+  .studio-info .info-card{ padding:1rem; border-radius:12px }
+  .studio-info h2{ font-size:1.125rem }
+  .studio-sub{ padding:0 0.5rem }
+}

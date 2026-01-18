@@ -403,6 +403,10 @@
   .auth-container.active .signup {
     transform: translateX(0);
   }
+
+  /* Show only the active panel on mobile */
+  .auth-container.active .login { display: none; }
+  .auth-container:not(.active) .signup { display: none; }
 }
 
 @media (max-width: 640px) {

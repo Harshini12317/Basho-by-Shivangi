@@ -47,10 +47,14 @@
   text-align: center;
   font-style: italic;
 
+  max-width: 70%;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  line-height: 1.4;
+
   pointer-events: none;
   z-index: 2;
   text-shadow: 0 2px 8px rgba(42, 31, 23, 0.08);
-  white-space: nowrap;
 }
 
 /* ===============================
@@ -89,12 +93,26 @@
 }
 @media (max-width: 768px) {
   .gsap-slider-section {
-    min-height: 110vh;
-    padding: 100px 0;
+    min-height: 90vh;
+    padding: 80px 0;
   }
 
   .gsap-slider-circle {
-    margin-top: 40px;
-    margin-bottom: 40px;
+    width: min(90vw, 360px);
+    height: min(90vw, 360px);
+    margin-top: 32px;
+    margin-bottom: 32px;
+  }
+
+  .gsap-slider-card {
+    width: clamp(90px, 32vw, 150px);
+    height: clamp(120px, 40vw, 200px);
+    border-radius: 16px;
+  }
+
+  .gsap-slider-text {
+    font-size: clamp(1rem, 4vw, 1.6rem);
+    max-width: 80%;
+    padding: 0 1rem;
   }
 }

@@ -503,8 +503,11 @@ export default function CustomOrderPage() {
           >
             {status === "authenticated" ? (
               <>
-                <p className="text-[#442D1C] font-semibold">
-                  Logged in as: <span className="text-[#8E5022]">{session?.user?.email}</span>
+                <p className="text-[#442D1C] font-semibold break-words max-w-xs mx-auto text-sm sm:text-base">
+                  Logged in as:
+                  <span className="text-[#8E5022] block sm:inline mt-1 sm:mt-0 break-words">
+                    {session?.user?.email}
+                  </span>
                 </p>
                 <p className="text-sm text-[#652810] mt-1">Your email and name will be used for this custom order request.</p>
               </>
@@ -602,7 +605,7 @@ export default function CustomOrderPage() {
                       setCustomOrderForm({ ...customOrderForm, referenceImages: urls });
                     }
                   }}
-                  className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl focus:border-[#C46A2B] focus:outline-none transition-all duration-300 bg-gray-50 hover:bg-gray-100 focus:bg:white file:mr-4 file:py-3 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#C46A2B] file:text-white hover:file:bg-[#D98557] file:transition-colors file:cursor-pointer"
+                  className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl focus:border-[#C46A2B] focus:outline-none transition-all duration-300 bg-gray-50 hover:bg-gray-100 focus:bg:white file:w-full sm:file:w-auto file:py-3 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#C46A2B] file:text-white hover:file:bg-[#D98557] file:transition-colors file:cursor-pointer file:text-center"
                 />
               </div>
               {customOrderForm.referenceImages.length > 0 && (

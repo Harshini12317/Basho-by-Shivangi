@@ -34,6 +34,8 @@ export default function GsapSlider() {
   const [sliderImages, setSliderImages] = useState<SliderImage[]>(DEFAULT_SLIDER_IMAGES);
   const phrases = ["Welcome to Basho!!", "Each piece is handcrafted with passion and care.", "Discover timeless pottery..", "We celebrate the beauty of imperfection in clay.", "Custom creations made for you.", "Feel the joy of handmade pottery.", "Crafted by skilled hands.", "Transform your space with bespoke ceramics.", "Where tradition meets contemporary design.", "Every piece tells a unique story.", "Bringing pottery into your everyday moments.", "Creating heirlooms meant to be cherished forever."];
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
+  const typingTimeoutRef = useRef<number | null>(null);
+  const phraseTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     // Fetch home page content to get dynamic images
@@ -57,44 +59,50 @@ export default function GsapSlider() {
   }, []);
 
   useEffect(() => {
+    let index = 0;
+    const fullText = phrases[currentPhraseIndex];
+
+    const typeWriter = () => {
+      if (index < fullText.length) {
+        setTypedText(fullText.slice(0, index + 1));
+        index += 1;
+        typingTimeoutRef.current = window.setTimeout(typeWriter, 150);
+      } else {
+        phraseTimeoutRef.current = window.setTimeout(() => {
+          setCurrentPhraseIndex((prev) => (prev + 1) % phrases.length);
+        }, 1500);
+      }
+    };
+
+    typeWriter();
+
+    return () => {
+      if (typingTimeoutRef.current !== null) {
+        window.clearTimeout(typingTimeoutRef.current);
+      }
+      if (phraseTimeoutRef.current !== null) {
+        window.clearTimeout(phraseTimeoutRef.current);
+      }
+    };
+  }, [currentPhraseIndex, phrases.length]);
+
+  useEffect(() => {
     if (!wrapperRef.current) return;
 
     const wrapper = wrapperRef.current;
     const cards = cardsRef.current;
     const total = cards.length;
 
-    /* Typewriter effect */
-    let index = 0;
-    const fullText = phrases[currentPhraseIndex];
-    
-    const typeWriter = () => {
-      if (index < fullText.length) {
-        setTypedText(fullText.slice(0, index + 1));
-        index++;
-        setTimeout(typeWriter, 150);
-      } else {
-        // When complete, wait 1.5 seconds then move to next phrase
-        setTimeout(() => {
-          index = 0;
-          setCurrentPhraseIndex((prev) => (prev + 1) % phrases.length);
-        }, 1500);
-      }
-    };
-    typeWriter();
-
-    /* ---------------- STATE ---------------- */
     const state = {
       rotation: 0,
       dragRotation: 0,
     };
 
-    /* ---------------- RADIUS ---------------- */
     const getRadius = () => {
       const size = wrapper.offsetWidth;
       return size / 2.4;
     };
 
-    /* ---------------- UPDATE ---------------- */
     const update = () => {
       const radius = getRadius();
 
@@ -117,7 +125,6 @@ export default function GsapSlider() {
 
     update();
 
-    /* ---------------- SCROLL ---------------- */
     const scrollTrigger = ScrollTrigger.create({
       trigger: wrapper,
       start: "top bottom",
@@ -129,7 +136,6 @@ export default function GsapSlider() {
       },
     });
 
-    /* ---------------- TOUCH ---------------- */
     let startX = 0;
 
     const handleTouchStart = (e: TouchEvent) => {
@@ -155,11 +161,9 @@ export default function GsapSlider() {
     wrapper.addEventListener("touchmove", handleTouchMove);
     wrapper.addEventListener("touchend", handleTouchEnd);
 
-    /* ---------------- RESIZE (THIS WAS MISSING) ---------------- */
     const handleResize = () => update();
     window.addEventListener("resize", handleResize);
 
-    /* ---------------- CLEANUP ---------------- */
     return () => {
       scrollTrigger.kill();
 

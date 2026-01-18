@@ -51,7 +51,7 @@ export default function Home() {
               </p>
               
               <h1 className="hero-title text-4xl sm:text-5xl lg:text-6xl font-serif font-bold leading-tight text-[var(--text-primary)] mb-6 sm:mb-8">
-                Multipurpose Ceramic<br className="hidden sm:block" />Dotted Kitchen
+                Multipurpose <br className="hidden sm:block" />Ceramic Curations
               </h1>
               
               <p className="hero-body mt-6 text-base sm:text-lg leading-relaxed text-[var(--text-muted)] max-w-md mx-auto lg:mx-0 mb-8 sm:mb-10">

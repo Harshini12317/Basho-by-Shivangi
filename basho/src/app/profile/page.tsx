@@ -500,9 +500,9 @@ export default function ProfilePage() {
               <div className="flex-1">
                 <h1 className="text-3xl lg:text-5xl xl:text-5xl font-serif font-bold text-[#4A2C1D] mb-3 leading-tight tracking-tight">{userName}</h1>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                  <p className="text-[#6B3F2B] font-semibold flex items-center gap-2 text-sm">
+                  <p className="text-[#6B3F2B] font-semibold flex items-center gap-2 text-xs sm:text-sm min-w-0">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#9DB8A0] animate-pulse"></span>
-                    <span className="font-mono">{userEmail}</span>
+                    <span className="font-mono truncate max-w-[60vw] sm:max-w-none">{userEmail}</span>
                   </p>
                   <div className="hidden sm:block text-[#EAD2B8]">•</div>
                   <p className="text-[#C46A2B]/80 text-sm font-medium">Member since {new Date().getFullYear()}</p>

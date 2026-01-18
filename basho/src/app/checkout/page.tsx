@@ -416,56 +416,56 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen py-16" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
-      <div className="max-w-6xl mx-auto p-8">
-        <h1 className="text-5xl font-bold text-[#442D1C] mb-10 text-center" style={{ fontFamily: 'Inter, sans-serif' }}>Order Summary & Payment</h1>
-        <div className="w-16 h-1 bg-[#EDD8B4] mx-auto mb-8"></div>
+    <div className="min-h-screen py-10 sm:py-16" style={{backgroundImage: 'url(/images/i2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed'}}>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#442D1C] mb-6 sm:mb-10 text-center" style={{ fontFamily: 'Inter, sans-serif' }}>Order Summary & Payment</h1>
+        <div className="w-16 h-1 bg-[#EDD8B4] mx-auto mb-6 sm:mb-8"></div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-[56px]">
-          <div className="bg-gradient-to-br from-white via-[#F9F7F2]/50 to-white/95 elegant-rounded-2xl p-10 shadow-2xl border-2 border-[#EDD8B4] clay-morphism">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-[56px]">
+          <div className="bg-gradient-to-br from-white via-[#F9F7F2]/50 to-white/95 elegant-rounded-2xl p-6 sm:p-8 lg:p-10 shadow-2xl border-2 border-[#EDD8B4] clay-morphism">
             <h2 className="text-2xl font-semibold text-[#442D1C] mb-6">Order Summary</h2>
             {checkoutItems.map((item) => {
               const product = products.find(p => p && p.slug === item.productSlug);
               return (
-                <div key={item.productSlug} className="flex items-center mb-6 p-5 bg-[#EDD8B4]/30 elegant-rounded-xl border border-[#8E5022]/20 clay-morphism hover-lift">
+                <div key={item.productSlug} className="flex flex-col sm:flex-row sm:flex-nowrap items-start sm:items-center mb-6 p-4 sm:p-5 bg-[#EDD8B4]/30 elegant-rounded-xl border border-[#8E5022]/20 clay-morphism hover-lift">
                   {product && (
                     <img
                       src={product.images?.[0] || '/images/product1.png'}
-                      className="w-24 h-24 object-cover elegant-rounded-lg border-2 border-white shadow-md mr-5"
+                      className="w-20 h-20 sm:w-24 sm:h-24 object-cover elegant-rounded-lg border-2 border-white shadow-md mr-5"
                       alt={product.title}
                     />
                   )}
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-[#442D1C] text-lg tracking-tight">{product?.title || `Product ${item.productSlug}`}</h3>
-                    <div className="flex items-center gap-3 mt-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-[#442D1C] text-sm sm:text-lg tracking-tight break-words">{product?.title || `Product ${item.productSlug}`}</h3>
+                    <div className="flex items-center gap-2 sm:gap-3 mt-3 flex-wrap">
                       <button
                         onClick={() => updateQuantity(item.productSlug, item.qty - 1)}
-                        className="w-10 h-10 bg-[#8E5022] text-white rounded-full flex items-center justify-center hover:bg-[#652810] transition-all shadow-sm hover:-translate-y-[1px] active:scale-[0.98]"
+                        className="w-8 h-8 sm:w-10 sm:h-10 bg-[#8E5022] text-white rounded-full flex items-center justify-center hover:bg-[#652810] transition-all shadow-sm hover:-translate-y-[1px] active:scale-[0.98]"
                       >
                         <FaMinus className="w-3.5 h-3.5" />
                       </button>
-                      <span className="text-[#652810] font-semibold min-w-[2.5rem] text-center">{item.qty}</span>
+                      <span className="text-[#652810] font-semibold min-w-[2rem] sm:min-w-[2.5rem] text-center">{item.qty}</span>
                       <button
                         onClick={() => updateQuantity(item.productSlug, item.qty + 1)}
-                        className="w-10 h-10 bg-[#8E5022] text-white rounded-full flex items-center justify-center hover:bg-[#652810] transition-all shadow-sm hover:-translate-y-[1px] active:scale-[0.98]"
+                        className="w-8 h-8 sm:w-10 sm:h-10 bg-[#8E5022] text-white rounded-full flex items-center justify-center hover:bg-[#652810] transition-all shadow-sm hover:-translate-y-[1px] active:scale-[0.98]"
                       >
                         <FaPlus className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => removeItem(item.productSlug)}
-                        className="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-all ml-2 shadow-sm hover:-translate-y-[1px] active:scale-[0.98]"
+                        className="w-8 h-8 sm:w-10 sm:h-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-all ml-2 shadow-sm hover:-translate-y-[1px] active:scale-[0.98]"
                       >
                         <FaTrash className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    <p className="text-[#8E5022] font-medium text-sm mt-3">₹{item.price.toFixed(2)} each</p>
+                    <p className="text-[#8E5022] font-medium text-xs sm:text-sm mt-3">₹{item.price.toFixed(2)} each</p>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          <div className="bg-gradient-to-br from-white via-[#F9F7F2]/50 to-white/95 elegant-rounded-2xl p-10 shadow-2xl border-2 border-[#EDD8B4] clay-morphism">
+          <div className="bg-gradient-to-br from-white via-[#F9F7F2]/50 to-white/95 elegant-rounded-2xl p-6 sm:p-8 lg:p-10 shadow-2xl border-2 border-[#EDD8B4] clay-morphism mt-2 lg:mt-0">
             <h2 className="text-2xl font-semibold text-[#442D1C] mb-6">Customer Details</h2>
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="space-y-4">
