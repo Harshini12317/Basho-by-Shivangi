@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { FiSearch, FiShoppingBag, FiMenu, FiX, FiPhone } from "react-icons/fi";
-import { FaInstagram } from "react-icons/fa";
-import { MdAccountCircle, MdHistory, MdFavoriteBorder, MdSettings, MdLogout, MdAdminPanelSettings, MdHome, MdInfo, MdLocalShipping, MdSchool, MdEdit, MdRateReview, MdPhotoLibrary, MdBusiness } from "react-icons/md";
+import { FaInstagram, FaUser } from "react-icons/fa";
+import { MdHistory, MdFavoriteBorder, MdSettings, MdLogout, MdAdminPanelSettings, MdHome, MdInfo, MdLocalShipping, MdSchool, MdEdit, MdRateReview, MdPhotoLibrary, MdBusiness } from "react-icons/md";
 import { useSession, signOut } from "next-auth/react";
 import "./Navbar.css";
 
@@ -162,7 +162,7 @@ export default function Navbar() {
 
     <div className="nav-links right-links">
       <Link href="/products">Products</Link>
-      <Link href="/corporate">Corporate Inquiries</Link>
+      <Link href="/testimonial">Testimonials</Link>
       <Link href="/workshop">Workshop</Link>
     </div>
 
@@ -172,7 +172,7 @@ export default function Navbar() {
  <div className="nav-icons">
   {session ? (
     <Link href="/profile" aria-label="Profile">
-      <MdAccountCircle />
+      <FaUser />
     </Link>
   ) : (
     <Link href="/auth" aria-label="Login" className="nav-login-text">
@@ -205,15 +205,15 @@ export default function Navbar() {
           <>
             {session ? (
               <Link href="/profile" className="menu-item" onClick={() => setMenuOpen(false)}>
-                <MdAccountCircle /> Profile
+                <FaUser /> Profile
               </Link>
             ) : (
               <Link href="/auth" className="menu-item" onClick={() => setMenuOpen(false)}>
-                <MdAccountCircle /> Login
+                <FaUser /> Login
               </Link>
             )}
-            <Link href="/testimonial" className="menu-item" onClick={() => setMenuOpen(false)}>
-              <MdRateReview /> Testimonials
+            <Link href="/corporate" className="menu-item" onClick={() => setMenuOpen(false)}>
+              <MdBusiness /> Corporate Inquiries
             </Link>
             <Link href="/gallery" className="menu-item" onClick={() => setMenuOpen(false)}>
               <MdPhotoLibrary /> Gallery
@@ -258,11 +258,11 @@ export default function Navbar() {
             <Link href="/custom-order" className="menu-item" onClick={() => setMenuOpen(false)}>
               <MdEdit /> Custom order
             </Link>
-            <Link href="/testimonial" className="menu-item" onClick={() => setMenuOpen(false)}>
-              <MdRateReview /> Testimonials
-            </Link>
             <Link href="/corporate" className="menu-item" onClick={() => setMenuOpen(false)}>
               <MdBusiness /> Corporate Inquiries
+            </Link>
+            <Link href="/testimonial" className="menu-item" onClick={() => setMenuOpen(false)}>
+              <MdRateReview /> Testimonials
             </Link>
             <Link href="/gallery" className="menu-item" onClick={() => setMenuOpen(false)}>
               <MdPhotoLibrary /> Gallery

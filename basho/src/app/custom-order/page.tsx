@@ -8,6 +8,12 @@ import { FaFire, FaLeaf } from "react-icons/fa";
 export default function CustomOrderPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const i3Fallbacks = ["/images/i3.jpeg", "/images/i3.jpg", "/images/i3.png", "/images/img3.png", "/images/common.png"];
+  const i4Fallbacks = ["/images/i4.jpeg", "/images/i4.jpg", "/images/i4.png", "/images/img4.png", "/images/common3.png"];
+  const [i3Index, setI3Index] = useState(0);
+  const [i4Index, setI4Index] = useState(0);
+  const i3Src = i3Fallbacks[i3Index];
+  const i4Src = i4Fallbacks[i4Index];
   const [customOrderForm, setCustomOrderForm] = useState({
     phone: "",
     description: "",
@@ -50,6 +56,8 @@ export default function CustomOrderPage() {
     }
     return true;
   };
+
+ 
 
   const handleCustomOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -455,24 +463,29 @@ export default function CustomOrderPage() {
           </motion.div>
         )}
 
-        {/* Custom Order Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 2.5 }}
-          className="custom-form-card relative overflow-hidden mx-4 sm:mx-0"
-        >
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#8E5022]/5 rounded-full -translate-y-16 translate-x-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#C85428]/5 rounded-full translate-y-12 -translate-x-12"></div>
-          <div className="absolute top-6 left-6 corner-icon flex items-center justify-center">
-            <FaFire className="text-red-600" />
-          </div>
-          <div className="absolute top-6 right-6 corner-icon flex items-center justify-center">
-            <FaLeaf className="text-green-600" />
+        {/* Two-column layout: image on left, form on right */}
+        <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-8 items-start mx-4 sm:mx-0">
+          <div className="flex justify-center md:justify-start">
+            <img src="/images/d.png" alt="Handcrafted Creations" className="w-full max-w-[260px] md:max-w-[280px] h-auto drop-shadow-xl" />
           </div>
 
-          <motion.h2
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 2.5 }}
+            className="custom-form-card relative overflow-hidden"
+          >
+            {/* Decorative background elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#8E5022]/5 rounded-full -translate-y-16 translate-x-16"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#C85428]/5 rounded-full translate-y-12 -translate-x-12"></div>
+            <div className="absolute top-6 left-6 corner-icon flex items-center justify-center">
+              <FaFire className="text-red-600" />
+            </div>
+            <div className="absolute top-6 right-6 corner-icon flex items-center justify-center">
+              <FaLeaf className="text-green-600" />
+            </div>
+
+            <motion.h2
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 2.7 }}
@@ -503,7 +516,7 @@ export default function CustomOrderPage() {
             )}
           </motion.div>
 
-          <form onSubmit={handleCustomOrderSubmit} className="space-y-6 sm:space-y-8 relative z-10">
+            <form onSubmit={handleCustomOrderSubmit} className="space-y-6 sm:space-y-8 relative z-10">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -589,7 +602,7 @@ export default function CustomOrderPage() {
                       setCustomOrderForm({ ...customOrderForm, referenceImages: urls });
                     }
                   }}
-                  className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl focus:border-[#8E5022] focus:outline-none transition-all duration-300 bg-gray-50 hover:bg-gray-100 focus:bg-white file:mr-4 file:py-3 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#8E5022] file:text-white hover:file:bg-[#652810] file:transition-colors file:cursor-pointer"
+                  className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl focus:border-[#C46A2B] focus:outline-none transition-all duration-300 bg-gray-50 hover:bg-gray-100 focus:bg:white file:mr-4 file:py-3 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#C46A2B] file:text-white hover:file:bg-[#D98557] file:transition-colors file:cursor-pointer"
                 />
               </div>
               {customOrderForm.referenceImages.length > 0 && (
@@ -608,7 +621,7 @@ export default function CustomOrderPage() {
                     >
                       <img
                         src={image}
-                      className="w-full aspect-square object-cover rounded-lg sm:rounded-xl border-2 border-gray-200 shadow-sm group-hover:shadow-md transition-shadow duration-300"
+                        className="w-full aspect-square object-cover rounded-lg sm:rounded-xl border-2 border-gray-200 shadow-sm group-hover:shadow-md transition-shadow duration-300"
                         alt={`Reference ${index + 1}`}
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-xl transition-colors duration-300"></div>
@@ -630,7 +643,7 @@ export default function CustomOrderPage() {
                 type="submit"
                 onClick={() => handleFormFieldInteraction()}
                 disabled={isSubmitting}
-                className="inline-flex items-center justify-center gap-2 sm:gap-3 bg-[#8E5022] hover:bg-[#652810] text-white py-3 sm:py-4 px-4 sm:px-6 rounded-lg font-semibold text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-60 w-full sm:w-auto"
+                className="inline-flex items-center justify-center gap-2 sm:gap-3 bg-[#C46A2B] hover:bg-[#D98557] text-white py-3 sm:py-4 px-4 sm:px-6 rounded-lg font-semibold text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-60 w-full sm:w-auto"
               >
                 {isSubmitting ? (
                   <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24">
@@ -642,8 +655,9 @@ export default function CustomOrderPage() {
               </motion.button>
               <p className="text-gray-500 text-sm mt-4">We&apos;ll get back to you within 24-48 hours</p>
             </motion.div>
-          </form>
-        </motion.div>
+            </form>
+          </motion.div>
+        </div>
           </>
         )}
       </div>

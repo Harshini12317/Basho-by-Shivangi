@@ -11,17 +11,17 @@ const products = [
   {
     title: "Tableware",
     description: "Hand-thrown bowls, plates, cups designed for daily use",
-    image: "/images/pottery-hero.png"
+    image: "/images/table.jpeg"
   },
   {
     title: "Custom Pottery",
     description: "Bespoke pieces created just for you",
-    image: "/images/pottery-hero.png"
+    image: "/images/p2.jpeg"
   },
   {
     title: "Limited Editions",
     description: "Seasonal releases with experimental glazes",
-    image: "/images/pottery-hero.png"
+    image: "/images/p1.jpeg"
   }
 ];
 

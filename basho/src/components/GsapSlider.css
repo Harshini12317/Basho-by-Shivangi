@@ -5,8 +5,7 @@
   position: relative;
   min-height: 160vh;          /* ⬅ MORE SPACE */
   width: 100%;
-  background: var(--bg-primary);
-  background-color:#f7eada;
+  background: transparent;
   padding: 160px 0;           /* ⬅ TOP & BOTTOM SAFETY */
   overflow: visible;
 }
