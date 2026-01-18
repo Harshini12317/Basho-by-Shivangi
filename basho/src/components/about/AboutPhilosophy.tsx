@@ -30,7 +30,7 @@ export default function AboutPhilosophy() {
       <div className="philosophy-container">
         <h2>The Philosophy of Basho</h2>
         <div className="philosophy-image">
-          <img src="/images/bashostory1.jpg" alt="Basho Philosophy" />
+          <img src="/images/bashostory2.jpg" alt="Basho Philosophy" />
         </div>
       </div>
     </section>

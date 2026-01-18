@@ -527,7 +527,8 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
                   </div>
                 </div>
               ))}
-            </>
+              </>
+            </div>
           ) : (
             <div className="text-center py-12">
               <p className="text-slate-500 text-lg">No items available at the moment.</p>

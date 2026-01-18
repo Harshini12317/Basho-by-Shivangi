@@ -41,7 +41,7 @@ export default function AboutTeamSlider() {
           <h2>Meet Our Founder</h2>
         </div>
         <div className="founder-story-image">
-          <img src="/images/bashostory2.jpg" alt="Basho Founder Story" />
+          <img src="/images/bashostory1.jpg" alt="Basho Founder Story" />
         </div>
       </div>
     </section>
