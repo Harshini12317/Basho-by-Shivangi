@@ -9,6 +9,14 @@ import { authOptions } from '@/lib/auth';
 import { generateInvoicePDF } from '@/lib/invoice-pdf';
 import { validateGST } from '@/lib/gst-validation';
 
+// Helper function to handle background tasks without blocking response
+function scheduleBackgroundTask(fn: () => Promise<void>) {
+  // Use setImmediate to run after the response is sent
+  setImmediate(() => {
+    fn().catch(err => console.error('Background task failed:', err));
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const {
@@ -18,7 +26,7 @@ export async function POST(request: NextRequest) {
       orderDetails
     } = await request.json();
 
-    // Verify payment signature
+    // Verify payment signature (this is critical and must complete)
     const sign = razorpay_order_id + '|' + razorpay_payment_id;
     const expectedSign = crypto
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
@@ -55,25 +63,29 @@ export async function POST(request: NextRequest) {
           await registration.save();
           console.log('Registration saved:', registration._id);
 
-          // Send success email for workshop registration
-          try {
-            await sendPaymentSuccessEmail(
-              orderDetails.customer.email,
-              {
-                orderId: razorpay_order_id,
-                amount: orderDetails.totalAmount,
-                items: [{
-                  name: orderDetails.workshop,
-                  price: orderDetails.totalAmount,
-                  qty: orderDetails.members,
-                }],
-              },
-              razorpay_payment_id
-            );
-          } catch (emailError) {
-            console.error('Error sending email:', emailError);
-          }
+          // Schedule email sending as background task
+          scheduleBackgroundTask(async () => {
+            try {
+              await sendPaymentSuccessEmail(
+                orderDetails.customer.email,
+                {
+                  orderId: razorpay_order_id,
+                  amount: orderDetails.totalAmount,
+                  items: [{
+                    name: orderDetails.workshop,
+                    price: orderDetails.totalAmount,
+                    qty: orderDetails.members,
+                  }],
+                },
+                razorpay_payment_id
+              );
+              console.log('Workshop registration email sent successfully');
+            } catch (emailError) {
+              console.error('Error sending registration email:', emailError);
+            }
+          });
 
+          // Return success immediately without waiting for email
           return NextResponse.json(
             { success: true, message: 'Workshop registration completed successfully' },
             { status: 200 }
@@ -130,65 +142,72 @@ export async function POST(request: NextRequest) {
             await order.save();
             console.log('Order saved:', order._id);
 
-            // Generate and send PDF invoice if GST is provided and valid
-            const gstNumber = orderDetails.customer.gstNumber;
-            const isGSTValid = gstNumber && validateGST(gstNumber);
-
-            if (isGSTValid) {
+            // Schedule PDF generation and email sending as background task
+            scheduleBackgroundTask(async () => {
               try {
-                // Fetch HSN code from static data
-                const staticData = await StaticData.findOne();
-                const hsnCode = staticData?.hsnCode || '';
+                // Generate and send PDF invoice if GST is provided and valid
+                const gstNumber = orderDetails.customer.gstNumber;
+                const isGSTValid = gstNumber && validateGST(gstNumber);
 
-                const pdfBuffer = await generateInvoicePDF({
-                  ...order.toObject(),
-                  razorpayOrderId: razorpay_order_id,
-                  paymentId: razorpay_payment_id,
-                  customer: orderDetails.customer,
-                  items: orderDetails.items,
-                  totalAmount: orderDetails.totalAmount,
-                  subtotal: orderDetails.subtotal,
-                  shippingAmount: orderDetails.shippingAmount,
-                  gstAmount: orderDetails.gstAmount,
-                  hsnCode,
-                });
+                if (isGSTValid) {
+                  try {
+                    // Fetch HSN code from static data
+                    const staticData = await StaticData.findOne();
+                    const hsnCode = staticData?.hsnCode || '';
 
-                // Send invoice email with PDF attachment
-                await sendPaymentSuccessEmail(
-                  orderDetails.customer.email,
-                  {
-                    ...orderDetails,
-                    orderId: razorpay_order_id,
-                    amount: orderDetails.totalAmount,
-                    pdfInvoice: pdfBuffer,
-                  },
-                  razorpay_payment_id
-                );
-              } catch (pdfError) {
-                console.error('Error generating/sending PDF invoice:', pdfError);
-                // Send regular email if PDF fails
-                await sendPaymentSuccessEmail(
-                  orderDetails.customer.email,
-                  {
-                    ...orderDetails,
-                    orderId: razorpay_order_id,
-                    amount: orderDetails.totalAmount
-                  },
-                  razorpay_payment_id
-                );
+                    const pdfBuffer = await generateInvoicePDF({
+                      ...order.toObject(),
+                      razorpayOrderId: razorpay_order_id,
+                      paymentId: razorpay_payment_id,
+                      customer: orderDetails.customer,
+                      items: orderDetails.items,
+                      totalAmount: orderDetails.totalAmount,
+                      subtotal: orderDetails.subtotal,
+                      shippingAmount: orderDetails.shippingAmount,
+                      gstAmount: orderDetails.gstAmount,
+                      hsnCode,
+                    });
+
+                    // Send invoice email with PDF attachment
+                    await sendPaymentSuccessEmail(
+                      orderDetails.customer.email,
+                      {
+                        ...orderDetails,
+                        orderId: razorpay_order_id,
+                        amount: orderDetails.totalAmount,
+                        pdfInvoice: pdfBuffer,
+                      },
+                      razorpay_payment_id
+                    );
+                  } catch (pdfError) {
+                    console.error('Error generating/sending PDF invoice:', pdfError);
+                    // Send regular email if PDF fails
+                    await sendPaymentSuccessEmail(
+                      orderDetails.customer.email,
+                      {
+                        ...orderDetails,
+                        orderId: razorpay_order_id,
+                        amount: orderDetails.totalAmount
+                      },
+                      razorpay_payment_id
+                    );
+                  }
+                } else {
+                  // Send regular confirmation email
+                  await sendPaymentSuccessEmail(
+                    orderDetails.customer.email,
+                    {
+                      ...orderDetails,
+                      orderId: razorpay_order_id,
+                      amount: orderDetails.totalAmount
+                    },
+                    razorpay_payment_id
+                  );
+                }
+              } catch (error) {
+                console.error('Error in background email/PDF task:', error);
               }
-            } else {
-              // Send regular confirmation email
-              await sendPaymentSuccessEmail(
-                orderDetails.customer.email,
-                {
-                  ...orderDetails,
-                  orderId: razorpay_order_id,
-                  amount: orderDetails.totalAmount
-                },
-                razorpay_payment_id
-              );
-            }
+            });
           }
         } catch (error) {
           console.error('Error saving order:', error);

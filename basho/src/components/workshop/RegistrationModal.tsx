@@ -1,5 +1,6 @@
 "use client";
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSession, signIn } from 'next-auth/react';
 
 interface ModalProps {
   workshopTitle: string;
@@ -9,13 +10,13 @@ interface ModalProps {
 }
 
 export default function RegistrationModal({ workshopTitle, workshopDate, workshopPrice, onClose }: ModalProps) {
+  const { data: session, status } = useSession();
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [members, setMembers] = useState(1);
   const [requests, setRequests] = useState("");
-  const [level, setLevel] = useState<"Beginner" | "Advanced">("Beginner");
   const [timeSlot, setTimeSlot] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const timeSlots = [
@@ -29,33 +30,151 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
     "05:00 PM - 06:00 PM",
     "06:00 PM - 07:00 PM",
   ];
-  const [paymentInitiated, setPaymentInitiated] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
+  const [isLoadingPayment, setIsLoadingPayment] = useState(false);
+  const [paymentError, setPaymentError] = useState("");
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
+  // Populate name from session when logged in
   useEffect(() => {
-    // Load Razorpay script
-    if (!(window as any).Razorpay) {
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.onload = () => setRazorpayLoaded(true);
-      document.body.appendChild(script);
-    } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setRazorpayLoaded(true);
+    if (session?.user?.name) {
+      setName(session.user.name);
     }
+  }, [session]);
+
+  // Load Razorpay script on component mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    // Check if Razorpay is already loaded
+    if ((window as any).Razorpay) {
+      return;
+    }
+
+    // Load Razorpay script
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => {
+      console.log('Razorpay script loaded successfully');
+    };
+    script.onerror = () => {
+      console.error('Failed to load Razorpay script');
+    };
+    document.body.appendChild(script);
   }, []);
+
+  // Check if user needs to login
+  if (status === "loading") {
+    return (
+      <div className="fixed inset-0 bg-black/35 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl p-8 text-center">
+          <svg className="animate-spin h-12 w-12 text-[#C63D3D] mx-auto mb-4" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p className="text-slate-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    return (
+      <div className="fixed inset-0 bg-black/35 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 overflow-y-auto">
+        <div className="relative w-full max-w-md rounded-[24px] overflow-hidden">
+          <div className="relative bg-gradient-to-br from-[#F8F7F2] via-[#F5EBDD] to-[#F0E6D2] p-8 md:p-12 border-2 border-[#EAD9C6] shadow-2xl rounded-[32px] backdrop-blur-sm">
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 z-[10001] pointer-events-auto w-10 h-10 rounded-full bg-white shadow-md hover:bg-slate-50 flex items-center justify-center transition-all duration-200 group border border-slate-100"
+              aria-label="Close modal"
+            >
+              <svg className="w-6 h-6 text-[#C63D3D] group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-[#C63D3D]/10 rounded-full mb-4">
+                <svg className="w-8 h-8 text-[#C63D3D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <h1 className="text-[28px] md:text-[32px] font-serif font-bold text-slate-900 tracking-wide mb-2">
+                LOGIN REQUIRED
+              </h1>
+              <p className="text-slate-600 text-sm md:text-base italic">
+                Please sign in to register for this workshop
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-center text-slate-700 text-sm">
+                Workshop registration is available for registered members only. This helps us keep track of attendance and send you important updates.
+              </p>
+              
+              <button
+                onClick={() => signIn()}
+                className="w-full px-8 py-4 rounded-2xl bg-gradient-to-r from-[#C63D3D] to-[#A22C2C] text-white font-bold text-lg tracking-wide shadow-lg hover:shadow-xl hover:from-[#B33636] hover:to-[#8B2A2A] transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-3"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v2a2 2 0 01-2 2H7a2 2 0 01-2-2v-2m14-4V7a2 2 0 00-2-2H9a2 2 0 00-2 2v4" />
+                </svg>
+                Sign In / Register
+              </button>
+
+              <button
+                onClick={onClose}
+                className="w-full px-8 py-3 rounded-2xl border-2 border-[#C63D3D] text-[#C63D3D] font-bold text-base tracking-wide hover:bg-[#C63D3D]/5 transition-all duration-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const pricePerPerson = workshopPrice || 65; // Use passed price or default
   const totalPrice = pricePerPerson * members;
   const priceDisplay = `₹${pricePerPerson} per person (Total: ₹${totalPrice})`;
+  const email = session?.user?.email || "";
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitted(true);
-    
+    setPaymentError("");
+    setIsLoadingPayment(true);
+
+    if (!timeSlot) {
+      setPaymentError("Please select a time slot");
+      setIsLoadingPayment(false);
+      return;
+    }
+
+    if (!selectedDate) {
+      setPaymentError("Please select a workshop date");
+      setIsLoadingPayment(false);
+      return;
+    }
+
     try {
+      // Check if Razorpay script is loaded first
+      if (typeof window === 'undefined' || !(window as any).Razorpay) {
+        setPaymentError('Razorpay is loading. Please wait a moment and try again.');
+        setIsLoadingPayment(false);
+        return;
+      }
+
+      // Check if Razorpay key is available
+      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      if (!razorpayKey) {
+        setPaymentError('Razorpay configuration is missing. Please contact support.');
+        console.error('NEXT_PUBLIC_RAZORPAY_KEY_ID is not set');
+        setIsLoadingPayment(false);
+        return;
+      }
+
       // Create Razorpay order
       const response = await fetch('/api/payments/create-order', {
         method: 'POST',
@@ -65,23 +184,33 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
         body: JSON.stringify({
           amount: totalPrice,
           currency: 'INR',
-          receipt: `workshop_${workshopTitle}_${Date.now()}`,
+          receipt: `ws_${Date.now()}`,
         }),
       });
 
       const orderData = await response.json();
 
-      if (orderData.id) {
-        // Initialize Razorpay
-        const options = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-          amount: orderData.amount,
-          currency: orderData.currency,
-          name: 'Basho Pottery Studio',
-          description: `${workshopTitle} Workshop Registration`,
-          order_id: orderData.id,
-          handler: async function (response: any) {
-            // Verify payment
+      if (!response.ok) {
+        throw new Error(orderData.details || orderData.error || 'Failed to create order');
+      }
+
+      if (!orderData.id) {
+        throw new Error('Payment order creation failed. Please try again.');
+      }
+
+      setIsLoadingPayment(false);
+
+      // Initialize Razorpay
+      const options = {
+        key: razorpayKey,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        order_id: orderData.id,
+        name: 'Basho Pottery Studio',
+        description: `${workshopTitle} Workshop Registration`,
+        handler: async function (response: any) {
+          try {
+            // Verify payment (this happens after user completes payment)
             const verifyResponse = await fetch('/api/payments/verify', {
               method: 'POST',
               headers: {
@@ -94,11 +223,10 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
                 orderDetails: {
                   customer: { name, email, phone },
                   workshop: workshopTitle,
-                  date: workshopDate,
+                  date: selectedDate,
                   timeSlot,
                   members,
                   requests,
-                  level,
                   totalAmount: totalPrice,
                 },
               }),
@@ -106,27 +234,31 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
 
             const verifyData = await verifyResponse.json();
             if (verifyData.success) {
-              setPaymentSuccess(true);
-              setPaymentInitiated(false);
               setShowSuccessPopup(true);
+            } else {
+              setPaymentError("Payment verification failed. Please contact support.");
             }
-          },
-          prefill: {
-            name,
-            email,
-            contact: phone,
-          },
-          theme: {
-            color: '#C63D3D',
-          },
-        };
+          } catch (verifyError) {
+            console.error('Payment verification error:', verifyError);
+            setPaymentError("Payment verification error. Your payment is being processed.");
+          }
+        },
+        prefill: {
+          name,
+          email,
+          contact: phone,
+        },
+        theme: {
+          color: '#C63D3D',
+        },
+      };
 
-        const rzp = new (window as any).Razorpay(options);
-        rzp.open();
-        setPaymentInitiated(true);
-      }
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
     } catch (error) {
       console.error('Payment initiation failed:', error);
+      setPaymentError(error instanceof Error ? error.message : 'Failed to initiate payment. Please try again.');
+      setIsLoadingPayment(false);
       setSubmitted(false);
     }
   };
@@ -149,7 +281,6 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
       phone ? `Phone: ${phone}` : undefined,
       `Number of Members: ${members}`,
       requests ? `Special Requests: ${requests}` : undefined,
-      `Experience Level: ${level}`,
       `Total Paid: ₹${totalPrice}`,
     ].filter(Boolean).join("\n");
     const details = encodeURIComponent(detailLines);
@@ -209,25 +340,6 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
             </div>
 
             <div className="space-y-1">
-              <label className="block text-slate-800 font-medium text-sm uppercase tracking-wide">Email Address</label>
-              <div className="relative">
-                <input
-                  type="email"
-                  className="w-full bg-white/80 backdrop-blur-sm rounded-xl shadow-sm px-4 py-3 border-2 border-transparent border-b-4 border-b-[#C63D3D] focus:border-[#C63D3D] focus:ring-4 focus:ring-[#C63D3D]/10 outline-none text-slate-900 placeholder-slate-400 transition-all duration-200"
-                  placeholder="your.email@example.com"
-                  required
-                  value={email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                  <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-1">
               <label className="block text-slate-800 font-medium text-sm uppercase tracking-wide">Phone Number <span className="text-slate-500 font-normal">(optional)</span></label>
               <div className="relative">
                 <input
@@ -240,6 +352,24 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                   <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-slate-800 font-medium text-sm uppercase tracking-wide">Workshop Date</label>
+              <div className="relative">
+                <input
+                  type="date"
+                  className="w-full bg-white/80 backdrop-blur-sm rounded-xl shadow-sm px-4 py-3 border-2 border-transparent border-b-4 border-b-[#C63D3D] focus:border-[#C63D3D] focus:ring-4 focus:ring-[#C63D3D]/10 outline-none text-slate-900 placeholder-slate-400 transition-all duration-200"
+                  value={selectedDate}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedDate(e.target.value)}
+                  required
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
               </div>
@@ -306,35 +436,6 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
               </div>
             </div>
 
-            {/* Experience Level */}
-            <div className="space-y-3">
-              <label className="block text-slate-800 font-medium text-sm uppercase tracking-wide">Experience Level</label>
-              <div className="flex items-center gap-8">
-                <label className="group relative flex items-center gap-3 cursor-pointer p-3 rounded-xl bg-white/60 backdrop-blur-sm border-2 border-transparent hover:border-[#C63D3D]/30 transition-all duration-200">
-                  <input
-                    type="radio"
-                    name="exp"
-                    className="w-4 h-4 text-[#C63D3D] border-2 border-slate-300 focus:ring-[#C63D3D] focus:ring-offset-0"
-                    checked={level === "Beginner"}
-                    onChange={() => setLevel("Beginner")}
-                  />
-                  <span className="text-slate-800 font-medium">Beginner</span>
-                  <div className="absolute inset-0 rounded-xl bg-[#C63D3D]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-                </label>
-                <label className="group relative flex items-center gap-3 cursor-pointer p-3 rounded-xl bg-white/60 backdrop-blur-sm border-2 border-transparent hover:border-[#C63D3D]/30 transition-all duration-200">
-                  <input
-                    type="radio"
-                    name="exp"
-                    className="w-4 h-4 text-[#C63D3D] border-2 border-slate-300 focus:ring-[#C63D3D] focus:ring-offset-0"
-                    checked={level === "Advanced"}
-                    onChange={() => setLevel("Advanced")}
-                  />
-                  <span className="text-slate-800 font-medium">Advanced</span>
-                  <div className="absolute inset-0 rounded-xl bg-[#C63D3D]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-                </label>
-              </div>
-            </div>
-
             {/* Price Display */}
             <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/50 shadow-sm">
               <div className="text-center">
@@ -355,16 +456,16 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <button
                 type="submit"
-                disabled={!razorpayLoaded || paymentInitiated || !timeSlot}
+                disabled={isLoadingPayment || !timeSlot}
                 className="flex-1 px-8 py-4 rounded-2xl bg-gradient-to-r from-[#C63D3D] to-[#A22C2C] text-white font-bold text-lg tracking-wide shadow-lg hover:shadow-xl hover:from-[#B33636] hover:to-[#8B2A2A] transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
               >
-                {paymentInitiated ? (
+                {isLoadingPayment ? (
                   <>
                     <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Processing Payment...
+                    Initiating Payment...
                   </>
                 ) : (
                   <>
@@ -377,13 +478,31 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
               </button>
             </div>
 
-            {submitted && !paymentInitiated && !paymentSuccess && (
+            {paymentError && (
+              <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
+                <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-red-800 font-medium text-sm flex-1">{paymentError}</p>
+                <button
+                  type="button"
+                  onClick={() => setPaymentError("")}
+                  className="text-red-600 hover:text-red-800 flex-shrink-0"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            )}
+
+            {isLoadingPayment && (
               <div className="flex items-center justify-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-xl">
                 <svg className="animate-spin w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <p className="text-blue-800 font-medium">Initiating secure payment...</p>
+                <p className="text-blue-800 font-medium">Creating your order with Razorpay...</p>
               </div>
             )}
           </form>
@@ -433,7 +552,7 @@ export default function RegistrationModal({ workshopTitle, workshopDate, worksho
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-600">Date:</span>
-                    <span className="font-medium text-slate-800">{workshopDate}</span>
+                    <span className="font-medium text-slate-800">{selectedDate}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-600">Members:</span>

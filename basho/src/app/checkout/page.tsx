@@ -265,7 +265,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           amount: totalAmount,
           currency: 'INR',
-          receipt: `order_${Date.now()}`,
+          receipt: `ord_${Date.now()}`,
         }),
       });
 
