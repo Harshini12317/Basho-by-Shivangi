@@ -6,7 +6,7 @@ import Order from '@/models/Order';
 import StaticData from '@/models/StaticData';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { generateInvoicePDF } from '@/lib/invoice-pdf';
+import { generateInvoicePDF, generateInvoiceHTML } from '@/lib/invoice-pdf';
 import { validateGST } from '@/lib/gst-validation';
 
 // Helper function to handle background tasks without blocking response
@@ -145,9 +145,16 @@ export async function POST(request: NextRequest) {
             // Schedule PDF generation and email sending as background task
             scheduleBackgroundTask(async () => {
               try {
-                // Generate and send PDF invoice if GST is provided and valid
-                const gstNumber = orderDetails.customer.gstNumber;
+                // Generate and send invoice if GST is provided and valid
+                const gstNumber = orderDetails.customer.gstNumber?.trim();
                 const isGSTValid = gstNumber && validateGST(gstNumber);
+
+                console.log('📋 Payment Success - Processing email:', {
+                  email: orderDetails.customer.email,
+                  gstNumber: gstNumber || 'none',
+                  isGSTValid,
+                  orderId: razorpay_order_id,
+                });
 
                 if (isGSTValid) {
                   try {
@@ -155,33 +162,39 @@ export async function POST(request: NextRequest) {
                     const staticData = await StaticData.findOne();
                     const hsnCode = staticData?.hsnCode || '';
 
+                    console.log('🔍 Generating PDF invoice with HSN:', hsnCode);
+
+                    // Generate PDF invoice for email
                     const pdfBuffer = await generateInvoicePDF({
-                      ...order.toObject(),
                       razorpayOrderId: razorpay_order_id,
-                      paymentId: razorpay_payment_id,
+                      createdAt: new Date().toISOString(),
                       customer: orderDetails.customer,
+                      address: orderDetails.address,
                       items: orderDetails.items,
-                      totalAmount: orderDetails.totalAmount,
                       subtotal: orderDetails.subtotal,
-                      shippingAmount: orderDetails.shippingAmount,
                       gstAmount: orderDetails.gstAmount,
+                      totalAmount: orderDetails.totalAmount,
                       hsnCode,
                     });
 
-                    // Send invoice email with PDF attachment
+                    console.log('✅ PDF invoice generated successfully, sending email');
+
+                    // Send invoice email with PDF invoice
                     await sendPaymentSuccessEmail(
                       orderDetails.customer.email,
                       {
                         ...orderDetails,
                         orderId: razorpay_order_id,
                         amount: orderDetails.totalAmount,
-                        pdfInvoice: pdfBuffer,
+                        pdfInvoice: pdfBuffer, // Send PDF for attachment
                       },
                       razorpay_payment_id
                     );
-                  } catch (pdfError) {
-                    console.error('Error generating/sending PDF invoice:', pdfError);
-                    // Send regular email if PDF fails
+
+                    console.log('✅ Invoice email sent successfully');
+                  } catch (invoiceError) {
+                    console.error('❌ Error generating/sending invoice:', invoiceError);
+                    // Send regular email if invoice generation fails
                     await sendPaymentSuccessEmail(
                       orderDetails.customer.email,
                       {
@@ -191,9 +204,11 @@ export async function POST(request: NextRequest) {
                       },
                       razorpay_payment_id
                     );
+                    console.log('✅ Confirmation email sent without invoice');
                   }
                 } else {
                   // Send regular confirmation email
+                  console.log('📧 Sending regular confirmation email (no GST)');
                   await sendPaymentSuccessEmail(
                     orderDetails.customer.email,
                     {

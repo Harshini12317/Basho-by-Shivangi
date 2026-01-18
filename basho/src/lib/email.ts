@@ -131,15 +131,17 @@ export const sendPaymentSuccessEmail = async (
 
   // Attach invoice if present
   if (orderDetails.pdfInvoice) {
+    const isHTML = orderDetails.pdfInvoice.toString('utf8').includes('<!DOCTYPE');
     customerMailOptions.attachments = [
       {
-        filename: `invoice-${orderDetails.orderId || paymentId}.pdf`,
+        filename: isHTML ? `invoice-${orderDetails.orderId || paymentId}.html` : `invoice-${orderDetails.orderId || paymentId}.pdf`,
         content: orderDetails.pdfInvoice,
-        contentType: "application/pdf",
+        contentType: isHTML ? "text/html" : "application/pdf",
       },
     ];
-    customerMailOptions.subject =
-      "🎉 Payment Successful - Order Confirmed (Invoice Attached) | Basho";
+    customerMailOptions.subject = isHTML
+      ? "🎉 Payment Successful - Order Confirmed (Invoice Attached) | Basho"
+      : "🎉 Payment Successful - Order Confirmed (Invoice Attached) | Basho";
   }
 
   const ownerMailOptions: SendMailOptions = {

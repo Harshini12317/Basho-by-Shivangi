@@ -49,6 +49,8 @@ export default function OrderDetailsPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -82,10 +84,16 @@ export default function OrderDetailsPage() {
   };
 
   const downloadBill = async () => {
+    setDownloading(true);
+    setDownloadError(null);
     try {
+      console.log('📥 Downloading bill for order:', orderId);
       const response = await fetch(`/api/orders/${orderId}/download-bill`);
+      
       if (response.ok) {
         const blob = await response.blob();
+        console.log('✅ Bill downloaded, size:', blob.size);
+        
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -95,11 +103,16 @@ export default function OrderDetailsPage() {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
       } else {
-        alert('Failed to download bill. Please try again.');
+        const errorData = await response.json();
+        const errorMessage = errorData.error || 'Failed to download bill. Please try again.';
+        console.error('❌ Bill download failed:', errorMessage);
+        setDownloadError(errorMessage);
       }
     } catch (error) {
-      console.error('Error downloading bill:', error);
-      alert('Failed to download bill. Please try again.');
+      console.error('❌ Error downloading bill:', error);
+      setDownloadError('Failed to download bill. Please try again.');
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -159,15 +172,33 @@ export default function OrderDetailsPage() {
                 {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
               </span>
               {order.customer.gstNumber && (
-                <button
-                  onClick={downloadBill}
-                  className="inline-flex items-center px-4 py-2 bg-[#8E5022] text-white rounded-lg hover:bg-[#652810] transition-colors ml-4 mt-2"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  Download Bill
-                </button>
+                <div className="mt-2">
+                  <button
+                    onClick={downloadBill}
+                    disabled={downloading}
+                    className="inline-flex items-center px-4 py-2 bg-[#8E5022] text-white rounded-lg hover:bg-[#652810] disabled:opacity-50 disabled:cursor-not-allowed transition-colors ml-4"
+                  >
+                    {downloading ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Downloading...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Download Bill
+                      </>
+                    )}
+                  </button>
+                  {downloadError && (
+                    <p className="text-red-600 text-sm mt-2">⚠️ {downloadError}</p>
+                  )}
+                </div>
               )}
             </div>
 
@@ -201,6 +232,9 @@ export default function OrderDetailsPage() {
                 <p className="text-[#442D1C]"><strong>Name:</strong> {order.customer.name}</p>
                 <p className="text-[#442D1C]"><strong>Email:</strong> {order.customer.email}</p>
                 <p className="text-[#442D1C]"><strong>Phone:</strong> {order.customer.phone}</p>
+                {order.customer.gstNumber && (
+                  <p className="text-[#442D1C]"><strong>GST Number:</strong> {order.customer.gstNumber}</p>
+                )}
               </div>
             </div>
 

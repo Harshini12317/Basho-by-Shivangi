@@ -6,6 +6,11 @@ A comprehensive full-stack e-commerce platform built with **Next.js 15**, **Reac
 
 ---
 
+## To access admin panel, use the credentials given below
+
+Email : bashoshivangi@gmail.com
+Password : Abc*1234
+
 ## Table of Contents
 
 - [Features](#features)

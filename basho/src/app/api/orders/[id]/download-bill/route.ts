@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/mongodb";
 import Order from "@/models/Order";
 import StaticData from "@/models/StaticData";
 import { generateInvoicePDF } from "@/lib/invoice-pdf";
+import { validateGST } from "@/lib/gst-validation";
 
 export async function GET(
   request: NextRequest,
@@ -34,13 +35,29 @@ export async function GET(
     });
 
     if (!order) {
+      console.log('🔍 Order not found:', id);
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    // Only allow download if GST number is provided
-    if (!order.customer.gstNumber) {
+    // Check if GST number exists and is valid
+    const gstNumber = order.customer?.gstNumber?.trim();
+    const isGSTValid = gstNumber && validateGST(gstNumber);
+
+    console.log('📋 Download bill request:', {
+      orderId: id,
+      email: session.user.email,
+      hasGST: !!gstNumber,
+      gstNumber: gstNumber || 'none',
+      isGSTValid,
+    });
+
+    if (!isGSTValid) {
+      console.log('❌ GST validation failed:', {
+        gstNumber,
+        isGSTValid,
+      });
       return NextResponse.json(
-        { error: "Bill download is only available for orders with GST number" },
+        { error: "Bill download is only available for orders with valid GST number" },
         { status: 403 }
       );
     }
@@ -48,20 +65,36 @@ export async function GET(
     // Generate PDF invoice
     const staticData = await StaticData.findOne();
     const hsnCode = staticData?.hsnCode || '';
-    const pdfBuffer = await generateInvoicePDF({ ...order.toObject(), hsnCode });
 
-    // Return PDF as downloadable file
+    console.log('🔄 Generating PDF invoice...');
+
+    const pdfBuffer = await generateInvoicePDF({
+      razorpayOrderId: order.razorpayOrderId,
+      createdAt: order.createdAt,
+      customer: order.customer,
+      address: order.address,
+      items: order.items,
+      subtotal: order.subtotal,
+      gstAmount: order.gstAmount,
+      totalAmount: order.totalAmount,
+      hsnCode,
+    });
+
+    console.log('✅ PDF invoice generated successfully');
+
+    // Return PDF as a file
     return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="invoice-${order._id}.pdf"`,
+        "Cache-Control": "no-cache, no-store, must-revalidate",
       },
     });
 
   } catch (error) {
-    console.error("Error generating bill:", error);
+    console.error("❌ Error generating bill:", error);
     return NextResponse.json(
-      { error: "Failed to generate bill" },
+      { error: "Failed to generate bill. Please try again later." },
       { status: 500 }
     );
   }
