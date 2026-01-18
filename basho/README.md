@@ -1,6 +1,8 @@
 # Basho by Shivangi - E-Commerce & Workshop Platform
 
-A comprehensive full-stack e-commerce platform built with **Next.js 15**, **React 19**, **TypeScript**, **MongoDB**, and **Tailwind CSS**. The platform features product management, custom orders, workshops, events, and an admin dashboard with payment integration via Razorpay.
+A comprehensive full-stack e-commerce platform built with **Next.js 15**, **React 19**, **TypeScript**, **MongoDB**, and **Tailwind CSS**. The platform features product management, custom orders, workshops, events, galleries, admin dashboard with payment integration via Razorpay, and a sophisticated popup management system.
+
+**Live URL**: https://bashoproject.vercel.com
 
 ---
 
@@ -16,31 +18,38 @@ A comprehensive full-stack e-commerce platform built with **Next.js 15**, **Reac
 - [Pages & Routes](#pages--routes)
 - [Admin Features](#admin-features)
 - [Components](#components)
+- [Mobile Responsive Design](#mobile-responsive-design)
 - [Scripts & Commands](#scripts--commands)
 - [Development](#development)
 - [Deployment](#deployment)
+- [Recent Updates](#recent-updates)
 
 ---
 
 ## Features
 
 ### Core E-Commerce Features
-- **Product Catalog** - Browse, search, and filter products by categories
+- **Product Catalog** - Browse, search, and filter products by categories with full mobile responsiveness
 - **Shopping Cart** - Add/remove items, manage quantities, persistent cart storage
-- **Checkout & Payments** - Secure checkout with Razorpay payment gateway integration
-- **Order Management** - Order tracking, status updates, order history for users
+- **Checkout & Payments** - Secure checkout with Razorpay payment gateway integration (PCI-DSS compliant)
+- **Order Management** - Order tracking, status updates, order history with invoice generation
 - **Wishlist** - Save favorite products for later
 - **Product Reviews** - User reviews and ratings for products
+- **Product Search & Filtering** - Advanced search with debouncing and category filtering
 
 ### Custom Orders
 - **Custom Order Requests** - Users can request custom products with specifications
-- **Photo Uploads** - Upload reference photos for custom orders
+- **Photo Uploads** - Upload reference photos for custom orders with preview functionality
 - **Order Tracking** - Monitor custom order progress and status
-- **Admin Management** - Manage custom orders and photos in admin dashboard
+- **Admin Management** - Manage custom orders and photos with image management
 
 ### Workshops & Events
-- **Workshop Management** - Browse, register for workshops with detailed information
-- **Workshop Registrations** - User registration with email confirmations
+- **Workshop Management** - Browse and register for workshops with detailed information
+- **Workshop Registration** - User registration with date selection and mandatory login
+- **Workshop Details** - Rich content with formatted sections:
+  - What you will learn (displays as bullet points)
+  - Includes section (formatted text display)
+  - More information section
 - **Event Management** - Create and manage events with capacity tracking
 - **Event Bookings** - User bookings and attendance tracking
 
@@ -48,7 +57,9 @@ A comprehensive full-stack e-commerce platform built with **Next.js 15**, **Reac
 - **Gallery Management** - Showcase product photography and work samples
 - **Image Optimization** - Cloudinary integration for fast image delivery with multiple formats (AVIF, WebP)
 - **Responsive Media** - Optimized images for all device sizes
-- **MediaShowcase Component** - Beautiful image gallery display
+- **MediaShowcase Component** - Beautiful image gallery with navigation
+- **Hero Slideshow** - Dynamic hero section with image and video support (10-second slide transitions)
+- **Video Support** - Upload and display MP4, WebM, OGG, MOV, MKV, AVI videos in hero slideshow
 
 ### User Features
 - **User Authentication** - NextAuth.js integration with secure login/signup
@@ -59,52 +70,84 @@ A comprehensive full-stack e-commerce platform built with **Next.js 15**, **Reac
 - **Email Notifications** - Automated email notifications for orders, registrations, confirmations
 
 ### Admin Dashboard
-- **Complete Admin Panel** - Manage all platform aspects from one unified dashboard
-- **Product Management** - Create, edit, delete products and categories with image uploads
-- **Order Management** - View, filter, and update order statuses with invoice generation
-- **User Management** - Manage user accounts, view activity, and set permissions
-- **Workshop Management** - Create, edit, and manage workshops with registration tracking
+- **Complete Admin Panel** - Unified dashboard for all platform management
+- **Product Management** - Create, edit, delete products with image uploads and category management
+- **Order Management** - View, filter, and update order statuses with invoice PDF generation
+- **User Management** - Manage user accounts and permissions
+- **Workshop Management** - Create workshops with image/video support, register users, manage registrations
 - **Event Management** - Create and manage events with capacity and booking limits
-- **Payment Tracking** - Monitor all Razorpay transactions and payment statuses
-- **Custom Order Management** - View, update, and manage custom order requests
-- **Popup Management** - Create and schedule promotional popups
-- **Static Data Management** - Manage homepage content and static pages
+- **Payment Tracking** - Monitor Razorpay transactions and payment statuses
+- **Custom Order Management** - View and manage custom order requests with photo galleries
+- **Popup Management** - 
+  - Create promotional popups with rich content and images
+  - **Edit existing popups** with form pre-population
+  - Target popups to specific pages (homepage, workshops)
+  - Schedule popups with start/end dates
+  - Set frequency (once per session, once per day, always)
+  - Support multiple display triggers (page load, delay, scroll)
+  - Reset popup view history
+- **Homepage Content Management** - Manage hero slideshow images/videos (7 slots), GSAP slider images, and features section
+- **Static Data Management** - Manage static content and pages
 - **Gallery Management** - Upload, organize, and delete gallery items
-- **Analytics Dashboard** - View key metrics and business intelligence
+- **Analytics Dashboard** - View key business metrics
+
+### Popup System Features
+- **Page-Specific Display** - Popups only show on selected pages during creation
+- **Schedule Control** - Set start/end times for popup availability
+- **Frequency Options**:
+  - Always: Shows on every page load
+  - Once per session: Shows once until page refresh
+  - Once per day: Shows once per 24-hour period
+- **Multiple Triggers**:
+  - Page load: Displays immediately
+  - Delay: Shows after X milliseconds
+  - Scroll: Shows after scrolling 40% down page
+- **Rich Content** - Title, subtitle, description, images, CTA buttons
+- **Image Gallery** - Multiple image support with carousel navigation
 
 ### Additional Features
 - **Contact Form** - User inquiries through contact form
 - **GST Validation** - Built-in GST validation for Indian business compliance
-- **PDF Invoice Generation** - Automatic invoice generation for orders
+- **PDF Invoice Generation** - Automatic invoice generation for orders with Razorpay details
 - **Email Service** - Nodemailer integration for transactional emails
 - **Image CDN** - Cloudinary for optimized image delivery
+- **Mobile Responsive** - Full responsive design from mobile (320px) to desktop (2560px+)
 
 ---
 
 ## Tech Stack
 
 ### Frontend
-- **Framework**: Next.js 15.5.9 (React Server Components)
+- **Framework**: Next.js 15.5.9 (React Server Components & Client Components)
 - **UI Library**: React 19.2.3
-- **Language**: TypeScript 5.x
-- **Styling**: Tailwind CSS 4 with PostCSS
-- **Icons**: Lucide React 0.562.0, React Icons 5.5.0
+- **Language**: TypeScript 5.x with strict type checking
+- **Styling**: Tailwind CSS 4 with PostCSS for utility-first CSS
+- **Icons**: 
+  - Lucide React 0.562.0
+  - React Icons 5.5.0
 - **Animations**: 
-  - GSAP 3.14.2 (tweens & sequences)
+  - GSAP 3.14.2 (complex animations & tweens)
   - Framer Motion 12.23.26 (component animations)
   - Particles.js 3.9.1 (particle effects)
-- **HTTP Client**: Axios 1.13.2
+- **HTTP Client**: Axios 1.13.2 with interceptors
+- **Date Handling**: date-fns for date operations
+- **State Management**: React Hooks (useState, useContext, useEffect)
 
 ### Backend
-- **Runtime**: Node.js
+- **Runtime**: Node.js with TypeScript
 - **API**: Next.js API Routes (serverless functions)
 - **Database**: MongoDB with Mongoose ODM 9.0.2
-- **Authentication**: NextAuth.js 4.24.13 (session-based)
-- **Password Hashing**: bcryptjs 3.0.3
-- **Email**: Nodemailer 7.0.12
+- **Authentication**: NextAuth.js 4.24.13 (session-based with JWT support)
+- **Security**: bcryptjs 3.0.3 for password hashing
+- **Email**: Nodemailer 7.0.12 for transactional emails
+- **PDF Generation**: pdfkit 0.13.0 for invoice generation
 
 ### External Services & Integrations
-- **Payment Gateway**: Razorpay 2.9.6 (PCI-DSS compliant)
+- **Payment Gateway**: Razorpay 2.9.6 (PCI-DSS compliant payment processing)
+- **Image CDN**: Cloudinary for image optimization and delivery
+- **File Storage**: Cloudinary for video and image hosting
+- **Email Service**: Nodemailer with Gmail/SMTP support
+- **Deployment**: Vercel (Next.js optimized platform)
 - **Image Management**: 
   - Cloudinary 2.8.0
   - Next-Cloudinary 6.17.5
@@ -864,7 +907,92 @@ NODE_ENV=production
 
 ---
 
+## Mobile Responsive Design
+
+The platform is fully responsive and optimized for all device sizes:
+
+### Breakpoints & Coverage
+- **Mobile (320px - 640px)**: Full mobile optimization with touch-friendly UI
+- **Tablet (641px - 1024px)**: Optimized tablet experience with adjusted layouts
+- **Desktop (1025px - 1440px)**: Full-featured desktop interface
+- **Large Screens (1441px+)**: Enhanced layout for ultra-wide displays
+
+### Responsive Components
+- **Navigation**: Mobile hamburger menu → Desktop full navbar
+- **Product Grid**: 1 column (mobile) → 2 columns (tablet) → 4 columns (desktop)
+- **Workshop Cards**: 1 column (mobile) → 2 columns (tablet) → 3 columns (desktop)
+- **Hero Section**: Reduced height (45vh mobile → 60vh tablet → 60vh desktop)
+- **Checkout Form**: Single column (mobile) → Two column (desktop)
+- **Admin Dashboard**: Full sidebar (desktop) → Collapsible menu (tablet/mobile)
+- **Forms**: Full-width (mobile) → Contained width (desktop)
+- **Images**: Responsive with Cloudinary dynamic sizing
+- **Videos**: Responsive containers with aspect ratio preservation
+
+### CSS Framework Features
+- **Tailwind CSS**: Mobile-first utility classes
+- **Breakpoint System**: sm, md, lg, xl breakpoints
+- **Responsive Typography**: Scales from 14px (mobile) to 32px+ (desktop)
+- **Spacing**: Adaptive padding & margins
+- **Flexbox & Grid**: Flexible layouts that adapt to screens
+
+---
+
+## Recent Updates (January 2026)
+
+### Hero Slideshow Enhancements
+- ✅ Added video support (MP4, WebM, OGG, MOV, MKV, AVI formats)
+- ✅ 10-second slide transitions for smooth playback
+- ✅ Reduced component size by 25-30% for better page layout
+- ✅ Automatic media type detection
+
+### Popup Management System
+- ✅ Complete CRUD operations for popups (Create, Read, Update, Delete)
+- ✅ **Edit Existing Popups** - Click "Edit" button to modify popup details
+- ✅ Page-specific targeting - Popups only show on selected pages
+- ✅ Schedule control with start/end dates
+- ✅ Multiple frequency options (always, once per session, once per day)
+- ✅ Trigger types (page load, delay, scroll)
+- ✅ Rich content support (images, title, description, CTA)
+- ✅ Image gallery with carousel navigation
+- ✅ Debug logging for troubleshooting popup display
+- ✅ Migration endpoint for fixing existing popups
+
+### Workshop System Improvements
+- ✅ Date picker for workshop registration
+- ✅ Mandatory login requirement for registration
+- ✅ Auto-populated email from session
+- ✅ Formatted text display (multiline text as bullet points):
+  - What You Will Learn section
+  - Includes section
+  - More Information section
+- ✅ Fast payment flow (1-second Razorpay opening)
+
+### Admin Panel Enhancements
+- ✅ Image and video upload support for homepage hero slideshow
+- ✅ FormData API for efficient multipart uploads
+- ✅ Media preview with type detection
+- ✅ Loading spinner during upload
+- ✅ Popup edit functionality with form pre-population
+- ✅ Validation messaging for required fields
+- ✅ Migration endpoint for data consistency
+
+### Homepage Management
+- ✅ 7-slot hero slideshow with image/video support
+- ✅ GSAP slider image management
+- ✅ Features section image management
+- ✅ Cloudinary integration for all media
+
+### Mobile Responsiveness
+- ✅ Full responsive design from 320px to 2560px+
+- ✅ Touch-friendly UI elements
+- ✅ Optimized form layouts for mobile
+- ✅ Responsive hero section (45vh mobile, 60vh tablet)
+- ✅ Mobile-optimized navigation
+
+---
+
 ## Development Guide
+````
 
 ### Prerequisites
 - Node.js 18+ (LTS recommended)
