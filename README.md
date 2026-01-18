@@ -2,7 +2,7 @@
 
 A comprehensive full-stack e-commerce platform built with **Next.js 15**, **React 19**, **TypeScript**, **MongoDB**, and **Tailwind CSS**. The platform features product management, custom orders, workshops, events, galleries, admin dashboard with payment integration via Razorpay, and a sophisticated popup management system.
 
-**Live URL**: https://bashoproject.vercel.com
+**Live URL**: https://bashoproject.vercel.app
 
 ---
 
