@@ -36,7 +36,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/5 pointer-events-none"></div>
         
         <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 py-10 lg:py-16 w-full relative z-10">
-         <div className="min-h-[60vh] grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-16">
+         <div className="min-h-[45vh] grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-16">
 
            <HeroSlideshow />
 

@@ -293,12 +293,12 @@ export default function HomePageManagement() {
             <div className="flex gap-4 items-end">
               <div className="flex-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Choose Image to Upload
+                  Choose Image or Video to Upload
                 </label>
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/*,video/*"
                   onChange={(e) => {
                     if (e.target.files?.[0]) {
                       handleImageUpload(e.target.files[0]);

@@ -18,6 +18,11 @@ interface SlideImage {
   altText?: string;
 }
 
+const isVideoUrl = (url: string): boolean => {
+  const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.mkv', '.avi'];
+  return videoExtensions.some(ext => url.toLowerCase().includes(ext));
+};
+
 export default function HeroSlideshow() {
   const [slideImages, setSlideImages] = useState<SlideImage[]>(DEFAULT_SLIDESHOW_IMAGES);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -49,7 +54,7 @@ export default function HeroSlideshow() {
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slideImages.length);
-    }, 5000); // Change slide every 5 seconds
+    }, 10000); // Change slide every 10 seconds
 
     return () => clearInterval(interval);
   }, [isAutoPlay, slideImages.length]);
@@ -70,7 +75,7 @@ export default function HeroSlideshow() {
   };
 
   return (
-    <div className="hero-slideshow-shell relative w-full h-full min-h-[400px] lg:min-h-[500px] flex items-center justify-center group order-1 lg:order-1">
+    <div className="hero-slideshow-shell relative w-full h-full min-h-[320px] lg:min-h-[400px] flex items-center justify-center group order-1 lg:order-1">
       {/* Main Slideshow Container */}
       <div className="hero-slideshow-card relative w-full h-full rounded-[32px] overflow-hidden">
         {/* Slides */}
@@ -81,14 +86,27 @@ export default function HeroSlideshow() {
               index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <img
-              src={image.imageUrl}
-              alt={image.altText || `Slide ${index + 1}`}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.src = '/images/product1.png';
-              }}
-            />
+            {isVideoUrl(image.imageUrl) ? (
+              <video
+                src={image.imageUrl}
+                className="w-full h-full object-cover"
+                autoPlay
+                loop
+                muted
+                onError={(e) => {
+                  (e.currentTarget as HTMLVideoElement).style.display = 'none';
+                }}
+              />
+            ) : (
+              <img
+                src={image.imageUrl}
+                alt={image.altText || `Slide ${index + 1}`}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = '/images/product1.png';
+                }}
+              />
+            )}
           </div>
         ))}
 

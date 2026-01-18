@@ -32,26 +32,33 @@ export default function PopupDisplay({ currentPage }: { currentPage: string }) {
   const [imgIndex, setImgIndex] = useState(0);
   
   useEffect(() => {
-    // Reset image index when popup changes, but do it in a callback
-    const timer = setTimeout(() => {
-      setImgIndex(0);
-    }, 0);
-    return () => clearTimeout(timer);
-  }, [popup, showPopup]);
+    console.log('🎯 PopupDisplay mounted/updated with currentPage:', currentPage, 'currentSlug:', currentSlug);
+  }, [currentPage, currentSlug]);
 
   const shouldShowByFrequency = (p: PopupItem) => {
     const idKey = `popup_${p._id}_seen`;
-    if (p.frequency === 'always') return true;
+    if (p.frequency === 'always') {
+      console.log(`"${p.name}" frequency check: always = TRUE`);
+      return true;
+    }
     if (p.frequency === 'once_per_session') {
       const seen = sessionStorage.getItem(idKey);
-      return !seen;
+      const shouldShow = !seen;
+      console.log(`"${p.name}" frequency check: once_per_session, sessionStorage has key: ${!!seen}, shouldShow: ${shouldShow}`);
+      return shouldShow;
     }
     if (p.frequency === 'once_per_day') {
       const last = localStorage.getItem(idKey);
-      if (!last) return true;
+      if (!last) {
+        console.log(`"${p.name}" frequency check: once_per_day, no localStorage entry = TRUE`);
+        return true;
+      }
       const oneDay = 24 * 60 * 60 * 1000;
-      return Date.now() - Number(last) > oneDay;
+      const shouldShow = Date.now() - Number(last) > oneDay;
+      console.log(`"${p.name}" frequency check: once_per_day, last shown: ${new Date(Number(last)).toLocaleString()}, shouldShow: ${shouldShow}`);
+      return shouldShow;
     }
+    console.log(`"${p.name}" frequency check: unknown frequency = TRUE`);
     return true;
   };
 
@@ -70,27 +77,81 @@ export default function PopupDisplay({ currentPage }: { currentPage: string }) {
     const now = new Date();
     const startOk = p.startAt ? now >= new Date(p.startAt) : true;
     const endOk = p.endAt ? now <= new Date(p.endAt) : true;
+    if (p.startAt || p.endAt) {
+      console.log(`"${p.name}" schedule check:`, {
+        now: now.toLocaleString(),
+        startAt: p.startAt ? new Date(p.startAt).toLocaleString() : 'Not set',
+        startOk,
+        endAt: p.endAt ? new Date(p.endAt).toLocaleString() : 'Not set',
+        endOk,
+        withinSchedule: startOk && endOk
+      });
+    }
     return startOk && endOk;
   };
 
+  useEffect(() => {
+    // Reset image index when popup changes, but do it in a callback
+    const timer = setTimeout(() => {
+      setImgIndex(0);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [popup, showPopup]);
+
   const evaluatePopups = (list: PopupItem[]) => {
+    console.log('🔍 Evaluating', list.length, 'popups for page:', currentPage);
+    console.log('📋 Full popup list:', list.map(p => ({ name: p.name, pages: p.pages })));
+    
     const candidates = list.filter((p) => {
-      if (!p.isActive) return false;
-      if (!withinSchedule(p)) return false;
+      const isActive = p.isActive;
+      const withinTime = withinSchedule(p);
       const includesPage = (p.pages || []).includes(currentPage);
-      if (!includesPage) return false;
-      if (currentPage === 'workshops' && currentSlug) {
-        return p.targetSlug ? p.targetSlug === currentSlug : true;
+      
+      // Slug check: 
+      // - If popup has no targetSlug, show on all pages
+      // - If popup has targetSlug, only show on workshops page and only if it matches
+      const passesSlugCheck = !p.targetSlug || (currentPage === 'workshops' && p.targetSlug === currentSlug);
+      
+      console.log(`Popup "${p.name}":`, { isActive, withinTime, includesPage, passesSlugCheck, pages: p.pages, currentPage, targetSlug: p.targetSlug, currentSlug });
+      
+      if (!isActive) {
+        console.log(`  ❌ Not active`);
+        return false;
       }
-      return !p.targetSlug;
+      if (!withinTime) {
+        console.log(`  ❌ Outside schedule`);
+        return false;
+      }
+      if (!includesPage) {
+        console.log(`  ❌ Page not in popup.pages. Pages array: [${p.pages}], CurrentPage: ${currentPage}`);
+        return false;
+      }
+      if (!passesSlugCheck) {
+        console.log(`  ❌ Slug check failed`);
+        return false;
+      }
+      console.log(`  ✅ All checks passed!`);
+      return true;
     });
-    const showable = candidates.find((p) => shouldShowByFrequency(p)) || null;
+    
+    console.log('✅ Candidate popups after filtering:', candidates.length);
+    console.log('📝 Candidate popup names:', candidates.map(c => c.name));
+    
+    const showable = candidates.find((p) => {
+      const shouldShow = shouldShowByFrequency(p);
+      console.log(`Frequency check for "${p.name}":`, shouldShow, `(frequency: ${p.frequency})`);
+      return shouldShow;
+    }) || null;
+    console.log('Showable popup:', showable?.name || 'None');
+    
     if (!showable) return;
     setPopup(showable);
     const showNow = showable.triggerType === 'page_load';
+    console.log(`Trigger type for "${showable.name}":`, showable.triggerType, 'Show immediately:', showNow);
     if (showNow) setShowPopup(true);
     if (showable.triggerType === 'delay') {
       const ms = showable.triggerDelayMs || 0;
+      console.log(`Showing popup after delay: ${ms}ms`);
       setTimeout(() => setShowPopup(true), ms);
     }
     if (showable.triggerType === 'scroll') {
@@ -111,7 +172,14 @@ export default function PopupDisplay({ currentPage }: { currentPage: string }) {
         const res = await fetch('/api/popups');
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data)) evaluatePopups(data);
+          console.log('Fetched popups:', data);
+          console.log('Current page:', currentPage);
+          if (Array.isArray(data)) {
+            console.log('Evaluating popups for page:', currentPage);
+            evaluatePopups(data);
+          }
+        } else {
+          console.error('Failed to fetch popups:', res.status);
         }
       } catch (error) {
         console.error('Error fetching popups:', error);

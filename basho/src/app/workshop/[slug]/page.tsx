@@ -22,6 +22,26 @@ interface Workshop {
   seats: number;
 }
 
+// Helper function to convert line breaks to list items
+const formatTextAsList = (text: string) => {
+  if (!text) return null;
+  const lines = text.split('\n').filter(line => line.trim() !== '');
+  
+  // Check if it's meant to be a list (multiple lines)
+  if (lines.length > 1) {
+    return (
+      <ul className="list-disc pl-5 space-y-2 text-sm sm:text-base text-slate-700">
+        {lines.map((line, index) => (
+          <li key={index}>{line.trim()}</li>
+        ))}
+      </ul>
+    );
+  }
+  
+  // Single line - display as paragraph
+  return <p className="text-sm sm:text-base text-slate-700">{text}</p>;
+};
+
 export default function WorkshopDetailPage() {
   const { slug } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -250,17 +270,17 @@ export default function WorkshopDetailPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 pt-6 sm:pt-8 pb-8 sm:pb-10 px-3 sm:px-6 md:px-12 border-t border-slate-100">
             <div>
               <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-slate-900">What you will learn</h3>
-              <p className="text-sm sm:text-base text-slate-700">{workshop.whatYouWillLearn}</p>
+              {formatTextAsList(workshop.whatYouWillLearn)}
             </div>
             <div>
               <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-slate-900">Includes</h3>
-              <p className="text-sm sm:text-base text-slate-700">{workshop.includes}</p>
+              {formatTextAsList(workshop.includes)}
             </div>
           </div>
 
           <div className="p-4 sm:p-6 md:p-12 border-t border-slate-100">
             <h3 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-slate-900">More Information</h3>
-            <p className="text-sm sm:text-base text-slate-700">{workshop.moreInfo}</p>
+            {formatTextAsList(workshop.moreInfo)}
           </div>
           <div className="px-4 sm:px-6 md:px-12 pb-4 sm:pb-6 flex justify-center">
             <button

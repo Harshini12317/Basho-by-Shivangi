@@ -29,6 +29,7 @@ const pageOptions = ['homepage', 'workshops'];
 
 export default function AdminPopupsPage() {
   const [items, setItems] = useState<Popup[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<Popup>({
     name: '',
     isActive: true,
@@ -136,8 +137,41 @@ export default function AdminPopupsPage() {
     });
   };
 
+  const resetForm = () => {
+    setEditingId(null);
+    setForm({
+      name: '',
+      isActive: true,
+      pages: [],
+      targetSlug: '',
+      image: '',
+      images: [],
+      title: '',
+      subtitle: '',
+      tags: [],
+      description: '',
+      ctaText: '',
+      ctaLink: '',
+      triggerType: 'page_load',
+      triggerDelayMs: 0,
+      frequency: 'once_per_session',
+      startAt: '',
+      endAt: '',
+    });
+  };
+
+  const editPopup = (popup: Popup) => {
+    console.log('📝 Editing popup:', popup.name, 'with pages:', popup.pages);
+    setEditingId(popup._id || null);
+    setForm(popup);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const savePopup = async () => {
-    if (!form.name || form.pages.length === 0) return;
+    if (!form.name || form.pages.length === 0) {
+      console.error('❌ Cannot save: name or pages missing', { name: form.name, pages: form.pages });
+      return;
+    }
     setIsSaving(true);
     try {
       const payload = {
@@ -145,37 +179,27 @@ export default function AdminPopupsPage() {
         startAt: form.startAt || undefined,
         endAt: form.endAt || undefined,
       };
+      
+      console.log('💾 Saving popup with payload:', { name: payload.name, pages: payload.pages, isUpdate: !!editingId });
 
-      const res = await fetch('/api/admin/popups', {
-        method: 'POST',
+      const url = editingId ? `/api/admin/popups/${editingId}` : '/api/admin/popups';
+      const method = editingId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
       if (res.ok) {
+        console.log('✅ Popup saved successfully');
         await fetchPopups();
-        setForm({
-          name: '',
-          isActive: true,
-          pages: [],
-          targetSlug: '',
-          image: '',
-          images: [],
-          title: '',
-          subtitle: '',
-          tags: [],
-          description: '',
-          ctaText: '',
-          ctaLink: '',
-          triggerType: 'page_load',
-          triggerDelayMs: 0,
-          frequency: 'once_per_session',
-          startAt: '',
-          endAt: '',
-        });
+        resetForm();
+      } else {
+        console.error('❌ Save failed:', res.status);
       }
     } catch (error) {
-      console.error('Error saving popup:', error);
+      console.error('❌ Error saving popup:', error);
     } finally {
       setIsSaving(false);
     }
@@ -227,8 +251,10 @@ export default function AdminPopupsPage() {
     <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200 p-8 space-y-8">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Popup Management</h1>
-          <p className="text-slate-600">Create and manage popups for your site</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">
+            {editingId ? '✏️ Edit Popup' : 'Popup Management'}
+          </h1>
+          <p className="text-slate-600">{editingId ? 'Update popup details' : 'Create and manage popups for your site'}</p>
         </div>
         <a href="/admin/dashboard" className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors flex items-center gap-2">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -494,8 +520,8 @@ export default function AdminPopupsPage() {
           {/* Pages Card */}
           <div className="bg-white rounded-2xl border shadow-sm p-6 space-y-6">
             <h3 className="text-base font-semibold text-gray-800 flex items-center gap-2">
-              Pages
-              <span className="text-xs text-gray-400 font-normal">Where popup appears</span>
+              Pages <span className="text-red-500">*</span>
+              <span className="text-xs text-gray-400 font-normal">Select where popup appears</span>
             </h3>
             <div className="flex flex-wrap gap-3">
               {pageOptions.map((p) => (
@@ -505,15 +531,18 @@ export default function AdminPopupsPage() {
                   onClick={() => togglePage(p)}
                   className={`px-4 py-1.5 rounded-full border text-sm font-medium transition ${
                     form.pages.includes(p) 
-                      ? 'bg-orange-500/10 text-orange-600 border border-orange-300' 
+                      ? 'bg-orange-500/10 text-orange-600 border-2 border-orange-500' 
                       : 'border border-gray-300 text-gray-600 hover:border-orange-400 hover:text-orange-500'
                   }`}
                 >
-                  {form.pages.includes(p) && '✓ '}
+                  {form.pages.includes(p) && '✅ '}
                   {p}
                 </button>
               ))}
             </div>
+            {form.pages.length === 0 && (
+              <p className="text-sm text-red-500 font-medium">⚠️ Please select at least one page</p>
+            )}
           </div>
 
           {/* Behavior & Schedule Card */}
@@ -692,81 +721,110 @@ export default function AdminPopupsPage() {
       </div>
 
       {/* Floating Action Bar */}
-      <div className="sticky bottom-0 bg-white border-t p-4 flex justify-end mt-8">
-        <button
-          type="button"
-          onClick={savePopup}
-          disabled={isSaving}
-          className="px-7 py-3 rounded-xl bg-orange-500 text-white font-semibold shadow-lg hover:bg-orange-600 hover:shadow-xl active:scale-[0.97] transition disabled:opacity-50"
-        >
-          {isSaving ? 'Saving...' : '➕ Create Popup'}
-        </button>
+      <div className="sticky bottom-0 bg-white border-t p-4 flex flex-col gap-3 mt-8">
+        {(!form.name || form.pages.length === 0) && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+            ⚠️ Missing required fields: {!form.name ? 'Name' : ''}{!form.name && form.pages.length === 0 ? ' and ' : ''}{form.pages.length === 0 ? 'Select at least one page' : ''}
+          </div>
+        )}
+        <div className="flex justify-end gap-3">
+          {editingId && (
+            <button
+              type="button"
+              onClick={resetForm}
+              disabled={isSaving}
+              className="px-7 py-3 rounded-xl bg-gray-400 text-white font-semibold shadow-lg hover:bg-gray-500 hover:shadow-xl active:scale-[0.97] transition disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={savePopup}
+            disabled={isSaving || !form.name || form.pages.length === 0}
+            className="px-7 py-3 rounded-xl bg-orange-500 text-white font-semibold shadow-lg hover:bg-orange-600 hover:shadow-xl active:scale-[0.97] transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSaving ? 'Saving...' : editingId ? '💾 Update Popup' : '➕ Create Popup'}
+          </button>
+        </div>
       </div>
 
       {/* Existing Popups Section */}
       <div className="space-y-6">
         <h2 className="text-lg font-semibold text-gray-800">Existing Popups</h2>
-        <div className="rounded-xl bg-white shadow-sm border border-gray-200 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr className="text-left text-gray-600">
-                <th className="px-6 py-4 font-medium">Name</th>
-                <th className="px-6 py-4 font-medium">Pages</th>
-                <th className="px-6 py-4 font-medium">Status</th>
-                <th className="px-6 py-4 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {items.map((x) => (
-                <tr key={x._id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 font-medium text-gray-900">{x.name}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1">
-                      {(x.pages || []).map((page) => (
-                        <span key={page} className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
-                          {page}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      x.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      {x.isActive ? 'Active' : 'Draft'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => x._id && updateActive(x._id, !x.isActive)}
-                        className={`px-3 py-1 rounded-full text-xs font-medium transition ${
-                          x.isActive 
-                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' 
-                            : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
-                        }`}
-                      >
-                        {x.isActive ? 'Disable' : 'Enable'}
-                      </button>
-                      <button
-                        onClick={() => resetSeen(x)}
-                        className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs font-medium transition"
-                      >
-                        Reset Seen
-                      </button>
-                      <button
-                        onClick={() => x._id && remove(x._id)}
-                        className="px-3 py-1 rounded-full bg-red-100 text-red-700 hover:bg-red-200 text-xs font-medium transition"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
+        {items.length === 0 ? (
+          <div className="rounded-xl bg-white shadow-sm border border-gray-200 p-8 text-center">
+            <p className="text-gray-500">No popups created yet. Create your first popup above!</p>
+          </div>
+        ) : (
+          <div className="rounded-xl bg-white shadow-sm border border-gray-200 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50">
+                <tr className="text-left text-gray-600">
+                  <th className="px-6 py-4 font-medium">Name</th>
+                  <th className="px-6 py-4 font-medium">Pages</th>
+                  <th className="px-6 py-4 font-medium">Status</th>
+                  <th className="px-6 py-4 font-medium">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {items.map((x) => (
+                  <tr key={x._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 font-medium text-gray-900">{x.name}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-wrap gap-1">
+                        {(x.pages || []).map((page) => (
+                          <span key={page} className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
+                            {page}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        x.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                      }`}>
+                        {x.isActive ? 'Active' : 'Draft'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => editPopup(x)}
+                          className="px-3 py-1 rounded-full bg-blue-500 text-white hover:bg-blue-600 text-xs font-medium transition"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => x._id && updateActive(x._id, !x.isActive)}
+                          className={`px-3 py-1 rounded-full text-xs font-medium transition ${
+                            x.isActive 
+                              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' 
+                              : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                          }`}
+                        >
+                          {x.isActive ? 'Disable' : 'Enable'}
+                        </button>
+                        <button
+                          onClick={() => resetSeen(x)}
+                          className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs font-medium transition"
+                        >
+                          Reset Seen
+                        </button>
+                        <button
+                          onClick={() => x._id && remove(x._id)}
+                          className="px-3 py-1 rounded-full bg-red-100 text-red-700 hover:bg-red-200 text-xs font-medium transition"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
       {/* Zoom Overlay */}
       {zoomOpen && zoomSrc && (
