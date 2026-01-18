@@ -19,7 +19,9 @@ export default function StudioPage() {
       </section>
 
       <section className="studio-content container mx-auto px-6 py-12">
-        <div className="studio-grid">
+        <div className="studio-chip">Studio Location</div>
+        <div className="studio-card">
+          <div className="studio-grid">
           <div className="studio-map">
             <div className="map-embed">
               <iframe
@@ -48,11 +50,9 @@ export default function StudioPage() {
               <p className="muted"><a href="tel:+919879575601" className="contact-link">Phone: +91 9879575601</a></p>
               <p className="muted"><a href="https://www.instagram.com/bashobyyshivangi?igsh=NnBhMzh3NTVwbzA4" target="_blank" rel="noopener noreferrer" className="contact-link">Instagram: @bashobyyshivangi</a></p>
 
-              <div className="mt-6">
-                <a className="studio-cta" href="https://maps.google.com/maps?q=21.1299866%2C72.7239895&z=17&hl=en" target="_blank" rel="noreferrer">Open in Google Maps</a>
-              </div>
             </div>
           </aside>
+          </div>
         </div>
       </section>
     </div>

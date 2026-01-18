@@ -498,7 +498,6 @@ export default function ProfilePage() {
                 <div className="absolute -bottom-2 -right-2 w-7 h-7 bg-[#9DB8A0] rounded-full border-3 border-[#FBF6EF] shadow-lg"></div>
               </div>
               <div className="flex-1">
-                <div className="text-[0.65rem] font-bold uppercase tracking-[0.25em] text-[#C46A2B]/80 mb-2.5 serif letter-spacing-wide">MY ACCOUNT</div>
                 <h1 className="text-3xl lg:text-5xl xl:text-5xl font-serif font-bold text-[#4A2C1D] mb-3 leading-tight tracking-tight">{userName}</h1>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                   <p className="text-[#6B3F2B] font-semibold flex items-center gap-2 text-sm">
@@ -516,7 +515,7 @@ export default function ProfilePage() {
                 onClick={() => signOut()}
                 className="group flex items-center justify-center gap-2 px-5 lg:px-7 py-3 lg:py-3.5 rounded-xl lg:rounded-full bg-[#F1E3D3] hover:bg-[#EAD2B8] text-[#6B3F2B] shadow-md hover:shadow-lg transition-all duration-300 border border-[#EAD2B8]/60 font-bold text-sm"
               >
-                <span>Sign Out</span>
+                <span>Log Out</span>
               </button>
               <Link
                 href="/products"

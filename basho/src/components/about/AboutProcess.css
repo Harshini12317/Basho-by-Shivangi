@@ -1,94 +1,221 @@
 .process-section {
-  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245,238,232,0.6));
-  padding: 2.5rem 1.5rem;
+  background: #FDFBF7; /* Warm off-white paper tone */
+  padding: 4rem 2rem;
+  overflow: visible;
+  position: relative;
+  /* Optional texture */
+  background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
 }
 
-.process-timeline {
-  max-width: 700px;
+.process-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+.process-header h2 {
+  font-family: var(--font-playfair), serif;
+  font-size: 2.5rem;
+  color: #4A3B32;
+  margin-bottom: 0.2rem;
+  font-weight: 600;
+}
+
+.process-header h3 {
+  font-family: var(--font-playfair), serif;
+  font-size: 2rem;
+  color: #8B5E3C;
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+
+.header-image-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.process-hero-img {
+  object-fit: contain;
+  opacity: 0.9;
+}
+
+/* Timeline Container */
+.process-timeline-container {
+  max-width: 800px;
   margin: 0 auto;
   position: relative;
+  padding-left: 40px; /* Space for the line */
 }
 
-/* Vertical line */
-.process-timeline::before {
-  content: "";
+/* Vertical Dashed Line */
+.process-timeline-line {
   position: absolute;
-  left: 14px;
+  left: 40px;
   top: 0;
   bottom: 0;
   width: 2px;
-  background: rgba(122, 86, 59, 0.25);
+  background-image: linear-gradient(to bottom, #8B5E3C 50%, transparent 50%);
+  background-size: 2px 10px; /* Dashed effect */
+  background-repeat: repeat-y;
+  z-index: 1;
 }
 
-/* Each step */
-.process-item {
-  position: relative;
+/* Row Wrapper */
+.process-row {
   display: flex;
-  align-items: flex-start;
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
+  align-items: center; /* Center vertically relative to card */
+  margin-bottom: 2rem;
+  position: relative;
+  width: 100%;
+  opacity: 0;
+  transform: none;
+  will-change: opacity;
 }
 
-/* Round symbol */
-.process-dot {
+/* Marker (Dot + Horizontal Connector) */
+.timeline-marker {
+  position: absolute;
+  left: -40px; /* Aligns with the vertical line at 40px padding context */
+  /* Actually, relative to .process-row, left 0 is start of content. 
+     We need to position it back at the line. */
+  left: -6px; /* Adjust to center dot on line */
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  z-index: 2;
+}
+
+.timeline-dot {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  flex-shrink: 0;
-  margin-top: 0.4rem;
-  background: rgba(122, 86, 59, 0.45);
-  transition: background 0.4s ease, box-shadow 0.4s ease;
+  position: relative;
+  background: transparent;
+  border: 2px solid #8B5E3C;
+  box-shadow: 0 0 0 2px #FDFBF7; /* spacing from line */
 }
 
-.process-item:hover .process-dot {
-  background: #da6d3d;
-  box-shadow: 0 0 8px rgba(160, 76, 40, 0.6);
+.timeline-dot::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #8B5E3C;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
-/* Card */
+.timeline-connector {
+  width: 40px; /* Length of horizontal line to card */
+  height: 2px;
+  background: #8B5E3C;
+}
+
+/* Card Styling */
 .process-card {
-  background: rgba(255, 255, 255, 0.6);
-  padding: 1.2rem 1.4rem;
-  border-radius: 12px;
-  max-width: 520px;
-  transition: transform 0.25s ease;
-  transform-origin: center;
+  background: #FFF;
+  border: 1px solid rgba(139, 94, 60, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(139, 94, 60, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  position: relative;
+  margin-left: 30px; /* Space for connector */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .process-card:hover {
-  animation: handmade-shake 0.35s ease-in-out;
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(139, 94, 60, 0.15);
 }
 
-/* TEXT */
-.process-card h4 {
-  font-size: 1.2rem;
+.process-icon-wrapper {
+  background: transparent;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: none;
+}
+
+.process-icon-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 0;
+}
+
+.process-content {
+  flex: 1;
+}
+
+.process-content h4 {
+  font-family: var(--font-playfair), serif;
+  font-size: 1.25rem;
+  color: #5A3A22;
+  margin-bottom: 0.5rem;
   font-weight: 600;
-  margin-bottom: 0.4rem;
-  color: #5a3a22;
 }
 
-.process-card p {
-  font-size: 0.9rem;
+.process-content p {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.95rem;
+  color: #6B5D52;
   line-height: 1.6;
-  color: #7a563b;
+  margin: 0;
 }
 
-/* Shake keyframes (very subtle) */
-@keyframes handmade-shake {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(0.6deg); }
-  50% { transform: rotate(-0.6deg); }
-  75% { transform: rotate(0.4deg); }
-  100% { transform: rotate(0deg); }
-}
-
-/* Mobile */
+/* Mobile Responsiveness */
 @media (max-width: 768px) {
-  .process-item {
-    gap: 1.5rem;
+  .process-timeline-container {
+    padding-left: 20px;
   }
-
-  .process-timeline::before {
-    left: 10px;
+  
+  .process-timeline-line {
+    left: 20px;
+  }
+  
+  .timeline-marker {
+    left: -7px;
+  }
+  
+  .timeline-connector {
+    width: 20px;
+  }
+  
+  .process-card {
+    flex-direction: column;
+    text-align: center;
+    margin-left: 15px;
+    padding: 1.2rem;
+    gap: 1rem;
+  }
+  
+  .process-icon-wrapper {
+    margin: 0 auto;
+  }
+  
+  .process-icon-img {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .process-header h2 {
+    font-size: 2rem;
+  }
+  
+  .process-header h3 {
+    font-size: 1.5rem;
   }
 }

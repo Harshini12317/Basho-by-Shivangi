@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useRef, useState } from 'react'
 import './corporate.css'
-import { FiBriefcase, FiPackage, FiTruck, FiGift, FiMapPin, FiMail, FiPhone, FiChevronRight } from 'react-icons/fi'
+import { FiBriefcase, FiPackage, FiTruck, FiGift, FiMapPin, FiMail, FiPhone, FiChevronRight, FiChevronDown } from 'react-icons/fi'
 import { colors } from '@/constants/colors'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
@@ -78,14 +78,15 @@ export default function CorporatePage() {
       `}</style>
       <section className="corp-hero-section">
         <div className="corp-hero-bg"></div>
-        <div className="container mx-auto px-6 relative z-10 py-20 md:py-32">
+        <div className="container mx-auto px-6 relative z-10 py-16 md:py-24">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="flex justify-center mb-6">
-              <img src="/images/peak-removebg-preview (1).png" alt="Brand symbol" className="w-32 h-32 md:w-40 md:h-40 object-contain" />
+            <div className="corp-peak-wrap">
+              <img src="/images/peak-removebg-preview (1).png" alt="Brand symbol" className="corp-peak-image" />
             </div>
             <h1 className="corp-title-3d">Corporate Artistry</h1>
-            <p className="corp-subtitle-premium">Handcrafted excellence for your brand&apos;s most meaningful connections. Timeless pottery for modern enterprises.</p>
-            <div className="mt-12 flex flex-wrap justify-center gap-6">
+            <div className="corp-divider"></div>
+            <p className="corp-subtitle-premium">Custom handcrafted pottery for corporate gifting, branding & experiences.</p>
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
               <button 
                 onClick={() => document.getElementById('inquiry')?.scrollIntoView({ behavior: 'smooth' })}
                 className="corp-btn-glow"
@@ -98,6 +99,9 @@ export default function CorporatePage() {
               >
                 Our Process
               </button>
+            </div>
+            <div className="corp-chevron">
+              <FiChevronDown />
             </div>
           </div>
         </div>

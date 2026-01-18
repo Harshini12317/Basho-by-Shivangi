@@ -337,8 +337,8 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
               <h1 className="nav-title px-4">Discover the Art of Clay</h1>
               <p className="nav-subtitle">Hands‑on pottery workshops for beginners & creators</p>
               <div className="mt-3 flex justify-center gap-3">
-                <a href="#workshops" className="px-4 py-2 rounded-full bg-[#8E5022] text-white shadow-md hover:bg-[#652810] transition-colors">Workshops</a>
-                <a href="/contact" className="px-4 py-2 rounded-full bg-white text-[#3d2b1f] ring-1 ring-[#EDD8B4] hover:bg-[#fffaf3] transition-colors">Experience</a>
+                <a href="#workshops" className="px-4 py-2 rounded-full bg-[#2F6F5A] text-white shadow-md hover:bg-[#265D4C] transition-colors">Workshops</a>
+                <a href="#events" className="px-4 py-2 rounded-full bg-white text-[#3d2b1f] ring-1 ring-[#EDD8B4] hover:bg-[#fffaf3] transition-colors">Experience</a>
               </div>
             </div>
           </div>
@@ -487,11 +487,11 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
           {experiences.length > 0 || events.length > 0 ? (
             <>
               {experiences.map((experience, index) => (
-                <div key={`exp-${index}`} className="grid md:grid-cols-2 items-center gap-8 mb-16">
-                  <div className="flex justify-center md:justify-start group cursor-pointer bg-white rounded-2xl p-2 ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">
-                    <img src={experience.image} alt={experience.title} className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
+                <div key={`exp-${index}`} className="grid md:grid-cols-2 items-stretch gap-8 mb-16">
+                  <div className="flex justify-center md:justify-start items-center group cursor-pointer bg-white rounded-2xl p-2 ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md h-[360px] md:h-[420px]">
+                    <img src={experience.image} alt={experience.title} className="max-h-full w-auto object-contain rounded-xl transition-all group-hover:shadow-md" />
                   </div>
-                  <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
+                  <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md h-[360px] md:h-[420px] flex flex-col justify-center">
                     <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">{experience.title}</div>
                     <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
                     <p className="leading-relaxed max-w-md md:max-w-lg">
@@ -502,17 +502,17 @@ export default function WorkshopList({ workshops: initialWorkshops }: { workshop
                 </div>
               ))}
               {events.map((event, index) => (
-                <div key={`event-${event._id}`} className="grid md:grid-cols-2 items-center gap-8 mb-16">
-                  <div className="flex justify-center md:justify-start group cursor-pointer bg-white rounded-2xl p-2 ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md">
+                <div key={`event-${event._id}`} className="grid md:grid-cols-2 items-stretch gap-8 mb-16">
+                  <div className="flex justify-center md:justify-start items-center group cursor-pointer bg-white rounded-2xl p-2 ring-1 ring-[#E2C48D] shadow-sm hover:shadow-md h-[360px] md:h-[420px]">
                     {event.images.length > 0 ? (
-                      <img src={event.images[0]} alt={event.title} className="w-[360px] md:w-[480px] h-auto object-contain rounded-xl transition-all group-hover:scale-105 group-hover:shadow-md hover:scale-105 active:scale-105" />
+                      <img src={event.images[0]} alt={event.title} className="max-h-full w-auto object-contain rounded-xl transition-all group-hover:shadow-md" />
                     ) : (
-                      <div className="w-[360px] md:w-[480px] h-[300px] bg-gray-200 rounded-xl flex items-center justify-center">
+                      <div className="w-full h-full bg-gray-200 rounded-xl flex items-center justify-center">
                         <p className="text-gray-500">No image</p>
                       </div>
                     )}
                   </div>
-                  <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md">
+                  <div className="bg-[#FFF8F2] text-slate-800 text-base md:text-lg px-4 md:px-6 py-5 rounded-2xl ring-1 ring-[#E2C48D] shadow-sm text-left md:text-left transition-shadow hover:shadow-md h-[360px] md:h-[420px] flex flex-col justify-center">
                     <div className="text-[12px] md:text-sm font-semibold uppercase tracking-wide mb-2 text-[#6A2424]">{event.title}</div>
                     <div className="h-1 w-12 bg-[#E76F51] rounded-full mb-4"></div>
                     {event.locationLink ? (

@@ -68,6 +68,8 @@ export default function AboutJapaneseCulture() {
     <section className="japanese-culture-section">
       <div className="culture-container">
         <h2>Our Philosophy</h2>
+        <p className="philosophy-subtitle">The principles that guide every form we shape.</p>
+        <div className="philosophy-divider"></div>
         
         <div className="philosophy-grid">
           {philosophies.map((item, index) => (
